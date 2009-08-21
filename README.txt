@@ -4,7 +4,7 @@ have. So I created an auto-installer for my own purposes.
 
 Now I only need to use bash or zsh to run:
 
-sh <(curl http://www.kkovacs.hu/etc/kkrc)
+sh <(curl http://github.com/kkovacs/kkrc.git/kkrc)
 
 and a shell script gets downloaded and executed, that will discover the
 system's operating system (OS X, Freebsd or Linux (NOTE: nowadays I use only

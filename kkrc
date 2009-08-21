@@ -1,0 +1,136 @@
+#!/bin/sh
+
+# Detect VIM rc-path. This makes a mess of the screen, so we do it first
+vim -c 'let @r=$VIM' -c 'normal "rp' -c 'w /tmp/vim_proof' -c 'qa!'
+
+# Start
+clear
+echo "=============================================="
+echo "Welcome to KKovacs's rc file installer script!"
+echo "=============================================="
+echo
+
+# Detect VIM rc-path
+if [ -e /tmp/vim_proof ]; then
+	vimpath=`cat /tmp/vim_proof`/
+	rm /tmp/vim_proof
+	echo "VIM said your vimrc path is '$vimpath'."
+else
+	echo "I can not detect your VIM rc path."
+	exit 1;
+fi
+
+# ZSH uses a hardcoded /etc/zshrc file
+zshpath=/etc/
+echo "Zshrc path is '$zshpath'."
+
+# Detect system, set up what is needed
+sys=`uname -s`
+if [ $sys = 'FreeBSD' ]; then
+	echo "Your system looks like a FreeBSD to me."
+	screenbinary=`whereis -bq screen`
+elif [ $sys = 'Linux' ]; then
+	echo "Your system looks like a Linux to me."
+	echo "Making an educated guess about your screenrc path."
+	screenpath=/etc/
+elif [ $sys = 'Darwin' ]; then
+	echo "Your system looks like an OS X to me."
+	screenbinary=`whereis screen`
+elif [ $sys = 'OpenBSD' ]; then
+	echo "Your system looks like an OpenBSD to me."
+	screenbinary=`whereis screen`
+else
+	echo "I can't recognize your system '$sys'. Sorry."
+	exit 1
+fi
+
+# GNU screen can be dissected by "strings"
+if [ -z "$screenpath" ]; then
+	echo "Dissecting strings from $screenbinary..."
+	screenpath=`strings $screenbinary | grep '^/.*etc' | sed -e 's/screenrc$//'`
+fi
+if [ ! -z "$screenpath" -a -d $screenpath ]; then
+	echo "Your screenrc path is '$screenpath'."
+else
+	echo "I can not find out your screen's rc path."
+	exit 1
+fi
+
+# We need CURL and AWK to function
+curl_proof=`curl --help | grep ascii | wc -l`
+if [ $curl_proof -lt 1 ]; then
+	echo "Oops, you don't seem to have CURL installed."
+	exit 1
+else
+	echo "You have CURL, it's ok."
+fi
+awk_proof=`awk 'BEGIN { print 2+3; }' </dev/null`
+if [ $awk_proof -ne 5 ]; then
+	echo "Oops, you don't seem to have AWK installed."
+	exit 1
+else
+	echo "You have AWK, it's ok."
+fi
+
+# This is the function that installs rc files
+installrc() {
+path=$1
+rc=$2
+file=${path}$rc
+
+echo "======== $rc ========"
+
+echo "Your $file... "
+if [ -f $file ]; then
+	echo "...exists... "
+	if [ -w $file ]; then
+		echo "...and is WRITABLE!"
+	else
+		echo "...but is NOT writable for you."
+		file=~/.$rc
+	fi
+else
+	echo "...does not exist. We will see if you have the rights to create one... "
+	touch $file;
+	if [ -w $file ]; then
+		echo "...and yes you have!"
+	else
+		echo "...and you don't."
+		file=~/.$rc
+	fi
+fi
+
+if [ -e $file ]; then
+	echo "Looking for my past work in $file..."
+	kkrc_count=`grep "KKRC" $file | wc -l`
+	if [ $kkrc_count -ne 2 ]; then
+		echo "I think I haven't been here before."
+	else
+		echo "Oh, I've been here before!"
+	fi
+fi
+
+echo
+echo "Looks like we will work on $file ."
+
+if [ -e $file ]; then
+	echo "Making a backup to $file.backup-before-kkrc..."
+	cp $file $file.backup-before-kkrc
+	if [ ! -e $file.backup-before-kkrc ]; then
+		echo "I can not make a backup of the file... I better give up now before something bad happens!"
+		exit 1;
+	fi
+	echo "Cutting my previous work..."
+	cat $file.backup-before-kkrc | awk 'BEGIN{cut=0;} /KKRC START/{cut=1;} {if (cut==0) print} /KKRC END/{cut=0;}' >$file
+fi
+echo "Downloading and appending snippet..."
+curl -s http://github.com/kkovacs/kkrc.git/$rc >>$file
+echo "... and we are done."
+}
+
+# Get to work, but give a chance for a CTRL-C
+echo "Sounds reasonable to you? Shall we start? Hit ENTER if yes."
+read A
+installrc $screenpath screenrc;
+installrc $zshpath zshrc;
+installrc $vimpath vimrc;
