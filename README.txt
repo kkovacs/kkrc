@@ -4,7 +4,7 @@ have. So I created an auto-installer for my own purposes.
 
 Now I only need to use bash or zsh to run:
 
-sh <(curl http://github.com/kkovacs/kkrc/raw/master/kkrc)
+sh <(curl https://github.com/kkovacs/kkrc/raw/master/kkrc)
 
 and a shell script gets downloaded and executed, that will discover the
 system's operating system (OS X, Freebsd or Linux (NOTE: nowadays I use only
@@ -26,7 +26,7 @@ updated) on servers where I have a normal (non-root) user account.
 Your output should look like this (example):
 ------------------------------------------------------------------------------
 
-Mac-mini-G4# sh <(curl "http://github.com/kkovacs/kkrc/raw/master/kkrc")
+Mac-mini-G4# sh <(curl "https://github.com/kkovacs/kkrc/raw/master/kkrc")
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100  3562  100  3562    0     0   2183      0  0:00:01  0:00:01 --:--:--  8994
