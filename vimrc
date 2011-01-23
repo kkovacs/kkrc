@@ -34,6 +34,9 @@ map <c-k> k<c-y>
 " I rarely edit only one big file nowadays, so I like to move to netrw easily
 map - :Explore<cr>
 
+" My little calculator
+map gc viW"zyA = <esc>"=<c-r>z<cr>p
+
 " GUI, colors, other extras
 " colorscheme delek
 " set guifont=Courier:h12
