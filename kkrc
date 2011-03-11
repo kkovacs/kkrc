@@ -44,7 +44,7 @@ fi
 if [ -f /etc/zshrc ]; then
 	zshpath=/etc/
 elif [ -f /etc/zsh/zshrc ]; then
-	zshpath=/etc/zsh
+	zshpath=/etc/zsh/
 else
 	echo "Can't find your zshrc."
 	exit 1
