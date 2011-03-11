@@ -20,10 +20,6 @@ else
 	exit 1;
 fi
 
-# ZSH uses a hardcoded /etc/zshrc file
-zshpath=/etc/
-echo "Zshrc path is '$zshpath'."
-
 # Detect system, set up what is needed
 sys=`uname -s`
 if [ $sys = 'FreeBSD' ]; then
@@ -43,6 +39,17 @@ else
 	echo "I can't recognize your system '$sys'. Sorry."
 	exit 1
 fi
+
+# Let's find the zshrc
+if [ -f /etc/zshrc ]; then
+	zshpath=/etc/
+elif [ -f /etc/zsh/zshrc ]; then
+	zshpath=/etc/zsh
+else
+	echo "Can't find your zshrc."
+	exit 1
+fi
+echo "Zshrc path is '$zshpath'."
 
 # GNU screen can be dissected by "strings"
 if [ -z "$screenpath" ]; then
