@@ -16,6 +16,9 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z} r:|[._-]=* r:|=*' 'm:{a
 autoload -Uz compinit
 compinit
 
+# I must have VI keys
+bindkey -v
+
 # Set up some handy aliases
 alias s="screen -xR"
 
