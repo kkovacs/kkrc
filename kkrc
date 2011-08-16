@@ -131,7 +131,7 @@ if [ -e $file ]; then
 	cat $file.backup-before-kkrc | awk 'BEGIN{cut=0;} /KKRC START/{cut=1;} {if (cut==0) print} /KKRC END/{cut=0;}' >$file
 fi
 echo "Downloading and appending snippet..."
-curl -s https://github.com/kkovacs/kkrc/raw/master/$rc >>$file
+curl -s https://raw.github.com/kkovacs/kkrc/raw/master/$rc >>$file
 echo "... and we are done."
 }
 
