@@ -6,11 +6,18 @@ echo "KKovacs's rc file installer script"
 echo "=================================="
 echo
 
+echo "Updating from git..."
+cd ~/.kkrc
+git fetch
+git checkout
+echo "...done."
+echo
+
 installrc() {
 file=$1
 softlink=$2
 
-echo "=== $file ==="
+echo "Installing $file..."
 
 if [ -L $softlink ]; then
 	echo "OK: Your $softlink is already a soft link, nice!"
