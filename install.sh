@@ -11,6 +11,7 @@ cd ~/.kkrc
 git pull
 echo "...done."
 echo
+# XXX if install.sh itself was updated, it should re-start
 
 installrc() {
 file=$1
