@@ -1,6 +1,4 @@
 
-# KKRC START - do not modify code between the KKRC markers, it may be overwritten automatically!
-
 # Remove some stupid / dangerous key bindings, and override some bad defaults
 
 #defflow on # will force screen to process ^S/^Q
@@ -32,4 +30,4 @@ caption always "%{kW}%?%-Lw%?%{bw}%n*%f %t%?(%u)%?%{kW}%?%+Lw%? %= %{= Wk} %{= g
 #hardstatus alwayslastline
 #bindkey -k k9 windowlist -b # Map F9 to screen selection
 
-# KKRC END
+# Local commands:

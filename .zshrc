@@ -1,6 +1,4 @@
 
-# KKRC START - do not modify code between the KKRC markers, it may be overwritten automatically!
-
 # Set up the right-side prompt to display the current working directory
 export RPROMPT='%~'
 # Set up the left-side prompt to display "username@machine [background job count]# "
@@ -22,4 +20,4 @@ bindkey -v
 # Set up some handy aliases
 alias s="screen -xR"
 
-# KKRC END
+# Local commands:
