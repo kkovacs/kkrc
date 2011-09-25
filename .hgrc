@@ -1,0 +1,28 @@
+[paths]
+#default = ssh://user@server/path
+
+[ui]
+#username = kkovacs <kkovacs@kkovacs.eu>
+verbose = True
+
+[diff]
+git = True
+
+[pager]
+pager = LESS='FSRX' less
+attend = annotate, cat, diff, status, export, glog, log, qdiff
+
+[extensions]
+graphlog=
+mq=
+rebase= 
+color=
+convert=
+pager=
+purge=
+record=
+transplant=
+
+# Get hg-git from http://hg-git.github.com/
+#hgext.bookmarks=
+#hggit=
