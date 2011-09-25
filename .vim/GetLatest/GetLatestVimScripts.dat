@@ -1,0 +1,14 @@
+ScriptID SourceID Filename
+--------------------------
+642 1 :AutoInstall: getscript.vim
+1075 1 :AutoInstall: netrw.vim
+1502 1 :AutoInstall: vimball.vim
+2010 1 :AutoInstall: sessionman.vim
+1896 1 :AutoInstall: ragtag.zip
+273 1 :AutoInstall: taglist.vim
+1984 1 :AutoInstall: vim-fuzzyfinder.zip
+3252 1 :AutoInstall: vim-l9.zip
+1590 1 :AutoInstall: unimpaired.zip
+40 1 :AutoInstall: DrawIt.vim
+2390 1 :AutoInstall: CSApprox.zip
+
