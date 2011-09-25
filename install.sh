@@ -1,17 +1,6 @@
 #!/bin/sh
 
-# Start
-echo "=================================="
-echo "KKovacs's rc file installer script"
-echo "=================================="
-echo
-
-echo "Updating from git..."
-cd ~/.kkrc
-git pull
-echo "...done."
-echo
-# XXX if install.sh itself was updated, it should re-start
+# Installs the softlinks in place.
 
 installrc() {
 file=$1
