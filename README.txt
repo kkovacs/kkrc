@@ -10,3 +10,7 @@ To install:
 
 git clone https://github.com/kkovacs/kkrc/ ~/.kkrc; ~/.kkrc/install.sh
 
+After that, you can always update with:
+
+~/.kkrc/update.sh
+
