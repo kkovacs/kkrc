@@ -8,8 +8,7 @@ echo
 
 echo "Updating from git..."
 cd ~/.kkrc
-git fetch
-git checkout
+git pull
 echo "...done."
 echo
 
