@@ -30,3 +30,4 @@ installrc .zshrc ~/.zshrc
 installrc .screenrc ~/.screenrc
 installrc .bash_profile ~/.bash_profile
 installrc .hgrc ~/.hgrc
+installrc .tmux.conf ~/.tmux.conf

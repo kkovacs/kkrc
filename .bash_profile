@@ -3,3 +3,6 @@
 
 # I need VI keys
 set -o vi
+
+# Screen quickstart
+alias s="screen -UxRR"
