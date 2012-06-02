@@ -24,6 +24,10 @@ set wildmode=list:longest
 " Always have a status line
 set laststatus=2
 
+" *** netrw ***
+" p and P should split vertically, since I'm widescreen
+let g:netrw_preview=1
+
 " *** Mappings ***
 
 " I like to scroll the screen and advance the cursor at the same time
