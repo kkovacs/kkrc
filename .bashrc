@@ -14,3 +14,5 @@ if [ $? -eq 0 ]; then
 else
 	echo "KKRC: No zsh found, you're on bash."
 fi
+
+# Local commands:

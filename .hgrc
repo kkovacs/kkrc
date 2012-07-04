@@ -2,7 +2,7 @@
 #default = ssh://user@server/path
 
 [ui]
-#username = kkovacs <kkovacs@kkovacs.eu>
+#username = KKovacs <kkovacs@kkovacs.eu>
 verbose = True
 
 [diff]
@@ -26,3 +26,5 @@ transplant=
 # Get hg-git from http://hg-git.github.com/
 #hgext.bookmarks=
 #hggit=
+
+# Local config:
