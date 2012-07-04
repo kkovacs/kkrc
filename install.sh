@@ -28,6 +28,6 @@ installrc .vimrc ~/.vimrc
 installrc .vim ~/.vim
 installrc .zshrc ~/.zshrc
 installrc .screenrc ~/.screenrc
-installrc .bash_profile ~/.bash_profile
+installrc .bashrc ~/.bashrc
 installrc .hgrc ~/.hgrc
 installrc .tmux.conf ~/.tmux.conf
