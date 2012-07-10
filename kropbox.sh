@@ -3,6 +3,15 @@
 #
 # Kropbox is "KKovacs's Dropbox", an extremely simple git-based
 #
+# HOW TO USE:
+# (0) install 'git' and 'screen' if needed.
+# (1) create git repos that have remotes, under $KROPBOXDIR.
+# (2) put a ".kropbox" file in them. (touch .kropbox)
+# (2.5) if using SSH, add your ssh keys to ssh-agent using ssh-add
+# (3) run ./.kkrc/kropbox.sh (maybe even from your .zshrc) to start the "daemons".
+#
+# When the "daemon(s)" are already running, you can connect to it using: "kropbox.sh attach XXX"
+# or kill it using: "kropbox.sh kill XXX", where XXX is the name of your kropbox directory.
 
 KROPBOXDIR=~
 SLEEPTIME=60
@@ -31,14 +40,14 @@ if [ $# -eq 0 ]; then
 			echo "[kb-$SUBDIR] running, OK."
 		else
 			echo "[kb-$SUBDIR] not running, starting it. (You can attach it with '$0 attach $SUBDIR')"
-			screen -dmS kb-$SUBDIR ~/.kkrc/kropbox.sh sync $SUBDIR
+			screen -dmS kb-$SUBDIR ~/.kkrc/kropbox.sh $SUBDIR
 		fi
 	done
 fi
 
-# "sync" command means it's supposed to do the sync
-if [ $# -eq 2 -a x$1 = "xsync" ]; then 
-	SUBDIR=$2
+# One argument means it's supposed to do the sync
+if [ $# -eq 1 ]; then 
+	SUBDIR=$1
 	# Sanity check
 	if [ ! -d $SUBDIR ]; then
 		echo "$SUBDIR is not a directory!"
