@@ -20,4 +20,7 @@ bindkey -v
 # Set up some handy aliases
 alias s="screen -xR"
 
+# Autostart kropbox?
+# ~/.kkrc/kropbox.sh
+
 # Local commands:
