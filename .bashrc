@@ -13,6 +13,10 @@ export PS1="\u@\h \033[00;01m\w\033[00m [\j]\$ "
 # Or, if ANSI is problematic:
 #export PS1="\u@\h \w [\j]\$ "
 
+# Set up some necessary environment variables
+export EDITOR=vim
+export LC_CTYPE="en_US.UTF-8"
+
 # Screen quickstart, the most important alias
 alias s="screen -UxRR"
 
