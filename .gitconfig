@@ -1,0 +1,19 @@
+[core]
+	excludesfile = ~/.kkrc/.gitignore
+
+[color]
+	ui = auto
+
+[diff]
+	rename = copy
+
+[alias]
+	st = status
+	ci = commit
+	co = checkout
+	br = branch
+	d = diff
+	l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+	ll = log --all --graph --decorate --pretty=oneline --abbrev-commit
+	lll = log --all --graph --decorate --pretty=format:\"%h%Cred A:%an%Cblue C:%cn%Creset \"%s\"%n\" --abbrev-commit
+

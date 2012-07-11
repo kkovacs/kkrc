@@ -1,1 +1,103 @@
 .vim/.netrwhist
+
+# Windows
+Thumbs.db
+
+# OS X
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# Vim
+.*.sw[a-z]
+*.un~i
+tags
+*~
+
+# Python
+*.py[cod]
+
+# node-cluster
+/pids
+*.sock
+
+# Compiled source
+*.com
+*.class
+*.dll
+*.exe
+*.out
+*.o
+*.so
+*.lib
+*.lai
+*.la
+*.a
+*.slo
+*.lo
+*.o
+
+# Packages
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.jar
+*.war
+*.ear
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# node.js
+/node_modules
+lib-cov
+*.seed
+*.log
+*.pid
+*.gz
+npm-debug.log
+
+# Rails
+*.rbc
+*.sassc
+.sass-cache
+capybara-*.html
+.rspec
+/.bundle
+/vendor/bundle
+/log/*
+/tmp/*
+/db/*.sqlite3
+/public/system/*
+/coverage/
+/spec/tmp/*
+rerun.txt
+pickle-email-*.html
+
+# PHP composer
+/vendor
+
+# PHP CodeIgniter
+*/config/development
+*/logs/log-*.php
+*/logs/!index.html
+*/cache/*
+*/cache/!index.html
+
+# Erlang
+.eunit
+*.o
+*.beam
+*.plt
