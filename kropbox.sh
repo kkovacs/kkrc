@@ -28,6 +28,13 @@ if [ $? -ne 0 ]; then
 	exit 1;
 fi
 
+# Sanity check: Are there keys in the ssh-agent already?
+STOREDKEYCOUNT=`ssh-add -l | grep -v "has no identities" | wc -l`
+if [ $STOREDKEYCOUNT -lt 1 ]; then
+	echo "No keys in ssh-agent yet -- please run ssh-add!"
+	exit 1
+fi
+
 # If the script was called without arguments, it looks for directories
 if [ $# -eq 0 ]; then 
 	# Work in the given directory
