@@ -11,8 +11,9 @@ export LC_CTYPE="en_US.UTF-8"
 zstyle ':completion:*' completer _expand _complete _match _correct _approximate _prefix
 zstyle ':completion:*' list-colors ''
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z} r:|[._-]=* r:|=*' 'm:{a-zA-Z}={A-Za-z} r:|[._-]=* r:|=*'
-autoload -Uz compinit
+autoload -Uz compinit bashcompinit
 compinit
+bashcompinit
 
 # I must have VI keys
 bindkey -v
