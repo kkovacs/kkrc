@@ -15,6 +15,9 @@ autoload -Uz compinit bashcompinit
 compinit
 bashcompinit
 
+# Zsh options
+setopt autocd auto_pushd pushd_ignore_dups no_nomatch hup
+
 # I must have VI keys
 bindkey -v
 
