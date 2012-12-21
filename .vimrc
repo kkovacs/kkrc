@@ -52,6 +52,11 @@ map <S-D-Left> :tabprevious<cr>
 map <M-D-Right> :tabnext<cr>
 map <M-D-Left> :tabprevious<cr>
 
+" Linux terminal-like clipboard handling
+map <c-s-c> "+y
+map <c-s-v> "+p
+imap <c-s-v> <c-r>+
+
 " A window just the right size
 " :set lines=53
 " :set columns=170
