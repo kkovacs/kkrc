@@ -17,3 +17,5 @@
 	ll = log --all --graph --decorate --pretty=oneline --abbrev-commit
 	lll = log --all --graph --decorate --pretty=format:\"%h%Cred A:%an%Cblue C:%cn%Creset \"%s\"%n\" --abbrev-commit
 
+[push]
+	default = matching
