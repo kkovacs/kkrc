@@ -83,4 +83,5 @@ let g:vim_markdown_folding_disabled=1
 " My full screen
 :map gF :set columns=999 guioptions=-R lines=999 fullscreen<cr>:colorscheme torte<cr>
 
-" Local commands:
+" Put local commands in:
+" ~/.vim/plugin/local.vim
