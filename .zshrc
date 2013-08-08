@@ -37,6 +37,7 @@ bindkey -v
 # Set up some handy aliases
 alias s="screen -xR"
 alias l="ls -lrt"
+alias la="ls -lrtA"
 
 # Colored ls on OS X
 export CLICOLOR=1
@@ -47,6 +48,10 @@ case "$OSTYPE" in
 	"linux-gnu")
 		# Colored ls
 		alias ls="ls --color"
+		alias ll="lsattr"
+		;;
+	"darwin12.0")
+		alias ll="l -@eO"
 		;;
 esac
 
