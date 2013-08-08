@@ -7,24 +7,54 @@ export PROMPT='%n@%m [%j]%# '
 export EDITOR=vim
 export LC_CTYPE="en_US.UTF-8"
 
-# Set up tab completion
-zstyle ':completion:*' completer _expand _complete _match _correct _approximate _prefix
+# The following lines were added by compinstall
+
+zstyle ':completion:*' auto-description 'Specify: %d'
+zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
+zstyle ':completion:*' file-sort modification
+zstyle ':completion:*' format 'Completing: %d'
+zstyle ':completion:*' group-name ''
 zstyle ':completion:*' list-colors ''
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z} r:|[._-]=* r:|=*' 'm:{a-zA-Z}={A-Za-z} r:|[._-]=* r:|=*'
-autoload -Uz compinit bashcompinit
+zstyle ':completion:*' list-prompt '%SAt %p: Hit TAB for more, or the character to insert%s'
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]} m:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' prompt 'Errors: %e'
+zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
+
+autoload -Uz compinit
 compinit
+# End of lines added by compinstall
+
+# Bash completion emulation
+autoload -Uz bashcompinit
 bashcompinit
 
 # Zsh options
-setopt autocd auto_pushd pushd_ignore_dups no_nomatch hup
+setopt autocd auto_pushd pushd_ignore_dups no_nomatch hup notify
 
 # I must have VI keys
 bindkey -v
 
 # Set up some handy aliases
 alias s="screen -xR"
+alias l="ls -lrt"
+
+# Colored ls on OS X
+export CLICOLOR=1
+export LSCOLORS=GxFxCxDxBxegedabagaced
+
+# OS-dependent stuff
+case "$OSTYPE" in
+	"linux-gnu")
+		# Colored ls
+		alias ls="ls --color"
+		;;
+esac
+
+# Display screens if any
+screen -ls | grep -v "Sockets"
 
 # Autostart kropbox?
 # ~/.kkrc/kropbox.sh
 
-# Local commands:
+# Local commands
+if [ -e ~/.zshrc.local ]; then . ~/.zshrc.local; fi
