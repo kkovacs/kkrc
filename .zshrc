@@ -51,7 +51,7 @@ case "$OSTYPE" in
 esac
 
 # Display screens if any
-screen -ls | grep -v "Sockets"
+screen -ls | grep -v "Socket"
 
 # Autostart kropbox?
 # ~/.kkrc/kropbox.sh
