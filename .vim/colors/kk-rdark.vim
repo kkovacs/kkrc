@@ -13,6 +13,7 @@
 " Changelog:
 "   0.5 - fixed the Pmenu colors
 "   0.6 - added SignColumn colors
+"   ...then modified by KKovacs for his own use.
 
 set background=dark
 
@@ -94,6 +95,9 @@ hi Type guifg=#e3e7df gui=none
 hi Keyword guifg=#eeeeec
 hi Special guifg=#888a85
 hi Error guifg=#eeeeec guibg=#cc0000
+
+" Cursor Column (for python)
+hi CursorColumn guibg=#2c3032
 
 " PHP
 hi phpRegionDelimiter guifg=#ad7fa8

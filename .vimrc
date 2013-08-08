@@ -67,4 +67,20 @@ imap <c-s-v> <c-r>+
 " My little calculator
 map gc viW"zyA = <esc>"=<c-r>z<cr>p
 
+set relativenumber
+set ruler
+colorscheme desert
+
+if has("gui_running")
+    colorscheme kk-rdark
+    set guioptions=egmrt
+endif
+
+set nocursorline
+
+let g:vim_markdown_folding_disabled=1
+
+" My full screen
+:map gF :set columns=999 guioptions=-R lines=999 fullscreen<cr>:colorscheme torte<cr>
+
 " Local commands:
