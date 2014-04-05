@@ -13,9 +13,13 @@
 	co = checkout
 	br = branch
 	d = diff
-	l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-	ll = log --all --graph --decorate --pretty=oneline --abbrev-commit
-	lll = log --all --graph --decorate --pretty=format:\"%h%Cred A:%an%Cblue C:%cn%Creset \"%s\"%n\" --abbrev-commit
+        l = log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative
+        # Or, before 1.8.3 (Damn, CentOS, it's 2014!): l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+        ll = log --all --graph --decorate --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset %n' --abbrev-commit --date=relative
+        glog = log --all --graph --decorate --pretty=oneline --abbrev-commit
 
 [push]
 	default = matching
+[user]
+	email = kkovacs@kkovacs.eu
+	name = Kristof Kovacs
