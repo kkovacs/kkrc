@@ -32,3 +32,5 @@ installrc .bashrc ~/.bashrc
 installrc .hgrc ~/.hgrc
 installrc .tmux.conf ~/.tmux.conf
 installrc .gitconfig ~/.gitconfig
+
+git submodule update --init
