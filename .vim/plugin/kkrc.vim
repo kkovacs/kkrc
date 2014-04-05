@@ -48,7 +48,7 @@ map <c-tab> :tabnext<cr>
 map <s-c-tab> :tabprevious<cr>
 
 " My little calculator
-map gc viW"zyA = <esc>"=<c-r>z<cr>p
+map <leader>c viW"zyA = <esc>"=<c-r>z<cr>p
 
 " GUI, colors, other extras
 colorscheme desert
@@ -60,4 +60,7 @@ endif
 
 " No automatic folding for .md files
 let g:vim_markdown_folding_disabled=1
+
+" Default list style is tree
+let g:netrw_liststyle=4
 
