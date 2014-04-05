@@ -25,6 +25,8 @@ set laststatus=2
 set ruler
 " No cursor line
 set nocursorline
+" So the stronger encryption never gets frogotten
+set cryptmethod=blowfish
 
 " Allow filetype plugin loading
 filetype plugin indent on
