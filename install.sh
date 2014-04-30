@@ -33,4 +33,5 @@ installrc .hgrc ~/.hgrc
 installrc .tmux.conf ~/.tmux.conf
 installrc .gitconfig ~/.gitconfig
 
+cd ~/.kkrc
 git submodule update --init
