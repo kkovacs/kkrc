@@ -32,6 +32,7 @@ installrc .bashrc ~/.bashrc
 installrc .hgrc ~/.hgrc
 installrc .tmux.conf ~/.tmux.conf
 installrc .gitconfig ~/.gitconfig
+installrc .Xmodmap ~/.Xmodmap
 
 cd ~/.kkrc
 git submodule update --init
