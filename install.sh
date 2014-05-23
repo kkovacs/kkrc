@@ -1,7 +1,15 @@
 #!/bin/sh
 
-# Installs the softlinks in place.
+# .bashrc is a special case, since it usually exists. If it's not ours,
+# rename it to .bashrc.orig
+if [ -L ~/.bashrc ]; then
+	echo "OK: No need to remove original .bashrc\n"
+else
+	echo "INFO: Renaming .bashrc to .bashrc.orig\n"
+	mv ~/.bashrc ~/.bashrc.orig
+fi
 
+# Installs the softlinks in place.
 installrc() {
 file=$1
 softlink=$2
@@ -21,7 +29,6 @@ fi
 
 # Just for pretty formatting
 echo
-
 }
 
 installrc .vimrc ~/.vimrc
@@ -35,5 +42,6 @@ installrc .gitconfig ~/.gitconfig
 installrc .Xmodmap ~/.Xmodmap
 installrc .i3 ~/.i3
 
+# Update git submodules
 cd ~/.kkrc
 git submodule update --init

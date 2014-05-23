@@ -4,6 +4,10 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
+# If there was a .bashrc we moved away at install, run that first
+# (so we can override)
+if [ -e ~/.bashrc.orig ]; then . ~/.bashrc.orig; fi
+
 # I need VI keys
 set -o vi
 
@@ -17,8 +21,10 @@ export PS1="\u@\h \033[00;01m\w\033[00m [\j]\$ "
 export EDITOR=vim
 export LC_CTYPE="en_US.UTF-8"
 
-# Screen quickstart, the most important alias
-alias s="screen -UxRR"
+# Set up some handy aliases
+alias s="screen -xR"
+alias l="ls -lrt"
+alias la="ls -lrtA"
 
 # Do we have ZSH? Use it if possible
 ZSH=`type -P zsh`
@@ -28,4 +34,5 @@ else
 	echo "KKRC: No zsh found, you're on bash."
 fi
 
-# Local commands:
+# Local commands
+if [ -e ~/.bashrc.local ]; then . ~/.bashrc.local; fi
