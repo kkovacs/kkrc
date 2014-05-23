@@ -20,7 +20,7 @@ bindsym $mod2+Return exec i3-sensible-terminal
 bindsym $mod+g exec gvim
 
 # kill focused window
-bindsym $mod+Shift+q kill
+bindsym $mod+q kill
 
 # start dmenu (a program launcher)
 bindsym $mod+space exec dmenu_run
@@ -60,8 +60,8 @@ bindsym $mod+v split v
 bindsym $mod+f fullscreen
 
 # change container layout (stacked, tabbed, toggle split)
-bindsym $mod+q layout stacking
-bindsym $mod+w layout tabbed
+bindsym $mod+w layout stacking
+bindsym $mod+t layout tabbed
 bindsym $mod+dead_acute layout toggle split
 
 # toggle tiling / floating
@@ -73,7 +73,7 @@ bindsym $mod2+f focus mode_toggle
 # focus the parent container
 bindsym $mod+a focus parent
 # focus the child container
-bindsym $mod+z focus child
+bindsym $mod+d focus child
 
 # switch to workspace
 bindsym F1 workspace 1
@@ -161,12 +161,11 @@ mode "reorg" {
 
 	# Parent and child
 	bindsym a focus parent
-	bindsym z focus child
+	bindsym d focus child
 
         # back to normal: Enter or Escape
         bindsym Return mode "default"
         bindsym Escape mode "default"
-	bindsym $alt+Escape mode "default"
 	bindsym $mod+alt+Escape mode "default"
 
 	# split in horizontal orientation
@@ -179,14 +178,13 @@ mode "reorg" {
 	bindsym f fullscreen
 
 	# change container layout (stacked, tabbed, toggle split)
-	bindsym q layout stacking
-	bindsym w layout tabbed
+	bindsym w layout stacking
+	bindsym t layout tabbed
 	bindsym e layout toggle split
 
 	# toggle tiling / floating
 	bindsym Shift+f floating toggle
 }
-bindsym $alt+Escape mode "reorg"
 bindsym $mod+Escape mode "reorg"
 
 # Start i3bar to display a workspace bar (plus the system information i3status
@@ -197,3 +195,6 @@ bar {
 
 # Hack to keep Mode_switch out of Mod4.
 exec "sleep 2; xmodmap -e 'remove Mod4 = Mode_switch'"
+
+# Owncloud
+exec "owncloud"
