@@ -1,0 +1,199 @@
+# i3 config file (v4)
+
+# My main key for most used functions - but also used in my dead-keys setup
+set $my Mode_switch+Mod1
+# Secondary key
+set $mod Mod5
+# Alt
+set $alt Mod1
+
+# Font for window titles.
+font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+# font pango:DejaVu Sans Mono 100
+
+# Use Mouse+Alt to drag floating windows to their wanted position
+floating_modifier $alt
+
+# start a terminal
+bindsym $my+Return exec i3-sensible-terminal
+bindsym $mod+Return exec i3-sensible-terminal
+bindsym $my+g exec gvim
+
+# kill focused window
+bindsym $my+Shift+q kill
+
+# start dmenu (a program launcher)
+bindsym $my+space exec dmenu_run
+
+# There also is the (new) i3-dmenu-desktop which only displays applications
+# shipping a .desktop file. It is a wrapper around dmenu, so you need that
+# installed.
+bindsym $alt+space exec --no-startup-id i3-dmenu-desktop
+
+# change focus
+bindsym $my+h focus left
+bindsym $my+dead_doubleacute focus down
+bindsym $my+k focus up
+bindsym $my+l focus right
+bindsym $my+Left focus left
+bindsym $my+Down focus down
+bindsym $my+Up focus up
+bindsym $my+Right focus right
+
+# move focused window
+bindsym $my+Shift+h move left
+bindsym $my+Shift+dead_doubleacute move down
+bindsym $my+Shift+k move up
+bindsym $my+Shift+l move right
+bindsym $my+Shift+Left move left
+bindsym $my+Shift+Down move down
+bindsym $my+Shift+Up move up
+bindsym $my+Shift+Right move right
+
+# split in horizontal orientation
+bindsym $my+s split h
+
+# split in vertical orientation
+bindsym $my+v split v
+
+# enter fullscreen mode for the focused container
+bindsym $my+f fullscreen
+
+# change container layout (stacked, tabbed, toggle split)
+bindsym $my+q layout stacking
+bindsym $my+w layout tabbed
+bindsym $my+dead_acute layout toggle split
+
+# toggle tiling / floating
+bindsym $my+Shift+f floating toggle
+
+# change focus between tiling / floating windows
+bindsym $mod+f focus mode_toggle
+
+# focus the parent container
+bindsym $my+a focus parent
+# focus the child container
+bindsym $my+z focus child
+
+# switch to workspace
+bindsym F1 workspace 1
+bindsym F2 workspace 2
+bindsym F3 workspace 3
+bindsym F4 workspace 4
+bindsym F5 workspace 5
+bindsym F6 workspace 6
+bindsym F7 workspace 7
+bindsym F8 workspace 8
+bindsym F9 workspace 9
+bindsym F10 workspace 10
+bindsym F11 scratchpad show
+
+# move focused container to workspace
+bindsym $my+F1 move container to workspace 1
+bindsym $my+F2 move container to workspace 2
+bindsym $my+F3 move container to workspace 3
+bindsym $my+F4 move container to workspace 4
+bindsym $my+F5 move container to workspace 5
+bindsym $my+F6 move container to workspace 6
+bindsym $my+F7 move container to workspace 7
+bindsym $my+F8 move container to workspace 8
+bindsym $my+F9 move container to workspace 9
+bindsym $my+F10 move container to workspace 10
+bindsym $my+F11 move scratchpad
+
+bindsym $alt+Tab workspace back_and_forth
+bindsym $my+Tab workspace next
+bindsym $my+Control+Tab workspace prev
+bindsym $my+Shift+Tab workspace prev
+
+# reload the configuration file
+bindsym $mod+Shift+c reload
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+# exit i3 (logs you out of your X session)
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+# resize window (you can also use the mouse for that)
+mode "resize" {
+        # These bindings trigger as soon as you enter the resize mode
+
+        # Pressing left will shrink the window’s width.
+        # Pressing right will grow the window’s width.
+        # Pressing up will shrink the window’s height.
+        # Pressing down will grow the window’s height.
+        bindsym h resize shrink width 10 px or 10 ppt
+        bindsym j resize grow height 10 px or 10 ppt
+        bindsym k resize shrink height 10 px or 10 ppt
+        bindsym l resize grow width 10 px or 10 ppt
+
+        # same bindings, but for the arrow keys
+        bindsym Left resize shrink width 10 px or 10 ppt
+        bindsym Down resize grow height 10 px or 10 ppt
+        bindsym Up resize shrink height 10 px or 10 ppt
+        bindsym Right resize grow width 10 px or 10 ppt
+
+        # back to normal: Enter or Escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+	bindsym $my+r mode "default"
+}
+bindsym $my+r mode "resize"
+
+mode "reorg" {
+	# change focus
+	bindsym h focus left
+	bindsym j focus down
+	bindsym k focus up
+	bindsym l focus right
+	bindsym Left focus left
+	bindsym Down focus down
+	bindsym Up focus up
+	bindsym Right focus right
+	# Move
+	bindsym Shift+h move left
+	bindsym Shift+j move down
+	bindsym Shift+k move up
+	bindsym Shift+l move right
+	bindsym Shift+Left move left
+	bindsym Shift+Down move down
+	bindsym Shift+Up move up
+	bindsym Shift+Right move right
+
+	# Parent and child
+	bindsym a focus parent
+	bindsym z focus child
+
+        # back to normal: Enter or Escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+	bindsym $alt+Escape mode "default"
+	bindsym $my+alt+Escape mode "default"
+
+	# split in horizontal orientation
+	bindsym s split h
+
+	# split in vertical orientation
+	bindsym v split v
+
+	# enter fullscreen mode for the focused container
+	bindsym f fullscreen
+
+	# change container layout (stacked, tabbed, toggle split)
+	bindsym q layout stacking
+	bindsym w layout tabbed
+	bindsym e layout toggle split
+
+	# toggle tiling / floating
+	bindsym Shift+f floating toggle
+}
+bindsym $alt+Escape mode "reorg"
+bindsym $my+Escape mode "reorg"
+
+# Start i3bar to display a workspace bar (plus the system information i3status
+# finds out, if available)
+bar {
+        status_command i3status
+}
+
+# Hack to keep Mode_switch out of Mod4.
+exec "sleep 2; xmodmap -e 'remove Mod4 = Mode_switch'"
