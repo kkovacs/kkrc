@@ -3,7 +3,7 @@
 # My main key for most used functions - but also used in my dead-keys setup
 set $mod Mode_switch+Mod1
 # Secondary key
-set $mod2 Mod5
+set $mod2 Mod3
 # Alt
 set $alt Mod1
 
@@ -17,7 +17,6 @@ floating_modifier $alt
 # start a terminal
 bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod2+Return exec i3-sensible-terminal
-bindsym $mod+g exec gvim
 
 # kill focused window
 bindsym $mod+q kill
@@ -68,8 +67,7 @@ bindsym $mod+dead_acute layout toggle split
 bindsym $mod+Shift+f floating toggle
 
 # change focus between tiling / floating windows
-bindsym $mod2+f focus mode_toggle
-
+bindsym $mod+grave focus mode_toggle
 # focus the parent container
 bindsym $mod+a focus parent
 # focus the child container
@@ -88,17 +86,17 @@ bindsym F9 workspace 9
 bindsym F10 workspace 10
 bindsym F11 scratchpad show
 
-# move focused container to workspace
-bindsym $mod+F1 move container to workspace 1
-bindsym $mod+F2 move container to workspace 2
-bindsym $mod+F3 move container to workspace 3
-bindsym $mod+F4 move container to workspace 4
-bindsym $mod+F5 move container to workspace 5
-bindsym $mod+F6 move container to workspace 6
-bindsym $mod+F7 move container to workspace 7
-bindsym $mod+F8 move container to workspace 8
-bindsym $mod+F9 move container to workspace 9
-bindsym $mod+F10 move container to workspace 10
+# move focused container to workspace, and switch to workspace
+bindsym $mod+F1 move container to workspace 1; workspace 1
+bindsym $mod+F2 move container to workspace 2; workspace 2
+bindsym $mod+F3 move container to workspace 3; workspace 3
+bindsym $mod+F4 move container to workspace 4; workspace 4
+bindsym $mod+F5 move container to workspace 5; workspace 5
+bindsym $mod+F6 move container to workspace 6; workspace 6
+bindsym $mod+F7 move container to workspace 7; workspace 7
+bindsym $mod+F8 move container to workspace 8; workspace 8
+bindsym $mod+F9 move container to workspace 9; workspace 9
+bindsym $mod+F10 move container to workspace 10; workspace 10
 bindsym $mod+F11 move scratchpad
 
 bindsym $alt+Tab workspace back_and_forth
@@ -193,8 +191,24 @@ bar {
         status_command i3status
 }
 
+# i3lock key
+bindsym $mod+BackSpace exec "i3lock -i ~/Pictures/i3lock.png"
+
+# i3-input for manual i3 commands
+bindsym $mod+i exec i3-input
+
+# Quickstart commands
+bindsym $mod2+v exec gvim
+bindsym $mod2+m exec midori
+bindsym $mod2+f exec firefox
+bindsym $mod2+t exec i3-sensible-terminal
+bindsym $mod2+p exec pcmanfm
+
 # Hack to keep Mode_switch out of Mod4.
 exec "sleep 2; xmodmap -e 'remove Mod4 = Mode_switch'"
 
 # Owncloud
 exec "owncloud"
+
+# Wallpaper managenent
+exec "nitrogen --restore"
