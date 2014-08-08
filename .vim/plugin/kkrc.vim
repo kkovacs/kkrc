@@ -50,6 +50,14 @@ map <s-c-tab> :tabprevious<cr>
 " My little calculator
 map <leader>c viW"zyA = <esc>"=<c-r>z<cr>p
 
+" Toggle "list" display
+map <leader>l :setlocal list!<cr>
+
+" switch to N char tabs (useful when browsing inelegant code)
+map <leader>2 :setlocal sw=2 ts=2<cr>
+map <leader>4 :setlocal sw=4 ts=4<cr>
+map <leader>8 :setlocal sw=8 ts=8<cr>
+
 " GUI, colors, other extras
 colorscheme desert
 syn on
@@ -60,7 +68,4 @@ endif
 
 " No automatic folding for .md files
 let g:vim_markdown_folding_disabled=1
-
-" Default list style is tree
-let g:netrw_liststyle=4
 

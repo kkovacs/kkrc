@@ -23,6 +23,12 @@ purge=
 record=
 transplant=
 
+[web]
+# This is to allow "hg serve" function for quick push/pulls.
+# Obviously, don't do this for a REAL repo serving account.
+push_ssl = false
+allow_push = *
+
 # Get hg-git from http://hg-git.github.com/
 #hgext.bookmarks=
 #hggit=
