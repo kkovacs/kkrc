@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<root>
+  <appdef>
+    <appname>MACVIM</appname>
+    <equal>org.vim.MacVim</equal>
+  </appdef>
+
+  <appdef>
+    <appname>CHROME</appname>
+    <equal>com.google.Chrome</equal>
+  </appdef>
+
+  <vkopenurldef>
+    <name>KeyCode::VK_OPEN_URL_APP_MacVim</name>
+    <url>file:///Applications/NewMacVim.app</url>
+  </vkopenurldef>
+
+  <item>
+    <name>Power to MacVim</name>
+    <appendix>(+ Fn+Power to Power)</appendix>
+    <identifier>remap.power_to_macvim</identifier>
+    <modifier_not>ModifierFlag::FN</modifier_not>
+    <autogen>__ConsumerToKey__ ConsumerKeyCode::POWER, KeyCode::VK_OPEN_URL_APP_MacVim</autogen>
+  </item>
+
+  <item>
+    <name>Fix Chrome to Linux-like (but don't kill Mac-like either)</name>
+    <appendix>Ctrl-T to Command-T, Ctrl-W to Command-W, Ctrl-LEFTCLICK to Command-LEFTCLICK</appendix>
+    <identifier>remap.fix_chrome</identifier>
+    <only>CHROME</only>
+    <autogen>__KeyToKey__ KeyCode::T, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_CONTROL, KeyCode::T, ModifierFlag::COMMAND_L</autogen>
+    <autogen>__KeyToKey__ KeyCode::W, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_CONTROL, KeyCode::W, ModifierFlag::COMMAND_L</autogen>
+    <autogen>__KeyToKey__ KeyCode::F, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_CONTROL, KeyCode::F, ModifierFlag::COMMAND_L</autogen>
+    <autogen>__KeyToKey__ KeyCode::G, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_CONTROL, KeyCode::G, ModifierFlag::COMMAND_L</autogen>
+    <autogen>__KeyToKey__ KeyCode::L, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_CONTROL, KeyCode::L, ModifierFlag::COMMAND_L</autogen>
+    <autogen>__KeyToKey__ KeyCode::R, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_CONTROL, KeyCode::R, ModifierFlag::COMMAND_L</autogen>
+    <autogen>__PointingButtonToPointingButton__ PointingButton::LEFT, MODIFIERFLAG_EITHER_LEFT_OR_RIGHT_CONTROL, PointingButton::LEFT, ModifierFlag::COMMAND_L</autogen>
+  </item>
+
+</root>

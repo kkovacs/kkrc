@@ -12,8 +12,10 @@ add Control = Control_L
 ! Left WIN (Super_L) key to Mode_switch (this brings out the 2nd and 3rd items of the keycode lines)
 keysym Super_L = Mode_switch
 
-! Let's make the Menu key a separate Shift
-add Mod5 = Menu
+! Let's make the Menu key a separate Shift,
+! but reassign it first to avoid the original function
+keysym Menu = Super_L
+add Mod3 = Super_L
 
 ! Dead keys -- set accents like on the mac os x
 !keycode  25 = w W dead_abovedot
