@@ -26,7 +26,10 @@ set ruler
 " No cursor line
 set nocursorline
 " So the stronger encryption never gets frogotten
-set cryptmethod=blowfish
+" Also I can't believe CentOS software is so ANCIENT
+if v:version >= 703
+	set cryptmethod=blowfish
+endif
 
 " Allow filetype plugin loading
 filetype plugin indent on
@@ -35,7 +38,7 @@ filetype plugin indent on
 let g:netrw_preview=1
 
 " Move into netrw effortlessly
-map - :Explore<cr>
+map - :Rexplore<cr>
 " Like the previous, but in a new tab
 map _ :Texplore<cr>
 
@@ -52,11 +55,16 @@ map <leader>c viW"zyA = <esc>"=<c-r>z<cr>p
 
 " Toggle "list" display
 map <leader>l :setlocal list!<cr>
+" Turn off list display
+map <leader>L :setlocal nolist<cr>
 
 " switch to N char tabs (useful when browsing inelegant code)
 map <leader>2 :setlocal sw=2 ts=2<cr>
 map <leader>4 :setlocal sw=4 ts=4<cr>
 map <leader>8 :setlocal sw=8 ts=8<cr>
+
+" Insert a line with the date (used in project notes)
+map <leader>dt O# <C-R>=strftime("%Y-%m-%d")<cr><esc><cr>
 
 " GUI, colors, other extras
 colorscheme desert
