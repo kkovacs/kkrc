@@ -53,10 +53,15 @@ map <s-c-tab> :tabprevious<cr>
 " My little calculator
 map <leader>c viW"zyA = <esc>"=<c-r>z<cr>p
 
-" Toggle "list" display
-map <leader>l :setlocal list!<cr>
+" Turn on "list" display
+map <leader>l :setlocal list<cr>
 " Turn off list display
 map <leader>L :setlocal nolist<cr>
+
+" Turn on paste
+map <leader>p :setlocal paste<cr>
+" Turn off paste
+map <leader>P :setlocal nopaste<cr>
 
 " switch to N char tabs (useful when browsing inelegant code)
 map <leader>2 :setlocal sw=2 ts=2<cr>
