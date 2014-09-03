@@ -72,6 +72,7 @@ map <leader>8 :setlocal sw=8 ts=8<cr>
 map <leader>dt O# <C-R>=strftime("%Y-%m-%d")<cr><esc><cr>
 
 " Jump direct to tabs 1-9 (and last)
+" From the beginning...
 map g1 :tabfirst<cr>
 map g2 :tabfirst\|tabnext 2<cr>
 map g3 :tabfirst\|tabnext 3<cr>
@@ -79,8 +80,9 @@ map g4 :tabfirst\|tabnext 4<cr>
 map g5 :tabfirst\|tabnext 5<cr>
 map g6 :tabfirst\|tabnext 6<cr>
 map g7 :tabfirst\|tabnext 7<cr>
-map g8 :tabfirst\|tabnext 8<cr>
-map g9 :tabfirst\|tabnext 9<cr>
+" ...and from the end
+map g8 :tablast\|tabprevious 2<cr>
+map g9 :tablast\|tabprevious 1<cr>
 map g0 :tablast<cr>
 
 " GUI, colors, other extras
