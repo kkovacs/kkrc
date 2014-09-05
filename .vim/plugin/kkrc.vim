@@ -93,6 +93,9 @@ if has("gui_running")
     set guioptions=egmrt
 endif
 
+" A win against the old frenemy, DoMatchParen
+highlight MatchParen cterm=underline,bold ctermbg=none ctermfg=red gui=underline,bold guibg=NONE guifg=red
+
 " No automatic folding for .md files
 let g:vim_markdown_folding_disabled=1
 
