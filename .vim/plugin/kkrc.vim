@@ -63,6 +63,11 @@ map <leader>p :setlocal paste<cr>
 " Turn off paste
 map <leader>P :setlocal nopaste<cr>
 
+" Turn on free cursor movement
+map <leader>f :setlocal virtualedit=all<cr>
+" Turn off free cursor movement
+map <leader>F :setlocal virtualedit=block<cr>
+
 " switch to N char tabs (useful when browsing inelegant code)
 map <leader>2 :setlocal sw=2 ts=2<cr>
 map <leader>4 :setlocal sw=4 ts=4<cr>
