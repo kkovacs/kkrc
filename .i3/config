@@ -8,15 +8,15 @@ set $mod2 Mod3
 set $alt Mod1
 
 # Font for window titles.
-font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
-# font pango:DejaVu Sans Mono 100
+# font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+font pango:DejaVu Sans Mono 9
 
 # Use Mouse+Alt to drag floating windows to their wanted position
 floating_modifier $alt
 
 # start a terminal
-bindsym $mod+Return exec i3-sensible-terminal
-bindsym $mod2+Return exec i3-sensible-terminal
+bindsym $mod+Return exec --no-startup-id i3-sensible-terminal
+bindsym $mod2+Return exec --no-startup-id i3-sensible-terminal
 
 # kill focused window
 bindsym $mod+q kill
@@ -71,7 +71,7 @@ bindsym $mod+grave focus mode_toggle
 # focus the parent container
 bindsym $mod+a focus parent
 # focus the child container
-bindsym $mod+d focus child
+bindsym $mod+z focus child
 
 # switch to workspace
 bindsym F1 workspace 1
@@ -191,24 +191,58 @@ bar {
         status_command i3status
 }
 
+# Mark and goto
+bindsym $mod2+Shift+1 mark mark1
+bindsym $mod2+Shift+2 mark mark2
+bindsym $mod2+Shift+3 mark mark3
+bindsym $mod2+Shift+4 mark mark4
+bindsym $mod2+Shift+5 mark mark5
+bindsym $mod2+1 [con_mark="mark1"] focus
+bindsym $mod2+2 [con_mark="mark2"] focus
+bindsym $mod2+3 [con_mark="mark3"] focus
+bindsym $mod2+4 [con_mark="mark4"] focus
+bindsym $mod2+5 [con_mark="mark5"] focus
+bindsym $mod+U00A1 [con_mark="mark1"] focus
+bindsym $mod+U2122 [con_mark="mark2"] focus
+bindsym $mod+U00A3 [con_mark="mark3"] focus
+bindsym $mod+U00A2 [con_mark="mark4"] focus
+bindsym $mod+U00A7 [con_mark="mark5"] focus
+
+# Named workspaces
+bindsym $mod+n exec --no-startup-id i3-input -F 'workspace "%s"' -P 'Switch to workspace: '
+
 # i3lock key
-bindsym $mod+BackSpace exec "i3lock -i ~/Pictures/i3lock.png"
+bindsym $mod+BackSpace exec --no-startup-id "i3lock -i ~/Cloud/Wallpaper/i3lock.png"
 
 # i3-input for manual i3 commands
-bindsym $mod+i exec i3-input
+bindsym $mod+i exec --no-startup-id i3-input
+
+# Volume controls
+bindsym XF86AudioRaiseVolume exec --no-startup-id amixer sset Master 5%+
+bindsym XF86AudioLowerVolume exec --no-startup-id amixer sset Master 5%-
+bindsym XF86AudioMute exec --no-startup-id amixer sset Master toggle
+
+# Sreen brightness controls
+bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 10
+bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 10
 
 # Quickstart commands
 bindsym $mod2+v exec gvim
-bindsym $mod2+m exec midori
+bindsym $mod2+b exec midori
 bindsym $mod2+f exec firefox
-bindsym $mod2+t exec i3-sensible-terminal
-bindsym $mod2+p exec pcmanfm
+bindsym $mod2+c exec --no-startup-id google-chrome-stable
+bindsym $mod2+t exec --no-startup-id i3-sensible-terminal
+bindsym $mod2+m exec pcmanfm
 
 # Hack to keep Mode_switch out of Mod4.
-exec "sleep 2; xmodmap -e 'remove Mod4 = Mode_switch'"
+exec --no-startup-id "sleep 2; xmodmap -e 'remove Mod4 = Mode_switch'"
 
-# Owncloud
-exec "owncloud"
+# Set keyboard rate
+exec_always --no-startup-id "xset r rate 300 30"
+
+# Autostart
+exec --no-startup-id "owncloud"
+exec --no-startup-id "nm-applet"
 
 # Wallpaper managenent
-exec "nitrogen --restore"
+exec --no-startup-id "nitrogen --restore"
