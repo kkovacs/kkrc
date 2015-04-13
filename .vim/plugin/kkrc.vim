@@ -64,9 +64,9 @@ map <leader>p :setlocal paste<cr>
 map <leader>P :setlocal nopaste<cr>
 
 " Turn on free cursor movement
-map <leader>f :setlocal virtualedit=all<cr>
+map <leader>v :setlocal virtualedit=all<cr>
 " Turn off free cursor movement
-map <leader>F :setlocal virtualedit=block<cr>
+map <leader>V :setlocal virtualedit=block<cr>
 
 " switch to N char tabs (useful when browsing inelegant code)
 map <leader>2 :setlocal sw=2 ts=2<cr>
@@ -76,7 +76,7 @@ map <leader>8 :setlocal sw=8 ts=8<cr>
 " Insert a line with the date (used in project notes)
 map <leader>dt O# <C-R>=strftime("%Y-%m-%d")<cr><esc><cr>
 
-" Jump direct to tabs 1-9 (and last)
+" Jump direct to tabs 1-7 (and last 3)
 " From the beginning...
 map g1 :tabfirst<cr>
 map g2 :tabfirst\|tabnext 2<cr>
@@ -90,6 +90,15 @@ map g8 :tablast\|tabprevious 2<cr>
 map g9 :tablast\|tabprevious 1<cr>
 map g0 :tablast<cr>
 
+" Highlight the word under the color with 4 different colors.
+" (Using "Diff*" because they are usually high contrast in every color scheme, yet used only in diff-mode.)
+map <leader>m1 viw"sy:syn match DiffAdd "<c-r>s"<cr>
+map <leader>m2 viw"sy:syn match DiffChange "<c-r>s"<cr>
+map <leader>m3 viw"sy:syn match DiffDelete "<c-r>s"<cr>
+map <leader>m4 viw"sy:syn match DiffText "<c-r>s"<cr>
+" Clear highlights
+map <leader>m0 :syn clear DiffAdd DiffChange DiffDelete DiffText<cr>
+
 " GUI, colors, other extras
 colorscheme desert
 syn on
@@ -100,6 +109,9 @@ endif
 
 " A win against the old frenemy, DoMatchParen
 highlight MatchParen cterm=underline,bold ctermbg=none ctermfg=red gui=underline,bold guibg=NONE guifg=red
+
+" Disable starting a comment after Enter
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
 " No automatic folding for .md files
 let g:vim_markdown_folding_disabled=1
