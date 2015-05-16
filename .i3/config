@@ -11,6 +11,9 @@ set $alt Mod1
 # font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
 font pango:DejaVu Sans Mono 9
 
+# Full-screen windows shouldn't have a border
+new_window normal 0 px
+
 # Use Mouse+Alt to drag floating windows to their wanted position
 floating_modifier $alt
 
@@ -210,9 +213,11 @@ bindsym $mod+U00A7 [con_mark="mark5"] focus
 
 # Named workspaces
 bindsym $mod+n exec --no-startup-id i3-input -F 'workspace "%s"' -P 'Switch to workspace: '
+bindsym $mod+m exec --no-startup-id i3-input -F 'move container to workspace "%s"' -P 'Move to workspace: '
 
 # i3lock key
-bindsym $mod+BackSpace exec --no-startup-id "i3lock -i ~/Cloud/Wallpaper/i3lock.png"
+#bindsym $mod+BackSpace exec --no-startup-id "i3lock -i ~/Pictures/i3lock.png"
+bindsym $mod+BackSpace exec --no-startup-id "xautolock -locknow"
 
 # i3-input for manual i3 commands
 bindsym $mod+i exec --no-startup-id i3-input
@@ -241,8 +246,11 @@ exec --no-startup-id "sleep 2; xmodmap -e 'remove Mod4 = Mode_switch'"
 exec_always --no-startup-id "xset r rate 300 30"
 
 # Autostart
-exec --no-startup-id "owncloud"
+#exec --no-startup-id "owncloud"
 exec --no-startup-id "nm-applet"
 
 # Wallpaper managenent
 exec --no-startup-id "nitrogen --restore"
+
+# Auto lock
+exec --no-startup-id xautolock -time 10 -locker "i3lock -i ~/Pictures/i3lock.png"
