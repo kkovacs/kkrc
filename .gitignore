@@ -59,7 +59,6 @@ tags
 
 # Logs and databases
 *.log
-*.sql
 *.sqlite
 
 # node.js
@@ -103,3 +102,20 @@ pickle-email-*.html
 *.o
 *.beam
 *.plt
+
+# Golang
+*.o
+*.a
+*.so
+_obj
+_test
+*.[568vq]
+[568vq].out
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.*
+_testmain.go
+*.test
+*.prof
