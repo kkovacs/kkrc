@@ -34,7 +34,7 @@ autoload -Uz bashcompinit
 bashcompinit
 
 # Zsh options
-setopt autocd auto_pushd pushd_ignore_dups no_nomatch hup notify hist_ignore_dups
+setopt auto_pushd pushd_ignore_dups no_nomatch hup notify hist_ignore_dups
 
 # I must have VI keys
 bindkey -v
