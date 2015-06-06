@@ -100,10 +100,13 @@ map <leader>m4 viw"sy:syn match DiffText "<c-r>s"<cr>
 map <leader>m0 :syn clear DiffAdd DiffChange DiffDelete DiffText<cr>
 
 " GUI, colors, other extras
-colorscheme desert
+ " Needed for Base16
+let base16colorspace=256
+set background=dark
+colorscheme base16-colors
 syn on
 if has("gui_running")
-    colorscheme kk-rdark
+    "colorscheme kk-rdark
     set guioptions=egmrt
 endif
 

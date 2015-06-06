@@ -4,6 +4,9 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
+# Set up colors
+~/.kkrc/base16-colors.dark.sh
+
 # If there was a .bashrc we moved away at install, run that first
 # (so we can override)
 if [ -e ~/.bashrc.orig ]; then . ~/.bashrc.orig; fi

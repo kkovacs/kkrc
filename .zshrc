@@ -1,3 +1,5 @@
+# Set up colors
+~/.kkrc/base16-colors.dark.sh
 
 # Set up the right-side prompt to display the current working directory
 export RPROMPT='%~'
