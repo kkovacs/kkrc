@@ -49,7 +49,7 @@ alias la="ls -lrtA"
 
 # Colored ls on OS X
 export CLICOLOR=1
-export LSCOLORS=GxFxCxDxBxegedabagaced
+export LSCOLORS=ExFxCxDxBxegedabagacad
 
 # OS-dependent stuff
 case "$OSTYPE" in
