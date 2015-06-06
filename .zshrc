@@ -1,5 +1,6 @@
 # Set up colors
-~/.kkrc/base16-colors.dark.sh
+BASE16_SHELL="$HOME/.kkrc/base16-colors.dark.sh"
+[[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
 
 # Set up the right-side prompt to display the current working directory
 export RPROMPT='%~'
