@@ -5,8 +5,10 @@
 [ -z "$PS1" ] && return
 
 # Set up colors
-BASE16_SHELL="$HOME/.kkrc/base16-colors.dark.sh"
-[[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
+if [ ! -n "$SSH_CLIENT" ] && [ ! -n "$SSH_TTY" ]; then
+	BASE16_SHELL="$HOME/.kkrc/base16-colors.dark.sh"
+	[[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
+fi
 
 # If there was a .bashrc we moved away at install, run that first
 # (so we can override)
