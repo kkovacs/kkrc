@@ -31,6 +31,9 @@ export LC_CTYPE="en_US.UTF-8"
 alias s="screen -xR"
 alias l="ls -lrt"
 alias la="ls -lrtA"
+alias ll="ls -lhFrt"
+alias grep="grep --color"
+alias json="python -mjson.tool"
 
 # Do we have ZSH? Use it if possible
 ZSH=`type -P zsh`

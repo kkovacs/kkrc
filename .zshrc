@@ -4,10 +4,27 @@ if [ ! -n "$SSH_CLIENT" ] && [ ! -n "$SSH_TTY" ]; then
 	[[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
 fi
 
-# Set up the right-side prompt to display the current working directory
-export RPROMPT='%~'
-# Set up the left-side prompt to display "username@machine [background job count]# "
-export PROMPT='%n@%m [%j]%# '
+# Needed for a colored prompt
+autoload -Uz colors && colors
+# Function to toggle zsh's RPROMPT.
+function rp () {
+	if [[ "$RPROMPT" == "" ]]; then
+		# Set up the right-side prompt to display the current working directory
+		export RPROMPT="%{$fg_bold[yellow]%}%~%{$reset_color%}"
+		# B&W: export RPROMPT='%~'
+		# Set up the left-side prompt to display "username@machine [background job count]# ", and if root, username be red
+		export PROMPT="%{%(#~$fg[red]~$fg[blue])%}%n%{$reset_color%}@%{$fg[green]%}%m %{$fg_no_bold[cyan]%}[%j]%{$reset_color%}%# "
+		# B&W: export PROMPT='%n@%m [%j]%# '
+	else
+		# No RPROMPT, set up the left-side prompt to contain the directory
+		export RPROMPT=''
+		export PROMPT="%{%(#~$fg[red]~$fg[blue])%}%n%{$reset_color%}@%{$fg[green]%}%m %{$fg_bold[yellow]%}%~%{$reset_color%} %{$fg_no_bold[cyan]%}[%j]%{$reset_color%}%# "
+		# B&W: export PROMPT='%n@%m %~ [%j]%# '
+	fi
+}
+# Initialize
+rp
+
 # Set up some necessary environment variables
 export EDITOR=vim
 export LC_CTYPE="en_US.UTF-8"
@@ -25,13 +42,11 @@ zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]} m:{[:lower:][:
 zstyle ':completion:*' prompt 'Errors: %e'
 zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
 
-autoload -Uz compinit
-compinit
+autoload -Uz compinit && compinit
 # End of lines added by compinstall
 
 # Bash completion emulation
-autoload -Uz bashcompinit
-bashcompinit
+autoload -Uz bashcompinit && bashcompinit
 
 # Zsh options
 setopt auto_pushd pushd_ignore_dups no_nomatch hup notify hist_ignore_dups
@@ -49,20 +64,24 @@ bindkey -v
 alias s="screen -xR"
 alias l="ls -lrt"
 alias la="ls -lrtA"
-
-# Colored ls on OS X
-export CLICOLOR=1
-export LSCOLORS=ExFxCxDxBxegedabagacad
+alias ll="ls -lhFrt"
+alias grep="grep --color"
+alias json="python -mjson.tool"
 
 # OS-dependent stuff
 case "$OSTYPE" in
 	"linux-gnu")
 		# Colored ls
 		alias ls="ls --color"
-		alias ll="lsattr"
+		# ls with extended attributes
+		alias lx="lsattr"
 		;;
-	"darwin12.0")
-		alias ll="l -@eO"
+	"darwin14.0")
+		# ls with extended attributes
+		alias lx="l -@eO"
+		# Colored ls on OS X
+		export CLICOLOR=1
+		export LSCOLORS=ExFxCxDxBxegedabagacad
 		;;
 esac
 
