@@ -20,6 +20,9 @@ defnonblock 5 # Enable non-blocking mode to better cope with flaky ssh connectio
 msgwait 1 # Messages displayed for this long
 startup_message off # Turn off startup screen
 defutf8 on # It's the XXI century, everyone should use UTF-8
+attrcolor b ".I"    # allow bold colors - necessary for some reason
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'   # tell screen how to set colors. AB = background, AF=foreground
+defbce on    # use current bg color for erased chars
 
 # Set up our "status line"
 
