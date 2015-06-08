@@ -8,7 +8,7 @@ fi
 autoload -Uz colors && colors
 # Function to toggle zsh's RPROMPT.
 function rp () {
-	if [[ "$RPROMPT" == "" ]]; then
+	if [[ "$RPROMPT" == "" || "$1" == "on" ]]; then
 		# Set up the right-side prompt to display the current working directory
 		export RPROMPT="%{$fg_bold[yellow]%}%~%{$reset_color%}"
 		# B&W: export RPROMPT='%~'
@@ -23,7 +23,7 @@ function rp () {
 	fi
 }
 # Initialize
-rp
+rp on
 
 # Set up some necessary environment variables
 export EDITOR=vim
