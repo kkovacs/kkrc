@@ -110,6 +110,9 @@ if has("gui_running")
     set guioptions=egmrt
 endif
 
+" Statusline with a few useful items, but still lightweight (no plugins!)
+set statusline=%n%m%h%r\ %f\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]\ %{&list?'LIST\ ':''}%{&paste?'PASTE\ ':''}%{&virtualedit=='all'?'VIRTUALEDIT\ ':''}%y%=C:%c%V\ L:%l/%L\ %P
+
 " A win against the old frenemy, DoMatchParen
 highlight MatchParen cterm=underline,bold ctermbg=none ctermfg=red gui=underline,bold guibg=NONE guifg=red
 
