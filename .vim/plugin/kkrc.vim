@@ -103,7 +103,7 @@ map <leader>m0 :syn clear DiffAdd DiffChange DiffDelete DiffText<cr>
  " Needed for Base16
 let base16colorspace=256
 set background=dark
-colorscheme base16-colors
+colorscheme kk-base16-colors
 syn on
 if has("gui_running")
     "colorscheme kk-rdark
