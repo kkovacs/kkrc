@@ -21,8 +21,8 @@ set wildmenu
 set wildmode=list:longest
 " Always have a status line
 set laststatus=2
-" Always show me the cursor position
-set ruler
+" Cursor position is in the statusline
+set noruler
 " No cursor line
 set nocursorline
 " So the stronger encryption never gets frogotten
@@ -111,10 +111,10 @@ if has("gui_running")
 endif
 
 " Statusline with a few useful items, but still lightweight (no plugins!)
-set statusline=%n%m%h%r\ %f\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]\ %{&list?'LIST\ ':''}%{&paste?'PASTE\ ':''}%{&virtualedit=='all'?'VIRTUALEDIT\ ':''}%y%=C:%c%V\ L:%l/%L\ %P
+set statusline=%n%m%h%r\ %f\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]\ %{&list?'LIST\ ':''}%{&paste?'PASTE\ ':''}%{&virtualedit=='all'?'VIRTUALEDIT\ ':''}%y%=C:%c%V\ L:%l/%L\ %p%%
 
 " A win against the old frenemy, DoMatchParen
-highlight MatchParen cterm=underline,bold ctermbg=none ctermfg=red gui=underline,bold guibg=NONE guifg=red
+" highlight MatchParen cterm=underline,bold ctermbg=none ctermfg=red gui=underline,bold guibg=NONE guifg=red
 
 " Disable starting a comment after Enter
 autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
