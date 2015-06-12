@@ -68,6 +68,11 @@ map <leader>v :setlocal virtualedit=all<cr>
 " Turn off free cursor movement
 map <leader>V :setlocal virtualedit=block<cr>
 
+" Force filetype to markdown
+map <leader>m :set filetype=mkd<cr>
+" Re-run filetype autodetection (not reliable...)
+map <leader>M :doautocmd FileType<cr>
+
 " switch to N char tabs (useful when browsing inelegant code)
 map <leader>2 :setlocal sw=2 ts=2<cr>
 map <leader>4 :setlocal sw=4 ts=4<cr>
@@ -91,13 +96,17 @@ map g9 :tablast\|tabprevious 1<cr>
 map g0 :tablast<cr>
 
 " Highlight the word under the color with 4 different colors.
-" (Using "Diff*" because they are usually high contrast in every color scheme, yet used only in diff-mode.)
-map <leader>m1 viw"sy:syn match DiffAdd "<c-r>s"<cr>
-map <leader>m2 viw"sy:syn match DiffChange "<c-r>s"<cr>
-map <leader>m3 viw"sy:syn match DiffDelete "<c-r>s"<cr>
-map <leader>m4 viw"sy:syn match DiffText "<c-r>s"<cr>
-" Clear highlights
-map <leader>m0 :syn clear DiffAdd DiffChange DiffDelete DiffText<cr>
+map <leader>h1 :call matchadd("Highlight1", expand("<cword>"))<cr>
+map <leader>h2 :call matchadd("Highlight2", expand("<cword>"))<cr>
+map <leader>h3 :call matchadd("Highlight3", expand("<cword>"))<cr>
+map <leader>h4 :call matchadd("Highlight4", expand("<cword>"))<cr>
+map <leader>h5 :call matchadd("Highlight5", expand("<cword>"))<cr>
+map <leader>h6 :call matchadd("Highlight6", expand("<cword>"))<cr>
+map <leader>h7 :call matchadd("Highlight7", expand("<cword>"))<cr>
+map <leader>h8 :call matchadd("Highlight8", expand("<cword>"))<cr>
+map <leader>h9 :call matchadd("Highlight9", expand("<cword>"))<cr>
+" Clear all highlights
+map <leader>h0 :call clearmatches()<cr>
 
 " GUI, colors, other extras
  " Needed for Base16

@@ -295,6 +295,17 @@ call <sid>hi("SpellLocal",   "", s:gui00, "", s:cterm00, "undercurl")
 call <sid>hi("SpellCap",     "", s:gui00, "", s:cterm00, "undercurl")
 call <sid>hi("SpellRare",    "", s:gui00, "", s:cterm00, "undercurl")
 
+" Diff highlighting
+call <sid>hi("Highlight1",   s:gui08, s:gui01,  s:cterm08, s:cterm01, "")
+call <sid>hi("Highlight2",   s:gui0A, s:gui01,  s:cterm0A, s:cterm01, "")
+call <sid>hi("Highlight3",   s:gui0B, s:gui01,  s:cterm0B, s:cterm01, "")
+call <sid>hi("Highlight4",   s:gui0D, s:gui01,  s:cterm0D, s:cterm01, "")
+call <sid>hi("Highlight5",   s:gui09, s:gui01,  s:cterm09, s:cterm01, "")
+call <sid>hi("Highlight6",   s:gui0C, s:gui01,  s:cterm0C, s:cterm01, "")
+call <sid>hi("Highlight7",   s:gui0E, s:gui01,  s:cterm0E, s:cterm01, "")
+call <sid>hi("Highlight8",   s:gui0F, s:gui01,  s:cterm0F, s:cterm01, "")
+call <sid>hi("Highlight9",   s:gui07, s:gui01,  s:cterm07, s:cterm01, "")
+
 " Remove functions
 delf <sid>hi
 delf <sid>gui
