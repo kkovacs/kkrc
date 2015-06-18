@@ -67,6 +67,7 @@ alias la="ls -lrtA"
 alias ll="ls -lhFrt"
 alias grep="grep --color"
 alias json="python -mjson.tool"
+alias kargs="xargs -P `getconf _NPROCESSORS_ONLN` -I%"
 
 # OS-dependent stuff
 case "$OSTYPE" in
