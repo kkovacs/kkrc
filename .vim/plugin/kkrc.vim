@@ -38,40 +38,40 @@ filetype plugin indent on
 let g:netrw_preview=1
 
 " Move into netrw effortlessly
-map - :Rexplore<cr>
+map <silent> - :Rexplore<cr>
 " Like the previous, but in a new tab
-map _ :Texplore<cr>
+map <silent> _ :Texplore<cr>
 
 " I like to scroll the screen and advance the cursor at the same time
 map <c-j> j<c-e>
 map <c-k> k<c-y>
 
 " GUI tab navigation
-map <c-tab> :tabnext<cr>
-map <s-c-tab> :tabprevious<cr>
+map <silent> <c-tab> :tabnext<cr>
+map <silent> <s-c-tab> :tabprevious<cr>
 
 " My little calculator
 map <leader>c viW"zyA = <esc>"=<c-r>z<cr>p
 
 " Turn on "list" display
-map <leader>l :setlocal list<cr>
+map <silent> <leader>l :setlocal list<cr>
 " Turn off list display
-map <leader>L :setlocal nolist<cr>
+map <silent> <silent> <leader>L :setlocal nolist<cr>
 
 " Turn on paste
-map <leader>p :setlocal paste<cr>
+map <silent> <leader>p :setlocal paste<cr>
 " Turn off paste
-map <leader>P :setlocal nopaste<cr>
+map <silent> <silent> <leader>P :setlocal nopaste<cr>
 
 " Turn on free cursor movement
-map <leader>v :setlocal virtualedit=all<cr>
+map <silent> <leader>v :setlocal virtualedit=all<cr>
 " Turn off free cursor movement
-map <leader>V :setlocal virtualedit=block<cr>
+map <silent> <silent> <leader>V :setlocal virtualedit=block<cr>
 
 " Force filetype to markdown
-map <leader>m :set filetype=mkd<cr>
+map <silent> <leader>m :set filetype=mkd<cr>
 " Re-run filetype autodetection (not reliable...)
-map <leader>M :doautocmd FileType<cr>
+map <silent> <silent> <leader>M :doautocmd FileType<cr>
 
 " switch to N char tabs (useful when browsing inelegant code)
 map <leader>2 :setlocal sw=2 ts=2<cr>
@@ -83,30 +83,33 @@ map <leader>dt O# <C-R>=strftime("%Y-%m-%d")<cr><esc><cr>
 
 " Jump direct to tabs 1-7 (and last 3)
 " From the beginning...
-map g1 :tabfirst<cr>
-map g2 :tabfirst\|tabnext 2<cr>
-map g3 :tabfirst\|tabnext 3<cr>
-map g4 :tabfirst\|tabnext 4<cr>
-map g5 :tabfirst\|tabnext 5<cr>
-map g6 :tabfirst\|tabnext 6<cr>
-map g7 :tabfirst\|tabnext 7<cr>
+map <silent> g1 :tabfirst<cr>
+map <silent> g2 :tabfirst\|tabnext 2<cr>
+map <silent> g3 :tabfirst\|tabnext 3<cr>
+map <silent> g4 :tabfirst\|tabnext 4<cr>
+map <silent> g5 :tabfirst\|tabnext 5<cr>
+map <silent> g6 :tabfirst\|tabnext 6<cr>
+map <silent> g7 :tabfirst\|tabnext 7<cr>
 " ...and from the end
-map g8 :tablast\|tabprevious 2<cr>
-map g9 :tablast\|tabprevious 1<cr>
-map g0 :tablast<cr>
+map <silent> g8 :tablast\|tabprevious 2<cr>
+map <silent> g9 :tablast\|tabprevious 1<cr>
+map <silent> g0 :tablast<cr>
 
 " Highlight the word under the color with 4 different colors.
-map <leader>h1 :call matchadd("Highlight1", expand("<cword>"))<cr>
-map <leader>h2 :call matchadd("Highlight2", expand("<cword>"))<cr>
-map <leader>h3 :call matchadd("Highlight3", expand("<cword>"))<cr>
-map <leader>h4 :call matchadd("Highlight4", expand("<cword>"))<cr>
-map <leader>h5 :call matchadd("Highlight5", expand("<cword>"))<cr>
-map <leader>h6 :call matchadd("Highlight6", expand("<cword>"))<cr>
-map <leader>h7 :call matchadd("Highlight7", expand("<cword>"))<cr>
-map <leader>h8 :call matchadd("Highlight8", expand("<cword>"))<cr>
-map <leader>h9 :call matchadd("Highlight9", expand("<cword>"))<cr>
+map <silent> <leader>h1 :call matchadd("Highlight1", expand("<cword>"))<cr>
+map <silent> <leader>h2 :call matchadd("Highlight2", expand("<cword>"))<cr>
+map <silent> <leader>h3 :call matchadd("Highlight3", expand("<cword>"))<cr>
+map <silent> <leader>h4 :call matchadd("Highlight4", expand("<cword>"))<cr>
+map <silent> <leader>h5 :call matchadd("Highlight5", expand("<cword>"))<cr>
+map <silent> <leader>h6 :call matchadd("Highlight6", expand("<cword>"))<cr>
+map <silent> <leader>h7 :call matchadd("Highlight7", expand("<cword>"))<cr>
+map <silent> <leader>h8 :call matchadd("Highlight8", expand("<cword>"))<cr>
+map <silent> <leader>h9 :call matchadd("Highlight9", expand("<cword>"))<cr>
 " Clear all highlights
-map <leader>h0 :call clearmatches()<cr>
+map <silent> <leader>h0 :call clearmatches()<cr>
+
+" Clear all highlights
+nmap <silent> <leader>/ :nohlsearch<cr>
 
 " GUI, colors, other extras
  " Needed for Base16
