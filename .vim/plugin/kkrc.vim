@@ -56,22 +56,27 @@ map <leader>c viW"zyA = <esc>"=<c-r>z<cr>p
 " Turn on "list" display
 map <silent> <leader>l :setlocal list<cr>
 " Turn off list display
-map <silent> <silent> <leader>L :setlocal nolist<cr>
+map <silent> <leader>L :setlocal nolist<cr>
 
 " Turn on paste
 map <silent> <leader>p :setlocal paste<cr>
 " Turn off paste
-map <silent> <silent> <leader>P :setlocal nopaste<cr>
+map <silent> <leader>P :setlocal nopaste<cr>
 
 " Turn on free cursor movement
 map <silent> <leader>v :setlocal virtualedit=all<cr>
 " Turn off free cursor movement
-map <silent> <silent> <leader>V :setlocal virtualedit=block<cr>
+map <silent> <leader>V :setlocal virtualedit=block<cr>
+
+" Turn on expandtab
+map <silent> <leader>e :setlocal expandtab<cr>
+" Turn off expandtab
+map <silent> <leader>E :setlocal noexpandtab<cr>
 
 " Force filetype to markdown
 map <silent> <leader>m :set filetype=mkd<cr>
 " Re-run filetype autodetection (not reliable...)
-map <silent> <silent> <leader>M :doautocmd FileType<cr>
+map <silent> <leader>M :doautocmd FileType<cr>
 
 " switch to N char tabs (useful when browsing inelegant code)
 map <leader>2 :setlocal sw=2 ts=2<cr>
@@ -123,7 +128,7 @@ if has("gui_running")
 endif
 
 " Statusline with a few useful items, but still lightweight (no plugins!)
-set statusline=%n%m%h%r\ %f\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]\ %{&list?'LIST\ ':''}%{&paste?'PASTE\ ':''}%{&virtualedit=='all'?'VIRTUALEDIT\ ':''}%y%=C:%c%V\ L:%l/%L\ %p%%
+set statusline=%n%m%h%r\ %f\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]\ %{&list?'LIST\ ':''}%{&expandtab?'EXPANDTAB\ ':''}%{&paste?'PASTE\ ':''}%{&virtualedit=='all'?'VIRTUALEDIT\ ':''}%y%=C:%c%V\ L:%l/%L\ %p%%
 
 " A win against the old frenemy, DoMatchParen
 " highlight MatchParen cterm=underline,bold ctermbg=none ctermfg=red gui=underline,bold guibg=NONE guifg=red
