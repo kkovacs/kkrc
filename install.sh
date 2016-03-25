@@ -44,4 +44,4 @@ installrc .i3 ~/.i3
 
 # Update git submodules
 cd ~/.kkrc
-git submodule update --init
+git submodule foreach git pull origin master
