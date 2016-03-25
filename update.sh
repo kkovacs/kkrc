@@ -6,9 +6,9 @@
 
 echo "Updating KKRC from git..."
 cd ~/.kkrc
-git pull --recurse-submodules
+git pull origin master
 echo "...updating submodules..."
-git submodule update --recursive
+git submodule foreach git pull origin master
 echo "...done."
 echo
 
