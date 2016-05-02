@@ -73,6 +73,11 @@ map <silent> <leader>e :setlocal expandtab<cr>
 " Turn off expandtab
 map <silent> <leader>E :setlocal noexpandtab<cr>
 
+" Turn on nowrap
+map <silent> <leader>w :setlocal nowrap<cr>
+" Turn off expandtab
+map <silent> <leader>W :setlocal wrap<cr>
+
 " Force filetype to markdown
 map <silent> <leader>m :set filetype=mkd<cr>
 " Re-run filetype autodetection (not reliable...)
@@ -128,7 +133,7 @@ if has("gui_running")
 endif
 
 " Statusline with a few useful items, but still lightweight (no plugins!)
-set statusline=%n%m%h%r\ %f\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]\ %{&list?'LIST\ ':''}%{&expandtab?'EXPANDTAB\ ':''}%{&paste?'PASTE\ ':''}%{&virtualedit=='all'?'VIRTUALEDIT\ ':''}%y%=C:%c%V\ L:%l/%L\ %p%%
+set statusline=%n%m%h%r\ %f\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]\ %{&list?'LIST\ ':''}%{&expandtab?'EXPANDTAB\ ':''}%{&wrap?'':'NOWRAP\ '}%{&paste?'PASTE\ ':''}%{&virtualedit=='all'?'VIRTUALEDIT\ ':''}%y%=C:%c%V\ L:%l/%L\ %p%%
 
 " A win against the old frenemy, DoMatchParen
 " highlight MatchParen cterm=underline,bold ctermbg=none ctermfg=red gui=underline,bold guibg=NONE guifg=red
