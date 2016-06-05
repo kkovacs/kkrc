@@ -47,5 +47,5 @@ cd ~/.kkrc
 if [ -e ~/.kkrc/.vim/bundle/vim-pathogen/README.markdown ]; then
 	git submodule foreach git pull origin master
 else
-	git submodule update --recursive
+	git submodule update --recursive --init
 fi
