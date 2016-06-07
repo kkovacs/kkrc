@@ -3,6 +3,9 @@
 
 [color]
 	ui = auto
+	diff = auto
+	status = auto
+	branch = auto
 
 [diff]
 	rename = copy
