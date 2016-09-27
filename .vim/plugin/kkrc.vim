@@ -23,12 +23,14 @@ set wildmode=list:longest
 set laststatus=2
 " Cursor position is in the statusline
 set noruler
+" Mode lines are the best
+set modeline
 " No cursor line
 set nocursorline
 " So the stronger encryption never gets frogotten
 " Also I can't believe CentOS software is so ANCIENT
-if v:version >= 703
-	set cryptmethod=blowfish
+if v:version >= 704
+	set cryptmethod=blowfish2
 endif
 
 " Allow filetype plugin loading
