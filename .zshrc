@@ -4,6 +4,29 @@ if [ ! -n "$SSH_CLIENT" ] && [ ! -n "$SSH_TTY" ]; then
 	[[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
 fi
 
+# OS-dependent stuff
+case "$OSTYPE" in
+	linux-gnu)
+		# Colored ls
+		alias ls="ls --color"
+		# ls with extended attributes
+		alias lx="lsattr"
+		;;
+	FreeBSD)
+		;&
+	darwin*)
+		# ls with extended attributes
+		alias lx="l -@eO"
+		# Colored ls on OS X
+		export CLICOLOR=1
+		;;
+esac
+
+# BSD colors
+export LSCOLORS=ExFxCxDxBxegedabagacad
+# Linux colors -- set always because of zsh's list-colors
+export LS_COLORS="di=1;34:ln=1;35:so=1;32:pi=1;33:ex=1;31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43"
+
 # Needed for a colored prompt
 autoload -Uz colors && colors
 # Function to toggle zsh's RPROMPT.
@@ -29,27 +52,28 @@ rp on
 export EDITOR=vim
 export LC_CTYPE="en_US.UTF-8"
 
-# The following lines were added by compinstall
-
+# Autocomplete
+autoload -Uz compinit && compinit
+zmodload -i zsh/complist        
+bindkey -M menuselect '^[[Z' reverse-menu-complete # Shift-tab in complist
 zstyle ':completion:*' auto-description 'Specify: %d'
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' file-sort modification
 zstyle ':completion:*' format 'Completing: %d'
 zstyle ':completion:*' group-name ''
-zstyle ':completion:*' list-colors ''
 zstyle ':completion:*' list-prompt '%SAt %p: Hit TAB for more, or the character to insert%s'
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]} m:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' prompt 'Errors: %e'
 zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
-
-autoload -Uz compinit && compinit
-# End of lines added by compinstall
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' menu select=2
+zstyle ':completion:*' verbose yes
 
 # Bash completion emulation
 autoload -Uz bashcompinit && bashcompinit
 
 # Zsh options
-setopt auto_pushd pushd_ignore_dups no_nomatch hup notify hist_ignore_dups
+setopt auto_pushd pushd_ignore_dups no_nomatch hup notify hist_ignore_dups hash_list_all completealiases always_to_end complete_in_word correct list_ambiguous
 
 # I must have VI keys
 bindkey -v
@@ -68,23 +92,6 @@ alias ll="ls -lhFrt"
 alias grep="grep --color"
 alias json="python -mjson.tool"
 alias kargs="xargs -P `getconf _NPROCESSORS_ONLN` -I%"
-
-# OS-dependent stuff
-case "$OSTYPE" in
-	"linux-gnu")
-		# Colored ls
-		alias ls="ls --color"
-		# ls with extended attributes
-		alias lx="lsattr"
-		;;
-	"darwin14.0")
-		# ls with extended attributes
-		alias lx="l -@eO"
-		# Colored ls on OS X
-		export CLICOLOR=1
-		export LSCOLORS=ExFxCxDxBxegedabagacad
-		;;
-esac
 
 # Display screens if any
 screen -ls | grep -v "Socket"
