@@ -30,6 +30,9 @@ set nocursorline
 " So the stronger encryption never gets frogotten
 " Also I can't believe CentOS software is so ANCIENT
 if v:version >= 704
+	set cryptmethod=blowfish
+endif
+if v:version >= 730
 	set cryptmethod=blowfish2
 endif
 
