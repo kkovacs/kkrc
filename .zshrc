@@ -94,6 +94,9 @@ alias json="python -mjson.tool"
 alias kargs="xargs -P `getconf _NPROCESSORS_ONLN` -I%"
 alias tmux="tmux -2"
 
+# hl - highlight command
+source ~/.kkrc/hl
+
 # Display screens if any
 screen -ls | grep -v "Socket"
 

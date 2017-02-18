@@ -48,6 +48,9 @@ else
 	echo "KKRC: No zsh found, you're on bash."
 fi
 
+# hl - highlight command
+source ~/.kkrc/hl
+
 # Display screens if any
 screen -ls | grep -v "Socket"
 
