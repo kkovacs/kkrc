@@ -46,7 +46,7 @@ function rp () {
 	fi
 }
 # Initialize
-rp on
+rp on; rp
 
 # Set up some necessary environment variables
 export EDITOR=vim
