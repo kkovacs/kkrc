@@ -37,7 +37,7 @@ alias la="ls -lrtA"
 alias ll="ls -lhFrt"
 alias grep="grep --color"
 alias json="python -mjson.tool"
-alias kargs="xargs -P `getconf _NPROCESSORS_ONLN` -I%"
+alias kargs="xargs -n 1 -P `getconf _NPROCESSORS_ONLN` -I{}"
 alias tmux="tmux -2"
 
 # Do we have ZSH? Use it if possible
