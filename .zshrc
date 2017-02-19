@@ -101,7 +101,7 @@ source ~/.kkrc/hl
 screen -ls | grep -v "Socket"
 
 # Autostart kropbox?
-# ~/.kkrc/kropbox.sh
+# ~/.kkrc/other/kropbox.sh
 
 # Local commands
 if [ -e ~/.zshrc.local ]; then . ~/.zshrc.local; fi
