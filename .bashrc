@@ -50,6 +50,7 @@ fi
 
 # hl - highlight command
 source ~/.kkrc/hl
+export -f hl
 
 # Display screens if any
 screen -ls | grep -v "Socket"
