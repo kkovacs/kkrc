@@ -25,6 +25,8 @@ set laststatus=2
 set noruler
 " Mode lines are the best
 set modeline
+" Show normal-mode commands as typed
+set showcmd
 " No cursor line
 set nocursorline
 " So the stronger encryption never gets frogotten
