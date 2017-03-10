@@ -51,6 +51,8 @@ rp on; rp
 # Set up some necessary environment variables
 export EDITOR=vim
 export LC_CTYPE="en_US.UTF-8"
+# Keep some history, but only in memory
+export HISTSIZE=1000
 
 # Autocomplete
 autoload -Uz compinit && compinit
