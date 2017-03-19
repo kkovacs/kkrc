@@ -45,14 +45,20 @@ function rp () {
 		# B&W: export PROMPT='%n@%m %~ [%j]%# '
 	fi
 }
-# Initialize
+# Initialize (to off)
 rp on; rp
 
 # Set up some necessary environment variables
 export EDITOR=vim
 export LC_CTYPE="en_US.UTF-8"
-# Keep some history, but only in memory
+
+# Keep some history...
 export HISTSIZE=1000
+# ...but only in memory...
+export SAVEHIST=0
+export HISTFILE=/dev/null
+# ... and actually display that history when asked. (With ISO timestamps!)
+alias history="fc -li 0"
 
 # Autocomplete
 autoload -Uz compinit && compinit
