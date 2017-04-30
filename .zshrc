@@ -57,8 +57,8 @@ export HISTSIZE=1000
 # ...but only in memory...
 export SAVEHIST=0
 export HISTFILE=/dev/null
-# ... and actually display that history when asked. (With ISO timestamps!)
-alias history="fc -li 0"
+# ... and actually display that history when asked. (With ISO timestamp and duration!)
+alias history="fc -liD 0"
 
 # Autocomplete
 autoload -Uz compinit && compinit
