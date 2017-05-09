@@ -26,7 +26,7 @@ defbce on    # use current bg color for erased chars
 
 # Set up our "status line"
 
-backtick 100 30 30 uptime
+#backtick 100 30 30 uptime
 #backtick 101 86400 86400 whoami
 #backtick 102 10 10 who
 caption always "%{kW}%?%-Lw%?%{Wb}%n*%f %t%?(%u)%?%{kW}%?%+Lw%? %= %{= Wk} %{= bW}%100`%{-} %{= yw}%101`%{-} %{= mw}%102`%{-}"
