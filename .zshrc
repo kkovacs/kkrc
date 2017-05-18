@@ -105,6 +105,14 @@ alias tmux="tmux -2"
 # hl - highlight command
 source ~/.kkrc/hl
 
+# Automatically set TMUX window title on SSH
+ssh() {
+    tmux rename-window "$*" >/dev/null 2>/dev/null
+    command ssh "$@"
+    # To switch back to auto-renaming after disconnection:
+    #tmux set-window-option automatic-rename "on" >/dev/null 2>/dev/null
+}
+
 # Display screens if any
 screen -ls | grep -v "Socket"
 
