@@ -16,6 +16,9 @@ if [ -e ~/.bashrc.orig ]; then . ~/.bashrc.orig; fi
 # I need VI keys
 set -o vi
 
+# Disable history
+unset HISTFILE
+
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off.
 export PS1="\[\033[00;34m\]\u\[\033[00m\]@\[\033[00;32m\]\h\[\033[00m\] \[\033[00;33m\]\w\[\033[00m\] \[\033[00;36m\][\j]\[\033[00m\]\$ "
 # Or, if ANSI is problematic:
