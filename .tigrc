@@ -1,1 +1,2 @@
 set main-options = --all
+set main-view = line-number:no,interval=5 id:yes date:relative author:abbreviated commit-title:yes,graph,refs,overflow=no
