@@ -41,6 +41,7 @@ installrc .tmux.conf ~/.tmux.conf
 installrc .gitconfig ~/.gitconfig
 installrc .Xmodmap ~/.Xmodmap
 installrc .tigrc ~/.tigrc
+installrc .psqlrc ~/.psqlrc
 installrc .i3 ~/.i3
 
 # Update git submodules
