@@ -42,6 +42,7 @@ installrc .gitconfig ~/.gitconfig
 installrc .Xmodmap ~/.Xmodmap
 installrc .tigrc ~/.tigrc
 installrc .psqlrc ~/.psqlrc
+installrc .inputrc ~/.inputrc
 installrc .i3 ~/.i3
 
 # Update git submodules

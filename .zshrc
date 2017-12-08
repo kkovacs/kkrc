@@ -59,6 +59,8 @@ export SAVEHIST=0
 export HISTFILE=/dev/null
 # ... and actually display that history when asked. (With ISO timestamp and duration!)
 alias history="fc -liD 0"
+# And `h` as a super-short alias to `history`
+alias h=history
 
 # Autocomplete
 autoload -Uz compinit && compinit
@@ -86,11 +88,18 @@ setopt auto_pushd pushd_ignore_dups no_nomatch hup notify hist_ignore_dups hash_
 # I must have VI keys
 bindkey -v
 
+# But still, CTRL-R as history search in bash nice
+bindkey '^R' history-incremental-search-backward
+
 # Fix Debian's idiotic idea that "up" key in history should jump to beginning of line (while "k" to the EOL, just to be more confusing)
 [[ -z "$terminfo[kcuu1]" ]] || bindkey -M viins "$terminfo[kcuu1]" up-line-or-history
 [[ -z "$terminfo[kcud1]" ]] || bindkey -M viins "$terminfo[kcud1]" down-line-or-history
 [[ "$terminfo[kcuu1]" == ""* ]] && bindkey -M viins "${terminfo[kcuu1]/O/[}" up-line-or-history
 [[ "$terminfo[kcud1]" == ""* ]] && bindkey -M viins "${terminfo[kcud1]/O/[}" down-line-or-history
+
+# CTRL-K and CTRL-J as history-search with the already typed part of the line
+bindkey -M viins '^k' up-line-or-search
+bindkey -M viins '^j' down-line-or-search
 
 # Set up some handy aliases
 alias s="screen -xR"
