@@ -97,9 +97,17 @@ bindkey '^R' history-incremental-search-backward
 [[ "$terminfo[kcuu1]" == ""* ]] && bindkey -M viins "${terminfo[kcuu1]/O/[}" up-line-or-history
 [[ "$terminfo[kcud1]" == ""* ]] && bindkey -M viins "${terminfo[kcud1]/O/[}" down-line-or-history
 
-# CTRL-K and CTRL-J as history-search with the already typed part of the line
+# CTRL-K and CTRL-J as history-search with the already typed part of the line.
+# Both in command and insert mode.
 bindkey -M viins '^k' up-line-or-search
 bindkey -M viins '^j' down-line-or-search
+bindkey -M vicmd '^k' up-line-or-search
+bindkey -M vicmd '^j' down-line-or-search
+# Same for cursor keys ctrl-up and ctrl-down, both command and insert mode.
+bindkey -M viins '^[[1;5A' up-line-or-search
+bindkey -M viins '^[[1;5B' down-line-or-search
+bindkey -M vicmd '^[[1;5A' up-line-or-search
+bindkey -M vicmd '^[[1;5B' down-line-or-search
 
 # Set up some handy aliases
 alias s="screen -xR"
