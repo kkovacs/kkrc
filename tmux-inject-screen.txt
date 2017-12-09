@@ -1,0 +1,19 @@
+:defscrollback 5000
+:termcapinfo vt100 dl=5\E[M
+:hardstatus off
+:bind ^k
+:bind L
+:bind ^\
+:bind \\ quit
+:bind K kill
+:bind } history
+:termcapinfo xterm*|linux*|rxvt*|kterm*|Eterm* hs:ts=\E]0;:fs=\007:ds=\E]0;\007
+:termcapinfo xterm*|linux*|rxvt*|kterm*|Eterm* OP
+:termcapinfo xterm*|linux*|rxvt*|kterm*|Eterm* ti@:te@
+:defnonblock 5
+:msgwait 1
+:defutf8
+:attrcolor b ".I"
+:termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+:defbce on
+:caption always "%{kW}%?%-Lw%?%{Wb}%n*%f %t%?(%u)%?%{kW}%?%+Lw%? %= %{= Wk} %{= bW}%100`%{-} %{= yw}%101`%{-} %{= mw}%102`%{-}"

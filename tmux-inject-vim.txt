@@ -1,0 +1,48 @@
+:set nobackup nocompatible incsearch hlsearch showmatch autoindent virtualedit=block encoding=utf8 wildmenu wildmode=list:longest laststatus=2 noruler modeline showcmd nocursorline viminfo=
+:filetype plugin indent on
+:let g:netrw_preview=1
+:map <silent> - :Rexplore<cr>
+:map <silent> _ :Texplore<cr>
+:map <c-j> j<c-e>
+:map <c-k> k<c-y>
+:map <silent> <leader>l :setlocal list<cr>
+:map <silent> <leader>L :setlocal nolist<cr>
+:map <silent> <leader>p :setlocal paste<cr>
+:map <silent> <leader>P :setlocal nopaste<cr>
+:map <silent> <leader>v :setlocal virtualedit=all<cr>
+:map <silent> <leader>V :setlocal virtualedit=block<cr>
+:map <silent> <leader>e :setlocal expandtab<cr>
+:map <silent> <leader>E :setlocal noexpandtab<cr>
+:map <silent> <leader>w :setlocal nowrap<cr>
+:map <silent> <leader>W :setlocal wrap<cr>
+:map <silent> <leader>s :set scrollbind<cr>
+:map <silent> <leader>S :set noscrollbind<cr>
+:map <silent> <leader>t :setlocal nu linebreak breakindent wrap<cr>:noremap <buffer> <silent>j gj<cr>:noremap <buffer> <silent> k gk<cr>
+:map <silent> <leader>T :setlocal nonu nolinebreak nobreakindent<cr>:unmap <buffer> j<cr>:unmap <buffer> k<cr>
+:map <leader>2 :setlocal sw=2 ts=2<cr>
+:map <leader>4 :setlocal sw=4 ts=4<cr>
+:map <leader>8 :setlocal sw=8 ts=8<cr>
+:map <silent> g1 :tabfirst<cr>
+:map <silent> g2 :tabfirst\|tabnext 2<cr>
+:map <silent> g3 :tabfirst\|tabnext 3<cr>
+:map <silent> g4 :tabfirst\|tabnext 4<cr>
+:map <silent> g5 :tabfirst\|tabnext 5<cr>
+:map <silent> g6 :tabfirst\|tabnext 6<cr>
+:map <silent> g7 :tabfirst\|tabnext 7<cr>
+:map <silent> g8 :tablast\|tabprevious 2<cr>
+:map <silent> g9 :tablast\|tabprevious 1<cr>
+:map <silent> g0 :tablast<cr>
+:map <silent> <leader>h1 :call matchadd("Highlight1", expand("<cword>"))<cr>
+:map <silent> <leader>h2 :call matchadd("Highlight2", expand("<cword>"))<cr>
+:map <silent> <leader>h3 :call matchadd("Highlight3", expand("<cword>"))<cr>
+:map <silent> <leader>h4 :call matchadd("Highlight4", expand("<cword>"))<cr>
+:map <silent> <leader>h5 :call matchadd("Highlight5", expand("<cword>"))<cr>
+:map <silent> <leader>h6 :call matchadd("Highlight6", expand("<cword>"))<cr>
+:map <silent> <leader>h7 :call matchadd("Highlight7", expand("<cword>"))<cr>
+:map <silent> <leader>h8 :call matchadd("Highlight8", expand("<cword>"))<cr>
+:map <silent> <leader>h9 :call matchadd("Highlight9", expand("<cword>"))<cr>
+:map <silent> <leader>h0 :call clearmatches()<cr>
+:nmap <silent> <leader>/ :nohlsearch<cr>
+:let base16colorspace=256
+:set statusline=%n%m%h%r\ %f\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]\ %{&list?'LIST\ ':''}%{&linebreak?'TEXTMODE\ ':''}%{&scrollbind?'SCROLLBIND\ ':''}%{&scrollbind?'SCROLLBIND\ ':''}%{&expandtab?'EXPANDTAB\ ':''}%{&wrap?'':'NOWRAP\ '}%{&paste?'PASTE\ ':''}%{&virtualedit=='all'?'VIRTUALEDIT\ ':''}%{strlen(&mouse)?'MOUSE\ ':''}%y%=C:%c%V\ L:%l/%L\ %p%%
+:autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o

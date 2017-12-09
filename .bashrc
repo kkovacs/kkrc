@@ -16,8 +16,14 @@ if [ -e ~/.bashrc.orig ]; then . ~/.bashrc.orig; fi
 # I need VI keys
 set -o vi
 
+# But still want CTRL-L
+bind -m vi-insert "\C-l":clear-screen
+
 # Disable history
 unset HISTFILE
+
+# Ignore both duplicated and whitespace
+HISTCONTROL=ignoreboth
 
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off.
 export PS1="\[\033[00;34m\]\u\[\033[00m\]@\[\033[00;32m\]\h\[\033[00m\] \[\033[00;33m\]\w\[\033[00m\] \[\033[00;36m\][\j]\[\033[00m\]\$ "
@@ -27,6 +33,7 @@ export PS1="\[\033[00;34m\]\u\[\033[00m\]@\[\033[00;32m\]\h\[\033[00m\] \[\033[0
 # Set up some necessary environment variables
 export EDITOR=vim
 export LC_CTYPE="en_US.UTF-8"
+export LANG="en_US.UTF-8"
 
 # BSD colors
 export LSCOLORS=ExFxCxDxBxegedabagacad
