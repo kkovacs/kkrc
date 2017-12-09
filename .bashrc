@@ -26,7 +26,7 @@ unset HISTFILE
 HISTCONTROL=ignoreboth
 
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off.
-export PS1="\[\033[00;34m\]\u\[\033[00m\]@\[\033[00;32m\]\h\[\033[00m\] \[\033[00;33m\]\w\[\033[00m\] \[\033[00;36m\][\j]\[\033[00m\]\$ "
+export PS1='\[\033[00;34m\]\u\[\033[00m\]@\[\033[00;32m\]\h\[\033[00m\] \[\033[00;33m\]\w\[\033[00m\] \[\033[00;36m\][\j]\[\033[00m\]\$ '
 # Or, if ANSI is problematic:
 #export PS1="\u@\h \w [\j]\$ "
 
@@ -46,10 +46,22 @@ alias l="ls -lrt"
 alias la="ls -lrtA"
 alias ll="ls -lhFrt"
 alias sc="systemctl"
+alias jc="journalctl"
+alias scs="systemctl status"
+alias sc0="systemctl stop"
+alias sc1="systemctl start"
+alias scr="systemctl restart"
 alias grep="grep --color"
 alias json="python -mjson.tool"
 alias kargs="xargs -n 1 -P `getconf _NPROCESSORS_ONLN` -I{}"
 alias tmux="tmux -2"
+
+# Now fix bash competion for our systemd aliases (unfortunately manually)
+# NOTE: unfortunately there is no way in bash to also autocomplete "scs", "sc0"... :(
+_completion_loader systemctl
+_completion_loader journalctl
+complete -F _systemctl sc
+complete -F _journalctl jc
 
 # Do we have ZSH? Use it if possible
 ZSH=`type -P zsh`
