@@ -36,12 +36,12 @@ function rp () {
 		export RPROMPT="%{$fg_bold[yellow]%}%~%{$reset_color%}"
 		# B&W: export RPROMPT='%~'
 		# Set up the left-side prompt to display "username@machine [background job count]# ", and if root, username be red
-		export PROMPT="%{%(#~$fg[red]~$fg[blue])%}%n%{$reset_color%}@%{$fg[green]%}%m %{$fg_no_bold[cyan]%}[%j]%{$reset_color%}%# "
+		export PROMPT="%{%(#~$fg[red]~$fg[blue])%}%n%{$reset_color%}@%{$fg[green]%}%m %{$fg_no_bold[cyan]%}[%j]%{$reset_color%}%% "
 		# B&W: export PROMPT='%n@%m [%j]%# '
 	else
 		# No RPROMPT, set up the left-side prompt to contain the directory
 		export RPROMPT=''
-		export PROMPT="%{%(#~$fg[red]~$fg[blue])%}%n%{$reset_color%}@%{$fg[green]%}%m %{$fg_bold[yellow]%}%~%{$reset_color%} %{$fg_no_bold[cyan]%}[%j]%{$reset_color%}%# "
+		export PROMPT="%{%(#~$fg[red]~$fg[blue])%}%n%{$reset_color%}@%{$fg[green]%}%m %{$fg_bold[yellow]%}%~%{$reset_color%} %{$fg_no_bold[cyan]%}[%j]%{$reset_color%}%% "
 		# B&W: export PROMPT='%n@%m %~ [%j]%# '
 	fi
 }
@@ -83,7 +83,7 @@ zstyle ':completion:*' verbose yes
 autoload -Uz bashcompinit && bashcompinit
 
 # Zsh options
-setopt auto_pushd pushd_ignore_dups no_nomatch hup notify hist_ignore_dups hash_list_all completealiases always_to_end complete_in_word correct list_ambiguous
+setopt auto_pushd pushd_ignore_dups no_nomatch hup notify hist_ignore_dups hash_list_all completealiases always_to_end complete_in_word correct list_ambiguous hist_ignore_space
 # So aliases like "sc" get autocompleted
 unsetopt complete_aliases
 
