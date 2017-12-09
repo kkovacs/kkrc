@@ -58,13 +58,6 @@ alias json="python -mjson.tool"
 alias kargs="xargs -n 1 -P `getconf _NPROCESSORS_ONLN` -I{}"
 alias tmux="tmux -2"
 
-# Now fix bash competion for our systemd aliases (unfortunately manually)
-# NOTE: unfortunately there is no way in bash to also autocomplete "scs", "sc0"... :(
-_completion_loader systemctl
-_completion_loader journalctl
-complete -F _systemctl sc
-complete -F _journalctl jc
-
 # Do we have ZSH? Use it if possible
 ZSH=`type -P zsh`
 if [ $? -eq 0 ]; then
@@ -72,6 +65,13 @@ if [ $? -eq 0 ]; then
 else
 	echo "KKRC: No zsh found, you're on bash."
 fi
+
+# Now fix bash competion for our systemd aliases (unfortunately manually)
+# NOTE: unfortunately there is no way in bash to also autocomplete "scs", "sc0"... :(
+_completion_loader systemctl
+_completion_loader journalctl
+complete -F _systemctl sc
+complete -F _journalctl jc
 
 # hl - highlight command
 source ~/.kkrc/hl
