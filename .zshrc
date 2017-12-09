@@ -84,6 +84,8 @@ autoload -Uz bashcompinit && bashcompinit
 
 # Zsh options
 setopt auto_pushd pushd_ignore_dups no_nomatch hup notify hist_ignore_dups hash_list_all completealiases always_to_end complete_in_word correct list_ambiguous
+# So aliases like "sc" get autocompleted
+unsetopt complete_aliases
 
 # I must have VI keys
 bindkey -v
@@ -114,6 +116,7 @@ alias s="screen -xR"
 alias l="ls -lrt"
 alias la="ls -lrtA"
 alias ll="ls -lhFrt"
+alias sc="systemctl"
 alias grep="grep --color"
 alias json="python -mjson.tool"
 alias kargs="xargs -n 1 -P `getconf _NPROCESSORS_ONLN` -I{}"
