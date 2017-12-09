@@ -68,10 +68,14 @@ fi
 
 # Now fix bash competion for our systemd aliases (unfortunately manually)
 # NOTE: unfortunately there is no way in bash to also autocomplete "scs", "sc0"... :(
+source /usr/share/bash-completion/bash_completion
 _completion_loader systemctl
 _completion_loader journalctl
 complete -F _systemctl sc
 complete -F _journalctl jc
+
+# Poor man's history expansion (which bash doesn't do on TAB)
+shopt -s histverify
 
 # hl - highlight command
 source ~/.kkrc/hl
