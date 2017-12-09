@@ -1,10 +1,10 @@
-\set QUIET 1
-\timing
-\x auto
-\pset linestyle unicode
-\set PROMPT1 'PSQL %n@%m %/%R%# '
-\set PROMPT2 '... %R > '
-\set VERBOSITY verbose
-\set HISTCONTROL ignoredups
-\set COMP_KEYWORD_CASE upper
-\unset QUIET
+ \set HISTCONTROL ignoreboth
+ \set QUIET 1
+ \timing
+ \x auto
+ \pset linestyle unicode
+ \set VERBOSITY verbose
+ \set COMP_KEYWORD_CASE upper
+ \set PROMPT2 '... %R > '
+ \set PROMPT1 'PSQL %n@%m %/%R%# '
+ \unset QUIET
