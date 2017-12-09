@@ -64,7 +64,7 @@ alias h=history
 
 # Autocomplete
 autoload -Uz compinit && compinit
-zmodload -i zsh/complist        
+zmodload -i zsh/complist
 bindkey -M menuselect '^[[Z' reverse-menu-complete # Shift-tab in complist
 zstyle ':completion:*' auto-description 'Specify: %d'
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate

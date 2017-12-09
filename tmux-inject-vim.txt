@@ -46,3 +46,4 @@
 :let base16colorspace=256
 :set statusline=%n%m%h%r\ %f\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]\ %{&list?'LIST\ ':''}%{&linebreak?'TEXTMODE\ ':''}%{&scrollbind?'SCROLLBIND\ ':''}%{&scrollbind?'SCROLLBIND\ ':''}%{&expandtab?'EXPANDTAB\ ':''}%{&wrap?'':'NOWRAP\ '}%{&paste?'PASTE\ ':''}%{&virtualedit=='all'?'VIRTUALEDIT\ ':''}%{strlen(&mouse)?'MOUSE\ ':''}%y%=C:%c%V\ L:%l/%L\ %p%%
 :autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+:echo "vim ok"
