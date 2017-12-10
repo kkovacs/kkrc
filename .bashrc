@@ -76,6 +76,7 @@ complete -F _journalctl jc
 
 # Poor man's history expansion (which bash doesn't do on TAB)
 shopt -s histverify
+shopt -s globstar
 
 # hl - highlight command
 source ~/.kkrc/hl
