@@ -83,7 +83,7 @@ zstyle ':completion:*' verbose yes
 autoload -Uz bashcompinit && bashcompinit
 
 # Zsh options
-setopt auto_pushd pushd_ignore_dups no_nomatch hup notify hist_ignore_dups hash_list_all completealiases always_to_end complete_in_word correct list_ambiguous hist_ignore_space
+setopt auto_pushd pushd_ignore_dups no_nomatch hup notify hist_ignore_dups hash_list_all completealiases always_to_end complete_in_word correct no_list_ambiguous hist_ignore_space
 # So aliases like "sc" get autocompleted
 unsetopt complete_aliases
 

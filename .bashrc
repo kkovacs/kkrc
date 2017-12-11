@@ -47,6 +47,7 @@ alias s="screen -xR"
 alias l="ls -lrt"
 alias la="ls -lrtA"
 alias ll="ls -lhFrt"
+alias h="history"
 alias sc="systemctl"
 alias jc="journalctl"
 alias scs="systemctl status"
@@ -77,6 +78,13 @@ complete -F _journalctl jc
 # Poor man's history expansion (which bash doesn't do on TAB)
 shopt -s histverify
 shopt -s globstar
+
+bind 'set show-all-if-ambiguous on'
+bind 'set completion-ignore-case on'
+bind 'set match-hidden-files off'
+bind 'set colored-stats on'
+bind '"\C-k":history-search-backward'
+bind '"\C-j":history-search-forward'
 
 # hl - highlight command
 source ~/.kkrc/hl
