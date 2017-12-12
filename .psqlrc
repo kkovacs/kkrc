@@ -5,6 +5,6 @@
  \pset linestyle unicode
  \set VERBOSITY verbose
  \set COMP_KEYWORD_CASE upper
- \set PROMPT2 '... %R > '
- \set PROMPT1 'PSQL %n@%m %/%R%# '
+ \set PROMPT2 '%[%033[31m%]%R%[%033[0m%] > '
+ \set PROMPT1 '%[%033[32m%]%M%[%033[0m%] %[%033[34m%]%n%[%033[0m%]@%[%033[35m%]%/%[%033[0m%]%R%# '
  \unset QUIET
