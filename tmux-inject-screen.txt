@@ -16,4 +16,4 @@
 :attrcolor b ".I"
 :termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
 :defbce on
-:caption always "%{kW}%?%-Lw%?%{Wb}%n*%f %t%?(%u)%?%{kW}%?%+Lw%? %= %{= Wk} %{= bW}%100`%{-} %{= yw}%101`%{-} %{= mw}%102`%{-}"
+:caption always "%{kW}%?%-Lw%?%{Wb}%n*%f %t%?(%u)%?%{kW}%?%+Lw%? %= %{= Wk} %{= bW}%100`%{-} %{= yw}%101`%{-} %{= mw}%102`%{-} %H "

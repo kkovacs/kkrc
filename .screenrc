@@ -29,7 +29,7 @@ defbce on    # use current bg color for erased chars
 #backtick 100 30 30 uptime
 #backtick 101 86400 86400 whoami
 #backtick 102 10 10 who
-caption always "%{kW}%?%-Lw%?%{Wb}%n*%f %t%?(%u)%?%{kW}%?%+Lw%? %= %{= Wk} %{= bW}%100`%{-} %{= yw}%101`%{-} %{= mw}%102`%{-}"
+caption always "%{kW}%?%-Lw%?%{Wb}%n*%f %t%?(%u)%?%{kW}%?%+Lw%? %= %{= Wk} %{= bW}%100`%{-} %{= yw}%101`%{-} %{= mw}%102`%{-} %H "
 #hardstatus string '%99`%{= Wk} %100`%112`%= %102`%101`%114`%115`%108`%113`%119`%117`%118`%116`%106`%104`%103`%105`%107`%Y-%m-%d %0c:%s'
 #hardstatus alwayslastline
 #bindkey -k k9 windowlist -b # Map F9 to screen selection
