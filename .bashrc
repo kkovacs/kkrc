@@ -54,6 +54,8 @@ alias scs="systemctl status"
 alias sc0="systemctl stop"
 alias sc1="systemctl start"
 alias scr="systemctl restart"
+alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all"
+alias gs="git status -sb";
 alias grep="grep --color"
 alias json="python -mjson.tool"
 alias kargs="xargs -n 1 -P `getconf _NPROCESSORS_ONLN` -I{}"

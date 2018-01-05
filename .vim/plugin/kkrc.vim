@@ -151,7 +151,7 @@ colorscheme kk-base16-colors
 syn on
 if has("gui_running")
     "colorscheme kk-rdark
-    set guioptions=egmrt
+    set guioptions=e
 endif
 
 " Statusline with a few useful items, but still lightweight (no plugins!)
