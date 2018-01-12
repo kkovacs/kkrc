@@ -34,6 +34,7 @@ export PROMPT_COMMAND="PS1='\[\033[00;\$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -
 
 # Set up some necessary environment variables
 export EDITOR=vim
+export PAGER=less
 export LC_CTYPE="en_US.UTF-8"
 export LANG="en_US.UTF-8"
 
