@@ -40,6 +40,7 @@ export LANG="en_US.UTF-8"
 
 # BSD colors
 export LSCOLORS=ExFxCxDxBxegedabagacad
+export CLICOLOR=1
 # Linux colors -- set always because of zsh's list-colors
 export LS_COLORS="di=1;34:ln=1;35:so=1;32:pi=1;33:ex=1;31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43"
 
@@ -62,17 +63,18 @@ alias json="python -mjson.tool"
 alias kargs="xargs -n 1 -P `getconf _NPROCESSORS_ONLN` -I{}"
 alias tmux="tmux -2"
 
-# Do we have ZSH? Use it if possible
-ZSH=`type -P zsh`
-if [ $? -eq 0 ]; then
-	exec $ZSH
-else
-	echo "KKRC: No zsh found, you're on bash."
-fi
+## Do we have ZSH? Use it if possible
+#ZSH=`type -P zsh`
+#if [ $? -eq 0 ]; then
+#	exec $ZSH
+#else
+#	echo "KKRC: No zsh found, you're on bash."
+#fi
 
 # Now fix bash competion for our systemd aliases (unfortunately manually)
 # NOTE: unfortunately there is no way in bash to also autocomplete "scs", "sc0"... :(
-source /usr/share/bash-completion/bash_completion
+[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion # Most Linux
+[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion # OS X
 _completion_loader systemctl
 _completion_loader journalctl
 complete -F _systemctl sc
