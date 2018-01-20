@@ -61,8 +61,8 @@ alias gs="git status -sb";
 alias json="python -mjson.tool"
 alias tmux="tmux -2"
 # Only if not on busybox
-[ -e /bin/busybox ] || alias grep="grep --color"
-[ -e /bin/busybox ] || alias less="less -X" # No alt screen
+[ -h $(type -p grep) ] || alias grep="grep --color"
+[ -h $(type -p less) ] || alias less="less -X" # No alt screen
 
 # Now fix bash competion for our systemd aliases (unfortunately manually)
 # NOTE: unfortunately there is no way in bash to also autocomplete "scs", "sc0"... :(
