@@ -122,7 +122,7 @@ alias scs="systemctl status"
 alias sc0="systemctl stop"
 alias sc1="systemctl start"
 alias scr="systemctl restart"
-alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all"
+alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
 alias gs="git status -sb";
 alias grep="grep --color"
 alias json="python -mjson.tool"
@@ -134,10 +134,24 @@ source ~/.kkrc/hl
 
 # Automatically set TMUX window title on SSH
 ssh() {
-    tmux rename-window "$*" >/dev/null 2>/dev/null
-    command ssh "$@"
-    # To switch back to auto-renaming after disconnection:
-    #tmux set-window-option automatic-rename "on" >/dev/null 2>/dev/null
+	# Store current window name
+	local SAVED=$(tmux display-message -p '#W')
+	local ARGS=($@)
+	local NAME="ssh"
+	local I
+	# Try to find the server name
+	for I in ${ARGS} ; do
+		[[ $I == "--" ]] && break
+		NAME="$I"
+	done
+	# Set window name
+	tmux rename-window "${NAME}" >/dev/null 2>/dev/null
+	# Do it
+	command ssh "$@"
+	# Restore window name
+	#tmux rename-window "$SAVED" >/dev/null 2>/dev/null
+	# To switch back to auto-renaming after disconnection:
+	#tmux set-window-option automatic-rename "on" >/dev/null 2>/dev/null
 }
 
 # Display screens if any

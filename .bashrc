@@ -16,7 +16,7 @@ if [ -e ~/.bashrc.orig ]; then . ~/.bashrc.orig; fi
 # I need VI keys
 set -o vi
 
-# But still want CTRL-L
+# But still want CTRL-L in readline
 bind -m vi-insert "\C-l":clear-screen
 
 # Disable history
@@ -56,7 +56,8 @@ alias scs="systemctl status"
 alias sc0="systemctl stop"
 alias sc1="systemctl start"
 alias scr="systemctl restart"
-alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all"
+alias less="less -X" # No alt screen
+alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
 alias gs="git status -sb";
 alias grep="grep --color"
 alias json="python -mjson.tool"
@@ -82,18 +83,49 @@ complete -F _journalctl jc
 
 # Poor man's history expansion (which bash doesn't do on TAB)
 shopt -s histverify
+# For "**"
 shopt -s globstar
+# Spell checking on tab expansion
+shopt -s cdspell dirspell
 
+# Configure readline
+bind 'TAB:menu-complete'
+bind '"\e[Z": menu-complete-backward'
+bind 'set menu-complete-display-prefix on'
 bind 'set show-all-if-ambiguous on'
 bind 'set completion-ignore-case on'
 bind 'set match-hidden-files off'
 bind 'set colored-stats on'
+bind 'set completion-prefix-display-length 2'
+bind 'set skip-completed-text on'
 bind '"\C-k":history-search-backward'
 bind '"\C-j":history-search-forward'
 
 # hl - highlight command
 source ~/.kkrc/hl
 export -f hl
+
+# Automatically set TMUX window title on SSH
+ssh() {
+	# Store current window name
+	local SAVED=$(tmux display-message -p '#W')
+	local ARGS=($@)
+	local NAME="ssh"
+	local I
+	# Try to find the server name
+	for I in ${ARGS} ; do
+		[[ $I == "--" ]] && break
+		NAME="$I"
+	done
+	# Set window name
+	tmux rename-window "${NAME}" >/dev/null 2>/dev/null
+	# Do it
+	command ssh "$@"
+	# To Restore window name automatically:
+	#tmux rename-window "$SAVED" >/dev/null 2>/dev/null
+	# To switch back to auto-renaming after disconnection:
+	#tmux set-window-option automatic-rename "on" >/dev/null 2>/dev/null
+}
 
 # Display screens if any
 screen -ls | grep -v "Socket"
