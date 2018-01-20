@@ -13,17 +13,16 @@ fi
 # (so we can override)
 if [ -e ~/.bashrc.orig ]; then . ~/.bashrc.orig; fi
 
-# I need VI keys
-set -o vi
-
-# But still want CTRL-L in readline
-bind -m vi-insert "\C-l":clear-screen
-
-# Disable history
-unset HISTFILE
+# START of part to be injected
 
 # Ignore both duplicated and whitespace
 HISTCONTROL=ignoreboth
+
+# I need VI keys
+set -o vi
+
+# Disable history
+unset HISTFILE
 
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off.
 #export PS1='\[\033[00;34m\]\u\[\033[00m\]@\[\033[00;32m\]\h\[\033[00m\] \[\033[00;33m\]\w\[\033[00m\] \[\033[00;36m\][\j]\[\033[00m\]\$ '
@@ -38,9 +37,10 @@ export PAGER=less
 export LC_CTYPE="en_US.UTF-8"
 export LANG="en_US.UTF-8"
 
+# Colors! :)
+export CLICOLOR=1
 # BSD colors
 export LSCOLORS=ExFxCxDxBxegedabagacad
-export CLICOLOR=1
 # Linux colors -- set always because of zsh's list-colors
 export LS_COLORS="di=1;34:ln=1;35:so=1;32:pi=1;33:ex=1;31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43"
 
@@ -56,21 +56,13 @@ alias scs="systemctl status"
 alias sc0="systemctl stop"
 alias sc1="systemctl start"
 alias scr="systemctl restart"
-alias less="less -X" # No alt screen
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
 alias gs="git status -sb";
-alias grep="grep --color"
 alias json="python -mjson.tool"
-alias kargs="xargs -n 1 -P `getconf _NPROCESSORS_ONLN` -I{}"
 alias tmux="tmux -2"
-
-## Do we have ZSH? Use it if possible
-#ZSH=`type -P zsh`
-#if [ $? -eq 0 ]; then
-#	exec $ZSH
-#else
-#	echo "KKRC: No zsh found, you're on bash."
-#fi
+# Only if not on busybox
+[ -e /bin/busybox ] || alias grep="grep --color"
+[ -e /bin/busybox ] || alias less="less -X" # No alt screen
 
 # Now fix bash competion for our systemd aliases (unfortunately manually)
 # NOTE: unfortunately there is no way in bash to also autocomplete "scs", "sc0"... :(
@@ -96,10 +88,22 @@ bind 'set show-all-if-ambiguous on'
 bind 'set completion-ignore-case on'
 bind 'set match-hidden-files off'
 bind 'set colored-stats on'
-bind 'set completion-prefix-display-length 2'
+bind 'set visible-stats on'
+bind 'set completion-prefix-display-length 1'
 bind 'set skip-completed-text on'
-bind '"\C-k":history-search-backward'
-bind '"\C-j":history-search-forward'
+bind 'set history-preserve-point on'
+
+# Better history stepping, both in insert and command mode
+bind -m vi 'k:history-search-backward'
+bind -m vi 'j:history-search-forward'
+bind -m vi '"\e[A":history-search-backward'
+bind -m vi '"\e[B":history-search-forward'
+bind -m vi-insert '"\e[A":history-search-backward'
+bind -m vi-insert '"\e[B":history-search-forward'
+# And I still want CTRL-L in insert mode
+bind -m vi-insert "\C-l":clear-screen
+
+# END of part to be injected
 
 # hl - highlight command
 source ~/.kkrc/hl
