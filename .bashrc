@@ -24,6 +24,9 @@ set -o vi
 # Disable history
 unset HISTFILE
 
+# Clear out other people's stupid history from my session
+history -c
+
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off.
 #export PS1='\[\033[00;34m\]\u\[\033[00m\]@\[\033[00;32m\]\h\[\033[00m\] \[\033[00;33m\]\w\[\033[00m\] \[\033[00;36m\][\j]\[\033[00m\]\$ '
 # Colored prompt with 'root' detection
@@ -56,6 +59,7 @@ alias scs="systemctl status"
 alias sc0="systemctl stop"
 alias sc1="systemctl start"
 alias scr="systemctl restart"
+alias psql="INPUTRC=/dev/fd/9 psql 9<<<'set editing-mode vi'";
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
 alias gs="git status -sb";
 alias json="python -mjson.tool"
@@ -68,8 +72,7 @@ alias tmux="tmux -2"
 # NOTE: unfortunately there is no way in bash to also autocomplete "scs", "sc0"... :(
 [ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion # Most Linux
 [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion # OS X
-_completion_loader systemctl
-_completion_loader journalctl
+if type _completion_loader 2>/dev/null >/dev/null; then _completion_loader systemctl; _completion_loader journalctl; fi
 complete -F _systemctl sc
 complete -F _journalctl jc
 
@@ -102,6 +105,12 @@ bind -m vi-insert '"\e[A":history-search-backward'
 bind -m vi-insert '"\e[B":history-search-forward'
 # And I still want CTRL-L in insert mode
 bind -m vi-insert "\C-l":clear-screen
+
+# Restore default completion for cd, since bash-completion doesn't handle wildcards
+compopt -o bashdefault cd
+
+# Disable Debian/Ubuntu's annoying "command not found" script
+unset -f command_not_found_handle
 
 # END of part to be injected
 
