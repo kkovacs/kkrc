@@ -30,7 +30,7 @@ history -c
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off.
 #export PS1='\[\033[00;34m\]\u\[\033[00m\]@\[\033[00;32m\]\h\[\033[00m\] \[\033[00;33m\]\w\[\033[00m\] \[\033[00;36m\][\j]\[\033[00m\]\$ '
 # Colored prompt with 'root' detection
-export PROMPT_COMMAND="PS1='\[\033[00;\$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)m\]\u\[\033[00m\]@\[\033[00;32m\]\h\[\033[00m\] \[\033[00;33m\]\w\[\033[00m\] \[\033[00;36m\][\j]\[\033[00m\]\\$ '"
+export PROMPT_COMMAND="PS1='\[\033[00;\$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\\$ '"
 # Or, if ANSI is problematic:
 #export PS1="\u@\h \w [\j]\$ "
 
@@ -75,6 +75,7 @@ alias tmux="tmux -2"
 if type _completion_loader 2>/dev/null >/dev/null; then _completion_loader systemctl; _completion_loader journalctl; fi
 complete -F _systemctl sc
 complete -F _journalctl jc
+complete -F _ssh sshs
 
 # Poor man's history expansion (which bash doesn't do on TAB)
 shopt -s histverify
@@ -138,6 +139,11 @@ ssh() {
 	#tmux rename-window "$SAVED" >/dev/null 2>/dev/null
 	# To switch back to auto-renaming after disconnection:
 	#tmux set-window-option automatic-rename "on" >/dev/null 2>/dev/null
+}
+
+# SSH with automatic GNU screen on the other side
+sshs() {
+	ssh "$@" -t -- screen -xR "${USER}"
 }
 
 # Display screens if any
