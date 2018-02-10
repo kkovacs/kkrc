@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Change to own dir
+cd "$(dirname $0)"
+
 # .bashrc is a special case, since it usually exists. If it's not ours,
 # rename it to .bashrc.orig
 if [ -L ~/.bashrc ]; then
@@ -10,43 +13,31 @@ else
 fi
 
 # Installs the softlinks in place.
-installrc() {
-file=$1
-softlink=$2
+process() {
+	local file="$1"
+	local softlink="$2"
 
-echo "Installing $file..."
+	echo "Installing $file..."
 
-if [ -L $softlink ]; then
-	echo "OK: Your $softlink is already a soft link, nice!"
-else
-	if [ -e $softlink ]; then
-		echo "WARNING: You have $softlink - please move it away."
+	if [ -L "$softlink" ]; then
+		echo "OK: Your $softlink is already a soft link, nice!"
 	else
-		ln -s ~/.kkrc/$file $softlink
-		echo "OK: Installed."
+		if [ -e "$softlink" ]; then
+			echo "WARNING: You have $softlink - please move it away."
+		else
+			ln -s "~/.kkrc/$file" "$softlink"
+			echo "OK: Installed."
+		fi
 	fi
-fi
 
-# Just for pretty formatting
-echo
+	# Just for pretty formatting
+	echo
 }
 
-installrc .vimrc ~/.vimrc
-installrc .vim ~/.vim
-installrc .zshrc ~/.zshrc
-installrc .screenrc ~/.screenrc
-installrc .bashrc ~/.bashrc
-installrc .hgrc ~/.hgrc
-installrc .tmux.conf ~/.tmux.conf
-installrc .gitconfig ~/.gitconfig
-installrc .Xmodmap ~/.Xmodmap
-installrc .tigrc ~/.tigrc
-installrc .psqlrc ~/.psqlrc
-installrc .inputrc ~/.inputrc
-installrc .i3 ~/.i3
+# Process all files/dirs
+. ./kkrc-files
 
 # Update git submodules
-cd ~/.kkrc
 if [ -e ~/.kkrc/.vim/bundle/vim-pathogen/README.markdown ]; then
 	git submodule foreach git pull origin master
 else

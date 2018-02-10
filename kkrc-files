@@ -1,0 +1,13 @@
+process .vimrc ~/.vimrc
+process .vim ~/.vim
+process .zshrc ~/.zshrc
+process .screenrc ~/.screenrc
+process .bashrc ~/.bashrc
+process .hgrc ~/.hgrc
+process .tmux.conf ~/.tmux.conf
+process .gitconfig ~/.gitconfig
+process .Xmodmap ~/.Xmodmap
+process .tigrc ~/.tigrc
+process .psqlrc ~/.psqlrc
+process .inputrc ~/.inputrc
+process .i3 ~/.i3
