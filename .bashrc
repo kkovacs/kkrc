@@ -13,30 +13,35 @@ fi
 # (so we can override)
 if [ -e ~/.bashrc.orig ]; then . ~/.bashrc.orig; fi
 
-# I need VI keys
-set -o vi
-
-# But still want CTRL-L
-bind -m vi-insert "\C-l":clear-screen
-
-# Disable history
-unset HISTFILE
+# START of part to be injected
 
 # Ignore both duplicated and whitespace
 HISTCONTROL=ignoreboth
 
+# I need VI keys
+set -o vi
+
+# Disable history
+unset HISTFILE
+
+# Clear out other people's stupid history from my session
+history -c
+
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off.
 #export PS1='\[\033[00;34m\]\u\[\033[00m\]@\[\033[00;32m\]\h\[\033[00m\] \[\033[00;33m\]\w\[\033[00m\] \[\033[00;36m\][\j]\[\033[00m\]\$ '
 # Colored prompt with 'root' detection
-export PROMPT_COMMAND="PS1='\[\033[00;\$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)m\]\u\[\033[00m\]@\[\033[00;32m\]\h\[\033[00m\] \[\033[00;33m\]\w\[\033[00m\] \[\033[00;36m\][\j]\[\033[00m\]\\$ '"
+export PROMPT_COMMAND="PS1='\[\033[00;\$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\\$ '"
 # Or, if ANSI is problematic:
 #export PS1="\u@\h \w [\j]\$ "
 
 # Set up some necessary environment variables
 export EDITOR=vim
+export PAGER=less
 export LC_CTYPE="en_US.UTF-8"
 export LANG="en_US.UTF-8"
 
+# Colors! :)
+export CLICOLOR=1
 # BSD colors
 export LSCOLORS=ExFxCxDxBxegedabagacad
 # Linux colors -- set always because of zsh's list-colors
@@ -54,43 +59,92 @@ alias scs="systemctl status"
 alias sc0="systemctl stop"
 alias sc1="systemctl start"
 alias scr="systemctl restart"
-alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all"
+alias psql="INPUTRC=/dev/fd/9 psql 9<<<'set editing-mode vi'";
+alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
 alias gs="git status -sb";
-alias grep="grep --color"
 alias json="python -mjson.tool"
-alias kargs="xargs -n 1 -P `getconf _NPROCESSORS_ONLN` -I{}"
 alias tmux="tmux -2"
-
-# Do we have ZSH? Use it if possible
-ZSH=`type -P zsh`
-if [ $? -eq 0 ]; then
-	exec $ZSH
-else
-	echo "KKRC: No zsh found, you're on bash."
-fi
+# Only if not on busybox
+[ -h $(type -p grep) ] || alias grep="grep --color"
+[ -h $(type -p less) ] || alias less="less -X" # No alt screen
 
 # Now fix bash competion for our systemd aliases (unfortunately manually)
 # NOTE: unfortunately there is no way in bash to also autocomplete "scs", "sc0"... :(
-source /usr/share/bash-completion/bash_completion
-_completion_loader systemctl
-_completion_loader journalctl
+[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion # Most Linux
+[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion # OS X
+if type _completion_loader 2>/dev/null >/dev/null; then _completion_loader systemctl; _completion_loader journalctl; fi
 complete -F _systemctl sc
 complete -F _journalctl jc
+complete -F _ssh sshs
 
 # Poor man's history expansion (which bash doesn't do on TAB)
 shopt -s histverify
+# For "**"
 shopt -s globstar
+# Spell checking on tab expansion
+shopt -s cdspell dirspell
 
+# Configure readline
+bind 'TAB:menu-complete'
+bind '"\e[Z": menu-complete-backward'
+bind 'set menu-complete-display-prefix on'
 bind 'set show-all-if-ambiguous on'
 bind 'set completion-ignore-case on'
 bind 'set match-hidden-files off'
 bind 'set colored-stats on'
-bind '"\C-k":history-search-backward'
-bind '"\C-j":history-search-forward'
+bind 'set visible-stats on'
+bind 'set completion-prefix-display-length 1'
+bind 'set skip-completed-text on'
+bind 'set history-preserve-point on'
+
+# Better history stepping, both in insert and command mode
+bind -m vi 'k:history-search-backward'
+bind -m vi 'j:history-search-forward'
+bind -m vi '"\e[A":history-search-backward'
+bind -m vi '"\e[B":history-search-forward'
+bind -m vi-insert '"\e[A":history-search-backward'
+bind -m vi-insert '"\e[B":history-search-forward'
+# And I still want CTRL-L in insert mode
+bind -m vi-insert "\C-l":clear-screen
+
+# Restore default completion for cd, since bash-completion doesn't handle wildcards
+compopt -o bashdefault cd
+
+# Disable Debian/Ubuntu's annoying "command not found" script
+unset -f command_not_found_handle
+
+# END of part to be injected
 
 # hl - highlight command
 source ~/.kkrc/hl
 export -f hl
+
+# Automatically set TMUX window title on SSH
+ssh() {
+	# Store current window name
+	local SAVED=$(tmux display-message -p '#W')
+	local ARGS=($@)
+	local NAME="ssh"
+	local I
+	# Try to find the server name
+	for I in ${ARGS} ; do
+		[[ $I == "--" ]] && break
+		NAME="$I"
+	done
+	# Set window name
+	tmux rename-window "${NAME}" >/dev/null 2>/dev/null
+	# Do it
+	command ssh "$@"
+	# To Restore window name automatically:
+	#tmux rename-window "$SAVED" >/dev/null 2>/dev/null
+	# To switch back to auto-renaming after disconnection:
+	#tmux set-window-option automatic-rename "on" >/dev/null 2>/dev/null
+}
+
+# SSH with automatic GNU screen on the other side
+sshs() {
+	ssh "$@" -t -- screen -xR "${USER}"
+}
 
 # Display screens if any
 screen -ls | grep -v "Socket"

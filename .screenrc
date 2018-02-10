@@ -23,13 +23,26 @@ defutf8 on # It's the XXI century, everyone should use UTF-8
 attrcolor b ".I"    # allow bold colors - necessary for some reason
 termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'   # tell screen how to set colors. AB = background, AF=foreground
 defbce on    # use current bg color for erased chars
+altscreen on	# use the alternate screen
+
+# One-key next and prev window
+# XXX conflicts with vim
+#bindkey ^E next
+#bindkey ^W prev
 
 # Set up our "status line"
 
+# Minimal bar
+#caption always "%-w(%n%f*%t)%+w%=%H"
+# Simple very clean bar
+#caption always "%-w%{+b wb} %n %t %{-}%+w %=%{Wb} %H %{-}"
+# Same as above but with flags
+caption always "%-Lw%{+b wb} %n%f:%t %{-}%+Lw %=%{+b Wb} %H %{-}"
+# With backticks in different colors
+#caption always "%{kW}%?%-Lw%?%{Wb}%n*%f %t%?(%u)%?%{kW}%?%+Lw%? %= %{= Wk} %{= bW}%100`%{-} %{= yw}%101`%{-} %{= mw}%102`%{-} %H "
 #backtick 100 30 30 uptime
 #backtick 101 86400 86400 whoami
 #backtick 102 10 10 who
-caption always "%{kW}%?%-Lw%?%{Wb}%n*%f %t%?(%u)%?%{kW}%?%+Lw%? %= %{= Wk} %{= bW}%100`%{-} %{= yw}%101`%{-} %{= mw}%102`%{-} %H "
 #hardstatus string '%99`%{= Wk} %100`%112`%= %102`%101`%114`%115`%108`%113`%119`%117`%118`%116`%106`%104`%103`%105`%107`%Y-%m-%d %0c:%s'
 #hardstatus alwayslastline
 #bindkey -k k9 windowlist -b # Map F9 to screen selection
