@@ -75,7 +75,7 @@ alias tmux="tmux -2"
 if type _completion_loader 2>/dev/null >/dev/null; then _completion_loader systemctl; _completion_loader journalctl; fi
 complete -F _systemctl sc
 complete -F _journalctl jc
-complete -F _ssh sshs
+complete -F _ssh sssh
 
 # Poor man's history expansion (which bash doesn't do on TAB)
 shopt -s histverify
@@ -142,7 +142,7 @@ ssh() {
 }
 
 # SSH with automatic GNU screen on the other side
-sshs() {
+sssh() {
 	ssh "$@" -t -- screen -xR "${USER}"
 }
 

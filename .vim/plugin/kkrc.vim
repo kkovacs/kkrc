@@ -113,7 +113,7 @@ map <leader>8 :setlocal sw=8 ts=8<cr>
 " Insert a line with the date (used in project notes)
 map <leader>dt O# <C-R>=strftime("%Y-%m-%d")<cr><esc><cr>
 
-" Jump direct to tabs 1-7 (and last 3)
+" Jump direct to tabs
 " From the beginning...
 map <silent> g1 :tabfirst<cr>
 map <silent> g2 :tabfirst\|tabnext 2<cr>
@@ -122,8 +122,7 @@ map <silent> g4 :tabfirst\|tabnext 4<cr>
 map <silent> g5 :tabfirst\|tabnext 5<cr>
 map <silent> g6 :tabfirst\|tabnext 6<cr>
 map <silent> g7 :tabfirst\|tabnext 7<cr>
-" ...and from the end
-map <silent> g8 :tablast\|tabprevious 2<cr>
+" ...and from the end. (NOTE: "g8" is actually used by vim)
 map <silent> g9 :tablast\|tabprevious 1<cr>
 map <silent> g0 :tablast<cr>
 
