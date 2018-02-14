@@ -7,6 +7,6 @@
 
 " Notebook mode - send commands via tmux
 " Send current line
-nmap <silent> S :.w!/tmp/scratch<cr>:echo system("tmux load-buffer -b scratch /tmp/scratch; tmux paste-buffer -d -b scratch")<cr>
+nmap <silent> S :.w !sed 's/^[[:space:]]*//' >/tmp/scratch<cr>:echo system("tmux load-buffer -b scratch /tmp/scratch; tmux paste-buffer -d -b scratch")<cr>
 " Send visual selection (line-wise)
-vmap <silent> S :'<,'>w!/tmp/scratch<cr>:echo system("tmux load-buffer -b scratch /tmp/scratch; tmux paste-buffer -d -b scratch")<cr>
+vmap <silent> S :'<,'>w !sed 's/^[[:space:]]*//' >/tmp/scratch<cr>:echo system("tmux load-buffer -b scratch /tmp/scratch; tmux paste-buffer -d -b scratch")<cr>

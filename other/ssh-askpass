@@ -1,0 +1,18 @@
+#! /bin/sh
+#
+# An SSH_ASKPASS command for MacOS X
+# Based on script by Joseph Mocker, Sun Microsystems
+# Save as /usr/libexec/ssh-askpass and chmod +x
+
+TITLE=${MACOS_ASKPASS_TITLE:-"SSH Agent"}
+
+DIALOG="display dialog \"$@\" buttons {\"Deny\", \"Allow\"} default button 2"
+DIALOG="$DIALOG with title \"$TITLE\" with icon caution"
+
+result=`osascript -e 'tell application "iTerm2"' -e "$DIALOG" -e 'end tell'`
+
+if [ "$result" = "button returned:Allow" ]; then
+    exit 0
+else
+    exit 1
+fi
