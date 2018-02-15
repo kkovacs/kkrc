@@ -50,7 +50,7 @@ export LS_COLORS="di=1;34:ln=1;35:so=1;32:pi=1;33:ex=1;31:bd=34;46:cd=34;43:su=3
 # Set up some handy aliases
 alias s="screen -xR"
 alias l="ls -lrt"
-alias la="ls -lrtA"
+alias la="ls -lrtd .*"
 alias ll="ls -lhFrt"
 alias h="history"
 alias sc="systemctl"
