@@ -13,4 +13,5 @@
 :attrcolor b ".I"
 :defbce on
 :altscreen on
+:bindkey ^@ next
 :caption always "%-Lw%{+b Wb} %n%f:%t %{-}%+Lw %=%{+b Wb} %H %{-}"

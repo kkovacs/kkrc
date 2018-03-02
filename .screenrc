@@ -25,10 +25,8 @@ termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'   # tell screen how to 
 defbce on    # use current bg color for erased chars
 altscreen on	# use the alternate screen
 
-# One-key next and prev window
-# XXX conflicts with vim
-#bindkey ^E next
-#bindkey ^W prev
+# Next window on ctrl-space
+bindkey ^@ next
 
 # Set up our "status line"
 
