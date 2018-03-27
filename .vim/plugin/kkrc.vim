@@ -95,6 +95,11 @@ map <silent> <leader>m :set mouse=a<cr>
 " Turn off mouse
 map <silent> <leader>M :set mouse=<cr>
 
+" Turn on relativenumber
+map <silent> <leader>r :set relativenumber<cr>
+" Turn off relativenumber
+map <silent> <leader>R :set norelativenumber<cr>
+
 " Turn on scrollbind
 map <silent> <leader>s :set scrollbind<cr>
 " Turn off scrollbind

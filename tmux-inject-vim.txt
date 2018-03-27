@@ -16,6 +16,8 @@
 :map <silent> <leader>E :setlocal noexpandtab<cr>
 :map <silent> <leader>w :setlocal nowrap<cr>
 :map <silent> <leader>W :setlocal wrap<cr>
+:map <silent> <leader>r :set relativenumber<cr>
+:map <silent> <leader>R :set norelativenumber<cr>
 :map <silent> <leader>s :set scrollbind<cr>
 :map <silent> <leader>S :set noscrollbind<cr>
 :map <silent> <leader>t :setlocal nu linebreak breakindent wrap<cr>:noremap <buffer> <silent>j gj<cr>:noremap <buffer> <silent> k gk<cr>
@@ -30,7 +32,6 @@
 :map <silent> g5 :tabfirst\|tabnext 5<cr>
 :map <silent> g6 :tabfirst\|tabnext 6<cr>
 :map <silent> g7 :tabfirst\|tabnext 7<cr>
-:map <silent> g8 :tablast\|tabprevious 2<cr>
 :map <silent> g9 :tablast\|tabprevious 1<cr>
 :map <silent> g0 :tablast<cr>
 :map <silent> <leader>h1 :call matchadd("Highlight1", expand("<cword>"))<cr>
