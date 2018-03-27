@@ -27,6 +27,9 @@ unset HISTFILE
 # Clear out other people's stupid history from my session
 history -c
 
+# Make history show date and time
+export HISTTIMEFORMAT="%F %T "
+
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off.
 #export PS1='\[\033[00;34m\]\u\[\033[00m\]@\[\033[00;32m\]\h\[\033[00m\] \[\033[00;33m\]\w\[\033[00m\] \[\033[00;36m\][\j]\[\033[00m\]\$ '
 # Colored prompt with 'root' detection
