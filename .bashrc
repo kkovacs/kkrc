@@ -28,7 +28,7 @@ unset HISTFILE
 history -c
 
 # Make history show date and time
-export HISTTIMEFORMAT="%F %T "
+HISTTIMEFORMAT="%F %T "
 
 # NOTE: We're not exporting the prompt: this is important especially in tmux
 # inject.  This is because in a subshell, other important things (most
@@ -37,7 +37,7 @@ export HISTTIMEFORMAT="%F %T "
 # fully set up.
 #
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off.
-#PS1='\[\033[00;$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\\$ '
+#PS1='\[\033[00;'$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\$ ';
 # Colored prompt with continuous 'root' detection
 PROMPT_COMMAND="PS1='\[\033[00;\$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\\$ '"
 # Or, if ANSI is problematic:
