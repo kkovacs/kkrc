@@ -30,12 +30,18 @@ history -c
 # Make history show date and time
 export HISTTIMEFORMAT="%F %T "
 
+# NOTE: We're not exporting the prompt: this is important especially in tmux
+# inject.  This is because in a subshell, other important things (most
+# notably HISTFILE, aliases, etc) are NOT exported anyway or might be
+# overwritten, and the plain prompt is a reminder that the environment is NOT
+# fully set up.
+#
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off.
-#export PS1='\[\033[00;34m\]\u\[\033[00m\]@\[\033[00;32m\]\h\[\033[00m\] \[\033[00;33m\]\w\[\033[00m\] \[\033[00;36m\][\j]\[\033[00m\]\$ '
-# Colored prompt with 'root' detection
-export PROMPT_COMMAND="PS1='\[\033[00;\$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\\$ '"
+#PS1='\[\033[00;$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\\$ '
+# Colored prompt with continuous 'root' detection
+PROMPT_COMMAND="PS1='\[\033[00;\$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\\$ '"
 # Or, if ANSI is problematic:
-#export PS1="\u@\h \w [\j]\$ "
+#PS1="\u@\h \w [\j]\$ "
 
 # Set up some necessary environment variables
 export EDITOR=vim
