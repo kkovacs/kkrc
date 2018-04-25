@@ -27,6 +27,8 @@ altscreen on	# use the alternate screen
 
 # Next window on ctrl-space
 bindkey ^@ next
+# Prev window on ctrl-/ (forward slash)
+bindkey ^_ prev
 
 # Set up our "status line"
 
