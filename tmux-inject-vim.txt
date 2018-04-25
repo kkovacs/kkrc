@@ -34,15 +34,15 @@
 :map <silent> g7 :tabfirst\|tabnext 7<cr>
 :map <silent> g9 :tablast\|tabprevious 1<cr>
 :map <silent> g0 :tablast<cr>
-:map <silent> <leader>h1 :call matchadd("Highlight1", expand("<cword>"))<cr>
-:map <silent> <leader>h2 :call matchadd("Highlight2", expand("<cword>"))<cr>
-:map <silent> <leader>h3 :call matchadd("Highlight3", expand("<cword>"))<cr>
-:map <silent> <leader>h4 :call matchadd("Highlight4", expand("<cword>"))<cr>
-:map <silent> <leader>h5 :call matchadd("Highlight5", expand("<cword>"))<cr>
-:map <silent> <leader>h6 :call matchadd("Highlight6", expand("<cword>"))<cr>
-:map <silent> <leader>h7 :call matchadd("Highlight7", expand("<cword>"))<cr>
-:map <silent> <leader>h8 :call matchadd("Highlight8", expand("<cword>"))<cr>
-:map <silent> <leader>h9 :call matchadd("Highlight9", expand("<cword>"))<cr>
+:map <silent> <leader>h1 :call matchadd("DiffText", expand("<cword>"))<cr>
+:map <silent> <leader>h2 :call matchadd("DiffDelete", expand("<cword>"))<cr>
+:map <silent> <leader>h3 :call matchadd("DiffAdd", expand("<cword>"))<cr>
+:map <silent> <leader>h4 :call matchadd("DiffChange", expand("<cword>"))<cr>
+:map <silent> <leader>h5 :call matchadd("Error", expand("<cword>"))<cr>
+:map <silent> <leader>h6 :call matchadd("Todo", expand("<cword>"))<cr>
+:map <silent> <leader>h7 :call matchadd("Folded", expand("<cword>"))<cr>
+:map <silent> <leader>h8 :call matchadd("PMenu", expand("<cword>"))<cr>
+:map <silent> <leader>h9 :call matchadd("PMenuSel", expand("<cword>"))<cr>
 :map <silent> <leader>h0 :call clearmatches()<cr>
 :nmap <silent> <leader>/ :nohlsearch<cr>
 :let base16colorspace=256
