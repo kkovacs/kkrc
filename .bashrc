@@ -46,7 +46,7 @@ PROMPT_COMMAND="PS1='\[\033[00;\$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)m\
 # Set up some necessary environment variables
 export EDITOR=vim
 export PAGER=less
-export LC_CTYPE="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
 export LANG="en_US.UTF-8"
 
 # Colors! :)
@@ -149,6 +149,8 @@ ssh() {
 	#tmux rename-window "$SAVED" >/dev/null 2>/dev/null
 	# To switch back to auto-renaming after disconnection:
 	#tmux set-window-option automatic-rename "on" >/dev/null 2>/dev/null
+	# Restore from alternate mode, if set
+	printf '\e[?47l'
 }
 
 # SSH with automatic GNU screen on the other side
