@@ -21,11 +21,14 @@ HISTCONTROL=ignoreboth
 # I need VI keys
 set -o vi
 
+# Disable Debian/Ubuntu's annoying "command not found" script
+unset -f command_not_found_handle
+
 # Disable history
 unset HISTFILE
 
 # Clear out other people's stupid history from my session
-history -c
+#history -c
 
 # Make history show date and time
 HISTTIMEFORMAT="%F %T "
@@ -37,9 +40,9 @@ HISTTIMEFORMAT="%F %T "
 # fully set up.
 #
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off.
-#PS1='\[\033[00;'$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\$ ';
+PS1='\[\033[00;'$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\$ ';
 # Colored prompt with continuous 'root' detection
-PROMPT_COMMAND="PS1='\[\033[00;\$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\\$ '"
+#PROMPT_COMMAND="PS1='\[\033[00;\$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\\$ '"
 # Or, if ANSI is problematic:
 #PS1="\u@\h \w [\j]\$ "
 
@@ -63,6 +66,7 @@ alias la="ls -lrtA -I*" # For Linux
 alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
 alias ll="ls -lhSr"
 alias h="history"
+alias hc="history -c"
 alias sc="systemctl"
 alias jc="journalctl"
 alias scs="systemctl status"
@@ -93,6 +97,8 @@ shopt -s histverify
 shopt -s globstar
 # Spell checking on tab expansion
 shopt -s cdspell dirspell
+# Set LINES and COLUMNS
+shopt -s checkwinsize
 
 # Configure readline
 bind 'TAB:menu-complete'
@@ -105,13 +111,17 @@ bind 'set colored-stats on'
 bind 'set visible-stats on'
 bind 'set completion-prefix-display-length 1'
 bind 'set skip-completed-text on'
-bind 'set history-preserve-point on'
+bind 'set history-preserve-point off'
 
 # Better history stepping, both in insert and command mode
-bind -m vi 'k:history-search-backward'
-bind -m vi 'j:history-search-forward'
-bind -m vi '"\e[A":history-search-backward'
-bind -m vi '"\e[B":history-search-forward'
+# HACK: Assigning functions to non-existent keys, so a few lines down we can do two things on one keypress. This is all about the jump to end-of-line
+bind -m vi '"\200":previous-history'
+bind -m vi '"\201":next-history'
+bind -m vi '"\202":end-of-line'
+bind -m vi 'k:"\200\202"'
+bind -m vi 'j:"\201\202"'
+bind -m vi '"\e[A":"\200\202"'
+bind -m vi '"\e[B":"\201\202"'
 bind -m vi-insert '"\e[A":history-search-backward'
 bind -m vi-insert '"\e[B":history-search-forward'
 # And I still want CTRL-L in insert mode
@@ -119,9 +129,6 @@ bind -m vi-insert "\C-l":clear-screen
 
 # Restore default completion for cd, since bash-completion doesn't handle wildcards
 compopt -o bashdefault cd
-
-# Disable Debian/Ubuntu's annoying "command not found" script
-unset -f command_not_found_handle
 
 # END of part to be injected
 
