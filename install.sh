@@ -25,7 +25,8 @@ process() {
 		if [ -e "$softlink" ]; then
 			echo "WARNING: You have $softlink - please move it away."
 		else
-			ln -s "~/.kkrc/$file" "$softlink"
+			# NOTE: No quotes on first param or ~ expansion not always happens
+			ln -s ~/.kkrc/$file "$softlink"
 			echo "OK: Installed."
 		fi
 	fi
