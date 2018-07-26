@@ -7,7 +7,7 @@
 :bind \\ quit
 :bind K kill
 :bind } history
-:bind r eval "clear" "scrollback 0" "scrollback 15000"
+:bind r eval "clear" "scrollback 0" "scrollback 15000" "stuff ^L"
 :defnonblock 5
 :msgwait 1
 :defutf8 on
