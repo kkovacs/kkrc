@@ -1,4 +1,4 @@
-:defscrollback 5000
+:defscrollback 15000
 :termcapinfo vt100 dl=5\E[M
 :hardstatus off
 :bind ^k
@@ -7,6 +7,7 @@
 :bind \\ quit
 :bind K kill
 :bind } history
+:bind r eval "clear" "scrollback 0" "scrollback 15000"
 :defnonblock 5
 :msgwait 1
 :defutf8 on

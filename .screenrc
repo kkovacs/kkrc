@@ -4,13 +4,14 @@
 #defflow on # will force screen to process ^S/^Q
 vbell off
 vbell_msg "   Wuff  ----  Wuff!!  "
-defscrollback 5000 # define a bigger scrollback, default is 100 lines
+defscrollback 15000 # define a bigger scrollback, default is 100 lines
 bind ^k
 bind L
 bind ^\
 bind \\ quit
 bind K kill
 bind } history
+bind r eval "clear" "scrollback 0" "scrollback 15000" # Clear both scrollback and screen
 termcapinfo vt100 dl=5\E[M # The vt100 description does not mention "dl". *sigh*
 hardstatus off
 termcapinfo xterm*|linux*|rxvt*|kterm*|Eterm* hs:ts=\E]0;:fs=\007:ds=\E]0;\007 # Set the hardstatus prop on gui terms to set the titlebar/icon title
