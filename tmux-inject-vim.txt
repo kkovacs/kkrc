@@ -1,4 +1,4 @@
-:set nobackup nocompatible incsearch hlsearch showmatch autoindent virtualedit=block encoding=utf8 wildmenu wildmode=list:longest laststatus=2 noruler modeline showcmd nocursorline viminfo= backspace=indent,eol,start complete-=i smarttab nrformats-=octal incsearch scrolloff=1 sidescrolloff=5 display+=lastline listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+ formatoptions+=j autoread history=1000 tabpagemax=50 sessionoptions-=options
+:set nobackup nocompatible incsearch hlsearch showmatch autoindent virtualedit=block encoding=utf8 wildmenu wildmode=list:longest laststatus=2 noruler modeline showcmd nocursorline viminfo= backspace=indent,eol,start complete-=i smarttab nrformats-=octal scrolloff=1 sidescrolloff=5 display+=lastline listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+ formatoptions+=j autoread history=1000 tabpagemax=50 sessionoptions-=options
 :syntax enable
 :filetype plugin indent on
 :let g:netrw_preview=1
