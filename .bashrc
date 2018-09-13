@@ -97,7 +97,7 @@ complete -F _journalctl jc
 complete -F _ssh sssh
 
 # Poor man's history expansion (which bash doesn't do on TAB)
-shopt -s histverify
+#shopt -s histverify
 # For "**"
 shopt -s globstar
 # Spell checking on tab expansion
@@ -117,6 +117,8 @@ bind 'set visible-stats on'
 bind 'set completion-prefix-display-length 1'
 bind 'set skip-completed-text on'
 bind 'set history-preserve-point off'
+# History expansion on space
+bind 'space:magic-space'
 
 # Better history stepping, both in insert and command mode
 # HACK: Assigning functions to non-existent keys, so a few lines down we can do two things on one keypress. This is all about the jump to end-of-line
