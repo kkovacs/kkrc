@@ -46,6 +46,10 @@ PS1='\[\033[00;'$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]
 # Or, if ANSI is problematic:
 #PS1="\u@\h \w [\j]\$ "
 
+# "bell" before prompt. Separated from PS1 so it's easier to turn off when needed,
+# and at least clears any erroneous local PROMPT_COMMAND.
+export PROMPT_COMMAND="printf '\a'"
+
 # Set up some necessary environment variables
 export EDITOR=vim
 export PAGER=less
@@ -70,7 +74,7 @@ alias l="ls -lrt"
 alias la="ls -lrtA -I*" # For Linux
 alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
 alias ll="ls -lhSr"
-alias bell="echo -ne '\007'"
+alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
 alias h="history"
 alias hc="history -c"
 alias sc="systemctl"

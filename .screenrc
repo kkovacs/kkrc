@@ -3,7 +3,7 @@
 
 #defflow on # will force screen to process ^S/^Q
 vbell off
-vbell_msg "   Wuff  ----  Wuff!!  "
+bell_msg "^G" # Re-sounds the bell
 defscrollback 15000 # define a bigger scrollback, default is 100 lines
 bind ^k
 bind L
@@ -11,7 +11,7 @@ bind ^\
 bind \\ quit
 bind K kill
 bind } history
-bind "#" monitor
+bind "#" monitor # Same as on tmux. "~" is for silence, by default
 bind r eval "clear" "scrollback 0" "scrollback 15000" "stuff ^L" # Clear both scrollback and screen then refresh
 termcapinfo vt100 dl=5\E[M # The vt100 description does not mention "dl". *sigh*
 hardstatus off

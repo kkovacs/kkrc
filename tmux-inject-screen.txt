@@ -1,3 +1,5 @@
+:vbell off
+:bell_msg "^G"
 :defscrollback 15000
 :termcapinfo vt100 dl=5\E[M
 :hardstatus off
