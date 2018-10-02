@@ -74,6 +74,7 @@ alias l="ls -lrt"
 alias la="ls -lrtA -I*" # For Linux
 alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
 alias ll="ls -lhSr"
+alias lr="ls -AR1|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d files\n%s \t\",p-2,\$0);p=0}{p++}END{print p \" files\"}'|less -FX" # Cut -FX in ash
 alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
 alias h="history"
 alias hc="history -c"
@@ -89,8 +90,8 @@ alias gs="git status -sb";
 alias json="python -mjson.tool"
 alias tmux="tmux -2"
 # Only if not on busybox
-[ -h $(type -p grep) ] || alias grep="grep --color"
-[ -h $(type -p less) ] || alias less="less -X" # No alt screen
+[ -L $(type -p grep) ] || alias grep="grep --color"
+[ -L $(type -p less) ] || alias less="less -X" # No alt screen
 
 # Now fix bash competion for our systemd aliases (unfortunately manually)
 # NOTE: unfortunately there is no way in bash to also autocomplete "scs", "sc0"... :(
