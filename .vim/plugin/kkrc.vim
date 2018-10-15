@@ -29,6 +29,8 @@ set modeline
 set showcmd
 " No cursor line
 set nocursorline
+" No viminfo
+set viminfo=
 " So the stronger encryption never gets frogotten
 " Also I can't believe CentOS software is so ANCIENT
 if v:version >= 704

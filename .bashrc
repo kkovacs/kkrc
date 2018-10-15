@@ -65,7 +65,7 @@ export LSCOLORS=ExFxCxDxBxegedabagacad
 export LS_COLORS="di=1;34:ln=1;35:so=1;32:pi=1;33:ex=1;31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43"
 
 # FOR INJECT: Lighter vim
-#export VIMINIT=":set nobackup noswapfile encoding=utf8"
+#export VIMINIT=":set nobackup noswapfile encoding=utf8 viminfo="
 alias vim="vim -n -i NONE" # No swapfile, no viminfo
 
 # Set up some handy aliases
