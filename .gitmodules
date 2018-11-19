@@ -4,9 +4,6 @@
 [submodule ".vim/bundle/vim-sensible"]
 	path = .vim/bundle/vim-sensible
 	url = https://github.com/tpope/vim-sensible
-[submodule ".vim/bundle/vim-markdown"]
-	path = .vim/bundle/vim-markdown
-	url = https://github.com/plasticboy/vim-markdown
 [submodule ".vim/bundle/vim-gnupg"]
 	path = .vim/bundle/vim-gnupg
 	url = https://github.com/jamessan/vim-gnupg/
