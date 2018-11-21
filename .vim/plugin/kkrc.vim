@@ -172,6 +172,15 @@ autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 " Fix YAML to 2-space
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 
-" No automatic folding for .md files
-let g:vim_markdown_folding_disabled=1
+" Fenced languages for markdown (
+let g:markdown_fenced_languages = ['yaml', 'json', 'xml', 'python', 'bash=sh']
 
+" No automatic folding for .md files
+"let g:vim_markdown_folding_disabled=1
+
+" Jupyter notebook inspiration - send commands into tmux
+" Send current line
+nmap S :silent .w !sed 's/^[[:space:]]*//' \| tmux load-buffer -b jupyter - ; tmux paste-buffer -d -b jupyter<cr>
+" Send visual selection (line-wise)
+" HACK: The Home/End hack is to avoid not being able to pass a range to :silent.
+vmap S :<home>silent <end>w !sed 's/^[[:space:]]*//' \| tmux load-buffer -b jupyter - ; tmux paste-buffer -d -b jupyter<cr>
