@@ -17,6 +17,7 @@
 :attrcolor b ".I"
 :defbce on
 :altscreen on
+:hardstatus ignore
 :bindkey ^@ next
 :bindkey ^_ prev
 :caption always "%-Lw%{+b Wb} %n%f:%t %{-}%+Lw %=%{+b Wb} %H %{-}"
