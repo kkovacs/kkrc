@@ -72,7 +72,7 @@ alias vim="vim -n -i NONE" # No swapfile, no viminfo
 alias s="screen -xR"
 alias l="ls -lrt"
 alias la="ls -lrtA -I*" # For Linux
-alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
+#alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
 alias ll="ls -lhSr"
 alias lr="ls -AR1|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d files\n%s \t\",p-2,\$0);p=0}{p++}END{print p \" files\"}'|less -FX" # Cut -FX in ash
 alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
@@ -92,6 +92,12 @@ alias tmux="tmux -2"
 # Only if not on busybox
 [ -L $(type -p grep) ] || alias grep="grep --color"
 [ -L $(type -p less) ] || alias less="less -X" # No alt screen
+
+# OS X specifics
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	# If we have `brew install coreutils`, then use the linux-compatible `ls`
+	[ -f /usr/local/bin/gls ] && alias ls="gls --color"
+fi
 
 # Now fix bash competion for our systemd aliases (unfortunately manually)
 # NOTE: unfortunately there is no way in bash to also autocomplete "scs", "sc0"... :(
