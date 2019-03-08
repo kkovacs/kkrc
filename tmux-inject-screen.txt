@@ -1,6 +1,6 @@
 :vbell off
 :bell_msg "^G"
-:defscrollback 15000
+:defscrollback 100000
 :termcapinfo vt100 dl=5\E[M
 :hardstatus off
 :bind ^k
@@ -10,7 +10,7 @@
 :bind K kill
 :bind } history
 :bind "#" monitor
-:bind r eval "clear" "scrollback 0" "scrollback 15000" "stuff ^L"
+:bind r eval "clear" "scrollback 0" "scrollback 100000" "stuff ^L"
 :defnonblock 5
 :msgwait 1
 :defutf8 on
