@@ -88,6 +88,7 @@ alias sc0="systemctl stop"
 alias sc1="systemctl start"
 alias scr="systemctl restart"
 alias psql="INPUTRC=/dev/fd/9 psql 9<<<'set editing-mode vi'";
+alias mysql='INPUTRC=/dev/fd/9 mysql 9<<<'\''set editing-mode vi'\'''
 # This is getting even uglier, but must have on remote machines
 #alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-view = line-number:no,interval=5 id:yes date:relative author:abbreviated commit-title:yes,graph,refs,overflow=no"'
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
