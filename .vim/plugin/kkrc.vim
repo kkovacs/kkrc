@@ -160,10 +160,10 @@ if has("gui_running")
 	set guioptions=e
 
 	" OS-specific stuff, like fonts
-	if has("mac")
+	if has("gui_macvim")
 		set guifont=Monaco:h11
-	elseif has("unix")
-	elseif has("win32")
+	elseif has("gui_gtk")
+	elseif has("gui_win32")
 	endif
 endif
 
