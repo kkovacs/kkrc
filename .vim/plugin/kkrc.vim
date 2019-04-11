@@ -156,8 +156,15 @@ set background=dark
 colorscheme kk-base16-colors
 syn on
 if has("gui_running")
-    "colorscheme kk-rdark
-    set guioptions=e
+	"colorscheme kk-rdark
+	set guioptions=e
+
+	" OS-specific stuff, like fonts
+	if has("mac")
+		set guifont=Monaco:h11
+	elseif has("unix")
+	elseif has("win32")
+	endif
 endif
 
 " Statusline with a few useful items, but still lightweight (no plugins!)
