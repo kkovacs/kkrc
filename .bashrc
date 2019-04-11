@@ -77,7 +77,7 @@ alias l="ls -lrt"
 alias la="ls -lrtA -I*" # For Linux
 #alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
 alias ll="ls -lhSr"
-alias lr="ls -AR1|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d files\n%s \t\",p-2,\$0);p=0}{p++}END{print p \" files\"}'|less -FX" # Cut -FX in ash
+alias lr="ls -AR1 -I .git|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d files\n%s \t\",p-2,\$0);p=0}{p++}END{print p \" files\"}'|less -FX" # Cut -FX in ash
 alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
 alias h="history"
 alias hc="history -c"
