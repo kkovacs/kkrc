@@ -210,7 +210,7 @@ ssh() {
 
 # SSH with automatic GNU screen on the other side
 sssh() {
-	ssh "$@" -t -- screen -S "${USER}" -X register s \" export SSH_AUTH_SOCK=\$SSH_AUTH_SOCK\\n\" \; screen -xR "${USER}"
+	ssh "$@" -t -- screen -S "${USER}" -X register s \" export SSH_AUTH_SOCK=\$SSH_AUTH_SOCK\" \; screen -xR "${USER}"
 }
 
 # Display screens if any
