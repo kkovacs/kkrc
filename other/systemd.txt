@@ -1,0 +1,23 @@
+cat >/etc/systemd/system/local@.service <<"EOF"
+
+[Unit]
+Description=Systemd unit for /root/start-%i.sh
+After=network-online.target
+# FIX: prevent systemd giving up if service exits (also fixes problems with too quick manual restarts)
+StartLimitInterval=0
+
+[Service]
+# FIX: because older systemd din't allow %i in the first word
+ExecStart=/usr/bin/time /root/start-%i.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+EOF
+
+systemctl daemon-reload
+
+#systemctl start local@...
+#systemctl enable local@...

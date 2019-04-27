@@ -81,12 +81,6 @@ alias lr="ls -AR1 -I .git|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d file
 alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
 alias h="history"
 alias hc="history -c"
-alias sc="systemctl"
-alias jc="journalctl"
-alias scs="systemctl status"
-alias sc0="systemctl stop"
-alias sc1="systemctl start"
-alias scr="systemctl restart"
 alias psql="INPUTRC=/dev/fd/9 psql 9<<<'set editing-mode vi'";
 alias mysql='INPUTRC=/dev/fd/9 mysql 9<<<'\''set editing-mode vi'\'''
 # This is getting even uglier, but must have on remote machines
@@ -95,6 +89,25 @@ alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s 
 alias gs="git status -sb";
 alias json="python -mjson.tool"
 alias tmux="tmux -2"
+
+# Better systemd. We use $SCS to store the unit we're working on, so no need for typing or history athletics.
+# self-reload, because systemd can't do it on its own...
+sdr() { systemctl daemon-reload ; }
+# `sc` is like systemctl, but stores last param in $SCS.
+sc() { SCS="${@: -1}" ; systemctl "$@" ; }
+# STATUS, full lines
+scs() { SCS="${1:-${SCS}}" ; systemctl status -l "$SCS" ; }
+# STOP, but shows a status afterwards
+sc0() { SCS="${1:-${SCS}}" ; systemctl stop "$SCS" ; scs ; }
+# START, but shows a status afterwards, and tails the log
+sc1() { SCS="${1:-${SCS}}" ; sdr ; journalctl -n 0 -xfu "$SCS" & systemctl start "$SCS" ; scs ; fg ; }
+# RELOAD, but shows a status afterwards, and tails the log
+scr() { SCS="${1:-${SCS}}" ; sdr ; journalctl -n 0 -xfu "$SCS" & systemctl reload-or-restart "$SCS" ; scs ; fg ; }
+# LOG in pager, extended info, jump to end
+jc() { SCS="${1:-${SCS}}" ; journalctl -xeu "$SCS" ; }
+# LOG "tail -f". Tries to fill the screen.
+jcf() { SCS="${1:-${SCS}}" ; journalctl -n "${LINES:-45}" -xefu "$SCS" ; }
+
 # Only if not on busybox
 [ -L $(type -p grep) ] || alias grep="grep --color"
 [ -L $(type -p less) ] || alias less="less -X" # No alt screen
@@ -111,7 +124,6 @@ fi
 [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion # OS X
 if type _completion_loader 2>/dev/null >/dev/null; then _completion_loader systemctl; _completion_loader journalctl; fi
 complete -F _systemctl sc
-complete -F _journalctl jc
 complete -F _ssh sssh
 
 # Poor man's history expansion (which bash doesn't do on TAB)
