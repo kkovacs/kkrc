@@ -90,19 +90,31 @@ alias gs="git status -sb";
 alias json="python -mjson.tool"
 alias tmux="tmux -2"
 
-# Better systemd. We use $SCS to store the unit we're working on, so no need for typing or history athletics.
+# Better systemd. Makes it almost usable, works around some brain-dead-ness.
+# - Functions start, reload and restart show the status of how it went, and also tails the log/journal afterwards. Exit tail with CTRL-c.
+# - We use $SCS to store (automatically) the unit we're working on, so no need for typing all the time, or history athletics. One rarely works on multiple services at once.
+# - We use daemon-reload automatically, because very often the thing you modified for a restart is the unit file.
+# - We use reset-failed, because for some incomprehensible reason, the restart-count limit imposed by StartLimitInterval[Sec] also affects manual restarts.
+
 # self-reload, because systemd can't do it on its own...
 sdr() { systemctl daemon-reload ; }
-# `sc` is like systemctl, but stores last param in $SCS.
+# List services, because it should be simple
+scl() { systemctl list-units --type service --all ; }
+# `sc` is like systemctl, but stores last param in $SCS. Try to set up autocomplete for it, too.
 sc() { SCS="${@: -1}" ; systemctl "$@" ; }
-# STATUS, full lines
+complete -F _systemctl sc
+# STATUS, but don't trim lines
 scs() { SCS="${1:-${SCS}}" ; systemctl status -l "$SCS" ; }
 # STOP, but shows a status afterwards
 sc0() { SCS="${1:-${SCS}}" ; systemctl stop "$SCS" ; scs ; }
-# START, but shows a status afterwards, and tails the log
-sc1() { SCS="${1:-${SCS}}" ; sdr ; journalctl -n 0 -xfu "$SCS" & systemctl start "$SCS" ; scs ; fg ; }
-# RELOAD, but shows a status afterwards, and tails the log
-scr() { SCS="${1:-${SCS}}" ; sdr ; journalctl -n 0 -xfu "$SCS" & systemctl reload-or-restart "$SCS" ; scs ; fg ; }
+# reusable command to show status afterwards, and tail the log during reload. Exit with CTRL-c
+stail() { SCS="${2:-${SCS}}" ; sdr ; systemctl reset-failed "$SCS" ; journalctl -n 0 -xfu "$SCS" & systemctl "$1" "$SCS" ; scs ; fg ; }
+# START
+sc1() { stail start "${1:-${SCS}}" ; }
+# RELOAD
+scr() { stail reload-or-restart "${1:-${SCS}}" ; }
+# RESTART
+scR() { stail restart "${1:-${SCS}}" ; }
 # LOG in pager, extended info, jump to end
 jc() { SCS="${1:-${SCS}}" ; journalctl -xeu "$SCS" ; }
 # LOG "tail -f". Tries to fill the screen.
@@ -123,7 +135,6 @@ fi
 [ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion # Most Linux
 [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion # OS X
 if type _completion_loader 2>/dev/null >/dev/null; then _completion_loader systemctl; _completion_loader journalctl; fi
-complete -F _systemctl sc
 complete -F _ssh sssh
 
 # Poor man's history expansion (which bash doesn't do on TAB)
