@@ -11,6 +11,8 @@ bind ^\
 bind \\ quit
 bind K kill
 bind } history
+bind . number +1
+bind , number -1
 bind "#" monitor # Same as on tmux. "~" is for silence, by default
 bind r eval "clear" "scrollback 0" "scrollback 100000" "stuff ^L" # Clear both scrollback and screen then refresh
 termcapinfo vt100 dl=5\E[M # The vt100 description does not mention "dl". *sigh*

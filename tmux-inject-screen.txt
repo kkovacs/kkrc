@@ -9,6 +9,8 @@
 :bind \\ quit
 :bind K kill
 :bind } history
+:bind . number +1
+:bind , number -1
 :bind "#" monitor
 :bind r eval "clear" "scrollback 0" "scrollback 100000" "stuff ^L"
 :defnonblock 5
