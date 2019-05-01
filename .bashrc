@@ -4,7 +4,7 @@
 [ -z "$PS1" ] && return
 
 # Set up colors
-if [ ! -n "$SSH_CLIENT" ] && [ ! -n "$SSH_TTY" ]; then
+if [ ! -n "$SSH_CLIENT" ] && [ ! -n "$SSH_TTY" ] && [ -z $VIM_TERMINAL ]; then
 	BASE16_SHELL="$HOME/.kkrc/base16-colors.dark.sh"
 	[[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
 fi
