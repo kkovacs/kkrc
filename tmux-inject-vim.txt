@@ -34,6 +34,7 @@
 :map <silent> g7 :tabfirst\|tabnext 7<cr>
 :map <silent> g9 :tablast\|tabprevious 1<cr>
 :map <silent> g0 :tablast<cr>
+:map <c-w>x :close<cr>
 :map <silent> <leader>h1 :call matchadd("DiffText", expand("<cword>"))<cr>
 :map <silent> <leader>h2 :call matchadd("DiffDelete", expand("<cword>"))<cr>
 :map <silent> <leader>h3 :call matchadd("DiffAdd", expand("<cword>"))<cr>

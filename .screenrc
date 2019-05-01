@@ -9,7 +9,7 @@ bind ^k
 bind L
 bind ^\
 bind \\ quit
-bind K kill
+bind x kill
 bind } history
 bind . number +1
 bind , number -1
