@@ -72,6 +72,8 @@ export QUOTING_STYLE=shell-escape
 alias vim="vim -n -i NONE" # No swapfile, no viminfo
 
 # Set up some handy aliases
+# screen with ssh auth sock transfer, to be used for injection. NOTE: watch out for conflicting session names
+#alias s="screen -S kk -X register s \" export SSH_AUTH_SOCK=$SSH_AUTH_SOCK\" ; screen -xR kk"
 alias s="screen -xR"
 alias l="ls -lrt"
 alias la="ls -lrtA -I*" # For Linux
