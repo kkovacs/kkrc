@@ -181,6 +181,7 @@ endif
 " But it needs a better get-back-to-command-mode key, let's use double-ESC
 if has('terminal')
 	tmap <esc><esc> <c-\><c-N>
+	map <c-w>t :vertical below terminal<cr>
 endif
 
 " Statusline with a few useful items, but still lightweight (no plugins!)
