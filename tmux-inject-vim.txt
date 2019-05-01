@@ -25,15 +25,10 @@
 :map <leader>2 :setlocal sw=2 ts=2<cr>
 :map <leader>4 :setlocal sw=4 ts=4<cr>
 :map <leader>8 :setlocal sw=8 ts=8<cr>
-:map <silent> g1 :tabfirst<cr>
-:map <silent> g2 :tabfirst\|tabnext 2<cr>
-:map <silent> g3 :tabfirst\|tabnext 3<cr>
-:map <silent> g4 :tabfirst\|tabnext 4<cr>
-:map <silent> g5 :tabfirst\|tabnext 5<cr>
-:map <silent> g6 :tabfirst\|tabnext 6<cr>
-:map <silent> g7 :tabfirst\|tabnext 7<cr>
-:map <silent> g9 :tablast\|tabprevious 1<cr>
-:map <silent> g0 :tablast<cr>
+:map <silent> <c-n> :tabnext<cr>
+:map <silent> <c-p> :tabprevious<cr>
+:map <silent> <c-w>, :tabmove -1<cr>
+:map <silent> <c-w>. :tabmove +1<cr>
 :map <c-w>x :close<cr>
 :map <silent> <leader>h1 :call matchadd("DiffText", expand("<cword>"))<cr>
 :map <silent> <leader>h2 :call matchadd("DiffDelete", expand("<cword>"))<cr>

@@ -120,22 +120,28 @@ map <leader>8 :setlocal sw=8 ts=8<cr>
 " Insert a line with the date (used in project notes)
 map <leader>dt O# <C-R>=strftime("%Y-%m-%d")<cr><esc><cr>
 
-" Jump direct to tabs
-" From the beginning...
-map <silent> g1 :tabfirst<cr>
-map <silent> g2 :tabfirst\|tabnext 2<cr>
-map <silent> g3 :tabfirst\|tabnext 3<cr>
-map <silent> g4 :tabfirst\|tabnext 4<cr>
-map <silent> g5 :tabfirst\|tabnext 5<cr>
-map <silent> g6 :tabfirst\|tabnext 6<cr>
-map <silent> g7 :tabfirst\|tabnext 7<cr>
-" ...and from the end. (NOTE: "g8" is actually used by vim)
-map <silent> g9 :tablast\|tabprevious 1<cr>
-map <silent> g0 :tablast<cr>
-
 " Better next/prev tab
-map <c-n> :tabnext<cr>
-map <c-p> :tabprevious<cr>
+map <silent> <c-n> :tabnext<cr>
+map <silent> <c-p> :tabprevious<cr>
+map <silent> <c-w>, :tabmove -1<cr>
+map <silent> <c-w>. :tabmove +1<cr>
+map <c-w>x :close<cr>
+" I HATE to override this since it's so standard, but since "new tab" is the
+" same for tmux and screen, I keep hitting it in vim too.
+"map <c-w>c :tabnew<cr>
+
+if has("gui_macvim")
+	map <d-1> 1gt
+	map <d-2> 2gt
+	map <d-3> 3gt
+	map <d-4> 4gt
+	map <d-5> 5gt
+	map <d-6> 6gt
+	map <d-7> 7gt
+	map <d-8> 8gt
+	map <d-9> 9gt
+	map <silent> <d-0> :tablast<cr>
+endif
 
 " Highlight the word under the color with 4 different colors.
 map <silent> <leader>h1 :call matchadd("Highlight1", expand("<cword>"))<cr>
