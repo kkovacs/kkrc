@@ -1,5 +1,6 @@
 [core]
 	excludesfile = ~/.kkrc/.gitignore
+	quotePath = false
 
 [color]
 	ui = auto
