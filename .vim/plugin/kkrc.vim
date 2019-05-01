@@ -60,7 +60,12 @@ map <silent> <c-tab> :tabnext<cr>
 map <silent> <s-c-tab> :tabprevious<cr>
 
 " My little calculator
-map <leader>c viW"zyA = <esc>"=<c-r>z<cr>p
+map <leader>= viW"zyA = <esc>"=<c-r>z<cr>p
+
+" cd into current file's diectory for this buffer only (!)
+map <leader>c :lchdir <c-r>=expand('%:p:h')<cr><cr>
+" cd into current file's diectory globally
+map <leader>C :chdir <c-r>=expand('%:p:h')<cr><cr>
 
 " Turn on "list" display
 map <silent> <leader>l :setlocal list<cr>

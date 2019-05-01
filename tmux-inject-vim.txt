@@ -6,6 +6,9 @@
 :map <silent> _ :Texplore<cr>
 :map <c-j> j<c-e>
 :map <c-k> k<c-y>
+:map <leader>= viW"zyA = <esc>"=<c-r>z<cr>p
+:map <leader>c :lchdir <c-r>=expand('%:p:h')<cr><cr>
+:map <leader>C :chdir <c-r>=expand('%:p:h')<cr><cr>
 :map <silent> <leader>l :setlocal list<cr>
 :map <silent> <leader>L :setlocal nolist<cr>
 :map <silent> <leader>p :setlocal paste<cr>
