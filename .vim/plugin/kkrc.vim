@@ -133,6 +133,10 @@ map <silent> g7 :tabfirst\|tabnext 7<cr>
 map <silent> g9 :tablast\|tabprevious 1<cr>
 map <silent> g0 :tablast<cr>
 
+" Better next/prev tab
+map <c-n> :tabnext<cr>
+map <c-p> :tabprevious<cr>
+
 " Highlight the word under the color with 4 different colors.
 map <silent> <leader>h1 :call matchadd("Highlight1", expand("<cword>"))<cr>
 map <silent> <leader>h2 :call matchadd("Highlight2", expand("<cword>"))<cr>
@@ -165,6 +169,12 @@ if has("gui_running")
 	elseif has("gui_gtk")
 	elseif has("gui_win32")
 	endif
+endif
+
+" Vim 8.1's new terminal mode is really exciting.
+" But it needs a better get-back-to-command-mode key, let's use double-ESC
+if has('terminal')
+	tmap <esc><esc> <c-\><c-N>
 endif
 
 " Statusline with a few useful items, but still lightweight (no plugins!)
