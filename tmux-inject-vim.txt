@@ -30,8 +30,7 @@
 :map <silent> <c-w>, :tabmove -1<cr>
 :map <silent> <c-w>. :tabmove +1<cr>
 :map <c-w>x :close<cr>
-:if has('terminal') tmap <esc><esc> <c-\><c-N> | endif
-:if has('terminal') map <c-w>t :vertical below terminal<cr> | endif
+:if has('terminal') tmap <esc><esc> <c-\><c-N> | map <c-w>t :vertical below terminal<cr> | map <c-w>T :tab terminal<cr> | endif
 :map <silent> <leader>h1 :call matchadd("DiffText", expand("<cword>"))<cr>
 :map <silent> <leader>h2 :call matchadd("DiffDelete", expand("<cword>"))<cr>
 :map <silent> <leader>h3 :call matchadd("DiffAdd", expand("<cword>"))<cr>

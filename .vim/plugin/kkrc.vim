@@ -182,6 +182,7 @@ endif
 if has('terminal')
 	tmap <esc><esc> <c-\><c-N>
 	map <c-w>t :vertical below terminal<cr>
+	map <c-w>T :tab terminal<cr>
 endif
 
 " Statusline with a few useful items, but still lightweight (no plugins!)
