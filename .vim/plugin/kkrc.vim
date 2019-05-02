@@ -128,12 +128,9 @@ map <leader>dt O# <C-R>=strftime("%Y-%m-%d")<cr><esc><cr>
 " Better next/prev tab
 map <silent> <c-n> :tabnext<cr>
 map <silent> <c-p> :tabprevious<cr>
-map <silent> <c-w>, :tabmove -1<cr>
-map <silent> <c-w>. :tabmove +1<cr>
-map <c-w>x :close<cr>
-" I HATE to override this since it's so standard, but since "new tab" is the
-" same for tmux and screen, I keep hitting it in vim too.
-"map <c-w>c :tabnew<cr>
+map <silent> <leader>, :tabmove -1<cr>
+map <silent> <leader>. :tabmove +1<cr>
+map <leader>x :close<cr>
 
 if has("gui_macvim")
 	map <d-1> 1gt
@@ -186,8 +183,8 @@ endif
 " But it needs a better get-back-to-command-mode key, let's use double-ESC
 if has('terminal')
 	tmap <esc><esc> <c-\><c-N>
-	map <c-w>t :vertical below terminal<cr>
-	map <c-w>T :tab terminal<cr>
+	map <leader><leader> :vertical below terminal<cr>
+	map <leader>\| :tab terminal<cr>
 endif
 
 " Statusline with a few useful items, but still lightweight (no plugins!)
