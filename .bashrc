@@ -215,6 +215,15 @@ sssh() {
 	ssh "$@" -t -- screen -S "${USER}" -X register s \" export SSH_AUTH_SOCK=\$SSH_AUTH_SOCK\" \; screen -xR "${USER}"
 }
 
+# Strictly NOT in inject, just LOCAL: open files from vim :term back in VIM.
+if [ ! -z $VIM_TERMINAL ]; then
+	unalias vim
+	function vim() {
+		printf '\e]51;["drop", "%s"]\g' "$(realpath "$1")"
+	}
+	export -f vim
+fi
+
 # Display screens if any
 screen -ls | grep -v "Socket"
 
