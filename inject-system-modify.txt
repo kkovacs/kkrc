@@ -1,5 +1,5 @@
  sed -i -e ':start s/^HISTTIME.*/HISTTIMEFORMAT="%F %T "/; t end; $a HISTTIMEFORMAT="%F %T "' -e ' n; b start; :end n; b end' .bashrc
  sed -i -e ':start s/^HISTSIZE.*/HISTSIZE=/; t end; $a HISTSIZE=' -e ' n; b start; :end n; b end' .bashrc
  sed -i -e ':start s/^HISTFILESIZE.*/HISTFILESIZE=10000/; t end; $a HISTFILESIZE=10000' -e ' n; b start; :end n; b end' .bashrc
- [ $(id) -eq 0 ] && sed -i -e ':start s/^alias git.*/alias git="echo Do not git as root."/; t end; $a alias git="echo Do not git as root."' -e ' n; b start; :end n; b end' .bashrc
+ [ $(id -u) -eq 0 ] && sed -i -e ':start s/^alias git.*/alias git="echo Do not git as root."/; t end; $a alias git="echo Do not git as root."' -e ' n; b start; :end n; b end' .bashrc
  cat .bashrc
