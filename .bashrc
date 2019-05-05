@@ -147,6 +147,8 @@ shopt -s globstar
 shopt -s cdspell dirspell
 # Set LINES and COLUMNS
 shopt -s checkwinsize
+# Save multi-line commands as one command
+shopt -s cmdhist
 
 # Configure readline
 bind 'TAB:menu-complete'
@@ -160,6 +162,7 @@ bind 'set visible-stats on'
 bind 'set completion-prefix-display-length 1'
 bind 'set skip-completed-text on'
 bind 'set history-preserve-point off'
+bind 'set mark-symlinked-directories on';
 # History expansion on space
 bind 'space:magic-space'
 
