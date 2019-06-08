@@ -139,7 +139,6 @@ fi
 [ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion # Most Linux
 [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion # OS X
 if type _completion_loader 2>/dev/null >/dev/null; then _completion_loader systemctl; _completion_loader journalctl; fi
-complete -F _ssh sssh
 
 # Poor man's history expansion (which bash doesn't do on TAB)
 #shopt -s histverify
@@ -213,11 +212,6 @@ ssh() {
 	#tmux set-window-option automatic-rename "on" >/dev/null 2>/dev/null
 	# Restore from alternate mode, if set
 	printf '\e[?47l'
-}
-
-# SSH with automatic GNU screen on the other side
-sssh() {
-	ssh "$@" -t -- screen -S "${USER}" -X register s \" export SSH_AUTH_SOCK=\$SSH_AUTH_SOCK\" \; screen -xR "${USER}"
 }
 
 # Strictly NOT in inject, just LOCAL: open files from vim :term back in VIM.
