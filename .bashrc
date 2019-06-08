@@ -13,10 +13,11 @@ fi
 # (so we can override)
 if [ -e ~/.bashrc.orig ]; then . ~/.bashrc.orig; fi
 
-# START of part to be injected
-
 # Ignore both duplicated and whitespace
+# (This is inserted separately to the front of the the inject file)
 HISTCONTROL=ignoreboth
+
+# START of part to be injected
 
 # I need VI keys
 set -o vi
@@ -40,9 +41,9 @@ HISTTIMEFORMAT="%F %T "
 # fully set up.
 #
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off. Root detection only on setup.
-PS1='\[\033[00;'$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\$ ';
+PS1='\[\033[00;'$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\$ '
 # Or if you dare to use 256 colors:
-#PS1='\[\033[00;'$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@\[\033[38;5;39m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\$ ';
+#PS1='\[\033[00;'$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@\[\033[38;5;39m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\$ '
 # Or, with CONTINUOUS 'root' detection
 #PROMPT_COMMAND="PS1='\[\033[00;\$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\\$ '"
 # Or, if ANSI is problematic:
@@ -57,7 +58,7 @@ export EDITOR=vim
 export PAGER=less
 export LC_ALL="en_US.UTF-8"
 export LANG="en_US.UTF-8"
-export LESSHISTFILE=/dev/null;
+export LESSHISTFILE=/dev/null
 
 # Colors! :)
 export CLICOLOR=1
@@ -71,7 +72,8 @@ export QUOTING_STYLE=shell-escape
 
 # FOR INJECT: Lighter vim
 #export VIMINIT=":set nobackup noswapfile encoding=utf8 viminfo="
-alias vim="vim -n -i NONE" # No swapfile, no viminfo
+# No swapfile, no viminfo
+alias vim="vim -n -i NONE"
 
 # Set up some handy aliases
 # screen with ssh auth sock transfer, to be used for injection. NOTE: watch out for conflicting session names
@@ -81,18 +83,17 @@ alias l="ls -lrt"
 alias la="ls -lrtA -I*" # For Linux
 #alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
 alias ll="ls -lhSr"
-alias lr="ls -AR1 -I .git|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d files\n%s \t\",p-2,\$0);p=0}{p++}END{print p \" files\"}'|less -FX" # Cut -FX in ash
+# Cut -FX in ash
+alias lr="ls -AR1 -I .git|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d files\n%s \t\",p-2,\$0);p=0}{p++}END{print p \" files\"}'|less -FX"
 alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
 alias h="history"
 alias hc="history -c"
-alias psql="INPUTRC=/dev/fd/9 psql 9<<<'set editing-mode vi'";
-alias mysql='INPUTRC=/dev/fd/9 mysql 9<<<'\''set editing-mode vi'\'''
+alias psql="INPUTRC=/dev/fd/9 psql 9<<<'set editing-mode vi'"
+alias mysql="INPUTRC=/dev/fd/9 mysql 9<<<'set editing-mode vi'"
 # This is getting even uglier, but must have on remote machines
-#alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-view = line-number:no,interval=5 id:yes date:relative author:abbreviated commit-title:yes,graph,refs,overflow=no"'
+alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-view = line-number:no,interval=5 id:yes date:relative author:abbreviated commit-title:yes,graph,refs,overflow=no"'
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
-alias gs="git status -sb";
-alias json="python -mjson.tool"
-alias tmux="tmux -2"
+alias gs="git status -sb"
 
 # Better systemd. Makes it almost usable, works around some brain-dead-ness.
 # - Functions start, reload and restart show the status of how it went, and also tails the log/journal afterwards. Exit tail with CTRL-c.
@@ -126,30 +127,24 @@ jcf() { SCS="${1:-${SCS}}" ; journalctl -n "${LINES:-45}" -xefu "$SCS" ; }
 
 # Only if not on busybox
 [ -L $(type -p grep) ] || alias grep="grep --color"
-[ -L $(type -p less) ] || alias less="less -X" # No alt screen
-
-# OS X specifics
-if [[ "$OSTYPE" == "darwin"* ]]; then
-	# If we have `brew install coreutils`, then use the linux-compatible `ls`
-	[ -f /usr/local/bin/gls ] && alias ls="gls --color"
-fi
+# No alt screen
+[ -L $(type -p less) ] || alias less="less -X"
 
 # Now fix bash competion for our systemd aliases (unfortunately manually)
 # NOTE: unfortunately there is no way in bash to also autocomplete "scs", "sc0"... :(
-[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion # Most Linux
-[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion # OS X
+# Most Linux
+[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
+# OS X
+[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
 if type _completion_loader 2>/dev/null >/dev/null; then _completion_loader systemctl; _completion_loader journalctl; fi
 
-# Poor man's history expansion (which bash doesn't do on TAB)
-#shopt -s histverify
-# For "**"
-shopt -s globstar
-# Spell checking on tab expansion
-shopt -s cdspell dirspell
-# Set LINES and COLUMNS
-shopt -s checkwinsize
-# Save multi-line commands as one command
-shopt -s cmdhist
+# Shell options.
+# histverify (NOT USED NOW): Poor man's history expansion (which bash doesn't do on TAB)
+# globstar: To have "**" as in zsh
+# cdspell, dirspell: Spell checking on tab expansion
+# checkwinsize: Set LINES and COLUMNS
+# cmdhist: Save multi-line commands as one command
+shopt -s globstar cdspell dirspell checkwinsize cmdhist
 
 # Configure readline
 bind 'TAB:menu-complete'
@@ -162,8 +157,8 @@ bind 'set colored-stats on'
 bind 'set visible-stats on'
 bind 'set completion-prefix-display-length 1'
 bind 'set skip-completed-text on'
-bind 'set history-preserve-point off'
-bind 'set mark-symlinked-directories on';
+bind 'set history-preserve-point on'
+bind 'set mark-symlinked-directories on'
 # History expansion on space
 bind 'space:magic-space'
 
@@ -185,6 +180,19 @@ bind -m vi-insert "\C-l":clear-screen
 compopt -o bashdefault cd
 
 # END of part to be injected
+
+# Commands which are not required in remote inject
+alias json="python -mjson.tool"
+alias tmux="tmux -2"
+
+# Locally we don't need these (but leave them in the inject part)
+unalias tig
+
+# OS X specifics
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	# If we have `brew install coreutils`, then use the linux-compatible `ls`
+	[ -f /usr/local/bin/gls ] && alias ls="gls --color"
+fi
 
 # hl - highlight command
 source ~/.kkrc/hl
