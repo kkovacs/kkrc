@@ -151,9 +151,11 @@ bind 'TAB:menu-complete'
 bind '"\e[Z": menu-complete-backward'
 bind 'set menu-complete-display-prefix on'
 bind 'set show-all-if-ambiguous on'
+bind 'set show-all-if-unmodified on'
 bind 'set completion-ignore-case on'
 bind 'set match-hidden-files off'
 bind 'set colored-stats on'
+bind 'set colored-completion-prefix on'
 bind 'set visible-stats on'
 bind 'set completion-prefix-display-length 1'
 bind 'set skip-completed-text on'
@@ -174,7 +176,7 @@ bind -m vi '"\e[B":"\201\202"'
 bind -m vi-insert '"\e[A":history-search-backward'
 bind -m vi-insert '"\e[B":history-search-forward'
 # And I still want CTRL-L in insert mode
-bind -m vi-insert "\C-l":clear-screen
+bind -m vi-insert "C-l:clear-screen"
 
 # Restore default completion for cd, since bash-completion doesn't handle wildcards
 compopt -o bashdefault cd
