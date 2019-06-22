@@ -3,5 +3,5 @@
  lineinfile 'HISTSIZE=' 'HISTSIZE=' .bashrc
  lineinfile 'HISTFILESIZE=' 'HISTFILESIZE=10000' .bashrc
  lineinfile 'HISTTIMEFORMAT=' 'HISTTIMEFORMAT="%F %T "' .bashrc
- [ "$(id -u)" -eq 0 ] && lineinfile 'alias git=' 'alias git="echo Do not git as root."' .bashrc
+ [ "$(id -u)" -eq 0 -a "$(logname)" != "${USER}" ] && lineinfile 'alias git=' 'alias git="echo Do not git as root."' .bashrc
  cat .bashrc
