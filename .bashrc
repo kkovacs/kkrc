@@ -113,7 +113,7 @@ scs() { SCS="${1:-${SCS}}" ; systemctl status -l "$SCS" ; }
 # STOP, but shows a status afterwards
 sc0() { SCS="${1:-${SCS}}" ; systemctl stop "$SCS" ; scs ; }
 # reusable command to show status afterwards, and tail the log during reload. Exit with CTRL-c
-stail() { SCS="${2:-${SCS}}" ; sdr ; systemctl reset-failed "$SCS" ; journalctl -n 0 -xfu "$SCS" & systemctl "$1" "$SCS" ; scs ; fg ; }
+stail() { SCS="${2:-${SCS}}" ; sdr ; systemctl reset-failed "$SCS" ; journalctl -n 0 -xfu "$SCS" & systemctl "$1" "$SCS" ; scs ; fg %journalctl ; }
 # START
 sc1() { stail start "${1:-${SCS}}" ; }
 # RELOAD
