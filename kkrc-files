@@ -11,3 +11,4 @@ process .tigrc ~/.tigrc
 process .psqlrc ~/.psqlrc
 process .inputrc ~/.inputrc
 process .i3 ~/.i3
+process .ansible.cfg ~/.ansible.cfg
