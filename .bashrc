@@ -140,12 +140,10 @@ complete -F _journalctl jcf
 # No alt screen, no line-numbers
 [ -L $(type -p less) ] || alias less="less -Xn"
 
-# Now fix bash competion for our systemd aliases (unfortunately manually)
-# Most Linux
-[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
-# OS X
-[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
-if type _completion_loader 2>/dev/null >/dev/null; then _completion_loader systemctl; _completion_loader journalctl; fi
+# Now fix bash competion for our systemd aliases.
+# Even without bash-completion, most linux package managers put these there from the systemd packages - take advantage.
+[ -f /usr/share/bash-completion/completions/systemctl ] && . /usr/share/bash-completion/completions/systemctl
+[ -f /usr/share/bash-completion/completions/journalctl ] && . /usr/share/bash-completion/completions/journalctl
 
 # Shell options.
 # histverify (NOT USED NOW): Poor man's history expansion (which bash doesn't do on TAB)
@@ -203,6 +201,8 @@ unalias tig
 if [[ "$OSTYPE" == "darwin"* ]]; then
 	# If we have `brew install coreutils`, then use the linux-compatible `ls`
 	[ -f /usr/local/bin/gls ] && alias ls="gls --color"
+	# Force load bash-completion on OS X
+	[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
 fi
 
 # hl - highlight command
