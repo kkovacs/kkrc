@@ -82,10 +82,11 @@ alias s="screen -xR"
 alias l="ls -lrt"
 alias la="ls -lrtA -I*" # For Linux
 #alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
-alias ll="ls -lhSr"
-# Cut -FX in ash
-alias lr="ls -AR1 -I .git|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d files\n%s \t\",p-2,\$0);p=0}{p++}END{print p \" files\"}'|less -FX"
-alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
+alias ll="ls -lrtA"
+# A version of ls/ll that is still quick to type, but uses less automatically
+lll() { ls -lrtA --color "$@" | less -FXRn +G ; }
+#alias lr="ls -AR1 -I .git|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d files\n%s \t\",p-2,\$0);p=0}{p++}END{print p \" files\"}'|less -FXn" # Cut -FX in ash
+#alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
 alias h="history"
 alias hc="history -c"
 alias psql="INPUTRC=/dev/fd/9 psql 9<<<'set editing-mode vi'"
@@ -136,8 +137,8 @@ complete -F _journalctl jcf
 
 # Only if not on busybox
 [ -L $(type -p grep) ] || alias grep="grep --color"
-# No alt screen
-[ -L $(type -p less) ] || alias less="less -X"
+# No alt screen, no line-numbers
+[ -L $(type -p less) ] || alias less="less -Xn"
 
 # Now fix bash competion for our systemd aliases (unfortunately manually)
 # Most Linux
