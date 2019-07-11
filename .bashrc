@@ -17,6 +17,13 @@ if [ -e ~/.bashrc.orig ]; then . ~/.bashrc.orig; fi
 # (This is inserted separately to the front of the the inject file)
 HISTCONTROL=ignoreboth
 
+# OS X specifics, before
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	# Force load bash-completion on OS X
+	# We need to do this BEFORE the generic part, or else `compopt` is unknown
+	[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+fi
+
 # START of part to be injected
 
 # I need VI keys
@@ -95,6 +102,9 @@ alias mysql="INPUTRC=/dev/fd/9 mysql 9<<<'set editing-mode vi'"
 alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-view = line-number:no,interval=5 id:yes date:relative author:abbreviated commit-title:yes,graph,refs,overflow=no"'
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
 alias gs="git status -sb"
+
+# Use bash-completion, if available
+[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
 
 # Better systemd. Makes it almost usable, works around brain-dead-ness, even add some comfort:
 # - We use $SCS to store (automatically) the unit we're working on, so no need for typing all the time, or history athletics. One rarely works on multiple services at once.
@@ -197,12 +207,10 @@ alias tmux="tmux -2"
 # Locally we don't need these (but leave them in the inject part)
 unalias tig
 
-# OS X specifics
+# OS X specifics, after
 if [[ "$OSTYPE" == "darwin"* ]]; then
 	# If we have `brew install coreutils`, then use the linux-compatible `ls`
 	[ -f /usr/local/bin/gls ] && alias ls="gls --color"
-	# Force load bash-completion on OS X
-	[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
 fi
 
 # hl - highlight command
