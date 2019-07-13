@@ -138,12 +138,14 @@ _scr() { _scx "reload-or-restart" ; }; complete -F _scr scr
 # RESTART
 scR() { stail restart "${1:-${SCS}}" ; }
 complete -F _scr scR # reusing _scr
-# LOG in pager, extended info, jump to end
-jc() { SCS="${1:-${SCS}}" ; journalctl -xeu "$SCS" ; }
+# journalctl alias for $SCS unit
+jcu() { SCS="${1:-${SCS}}" ; journalctl -xeu "$SCS" ; }
 complete -F _journalctl jc
 # LOG "tail -f". Tries to fill the screen.
 jcf() { SCS="${1:-${SCS}}" ; journalctl -n "${LINES:-45}" -xefu "$SCS" ; }
 complete -F _journalctl jcf
+# "generic" journalctl alias
+jc() { journalctl -xe "$@" ; }
 
 # Only if not on busybox
 [ -L $(type -p grep) ] || alias grep="grep --color"
@@ -188,6 +190,7 @@ bind -m vi '"\201":next-history'
 bind -m vi '"\202":end-of-line'
 bind -m vi 'k:"\200\202"'
 bind -m vi 'j:"\201\202"'
+# NOTE: use `tput rmkx` or `reset` when the terminal is sending \eOA instead of \e[A (stuck in "app mode"), see https://vi.stackexchange.com/questions/15324/up-arrow-key-code-why-a-becomes-oa
 bind -m vi '"\e[A":"\200\202"'
 bind -m vi '"\e[B":"\201\202"'
 bind -m vi-insert '"\e[A":history-search-backward'
