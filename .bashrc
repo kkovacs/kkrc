@@ -106,59 +106,13 @@ alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
 alias gs="git status -sb"
 
-# Use bash-completion, if available
-[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
-
-# Better systemd. Makes it almost usable, works around brain-dead-ness, even add some comfort:
-# - We use $SCS to store (automatically) the unit we're working on, so no need for typing all the time, or history athletics. One rarely works on multiple services at once.
-# - Functions start, reload and restart show the status of how it went, and also tails the log/journal afterwards. Exit tail with CTRL-c.
-
-# Generic helper function to set up bash autocomplete for our aliases
-_scx() { COMP_WORDS=(systemctl "$1" "${COMP_WORDS[@]:1}") ; ((COMP_CWORD++)) ; _systemctl ; }
-# self-reload, because systemd can't do it on its own...
-sdr() { systemctl daemon-reload ; }
-# List services, because it should be simple
-scl() { systemctl list-units --type service --all ; }
-# `sc` is like systemctl, but stores last param in $SCS. Try to set up autocomplete for it, too.
-sc() { SCS="${@: -1}" ; systemctl "$@" ; }
-complete -F _systemctl sc
-# STATUS, but don't trim lines
-scs() { SCS="${1:-${SCS}}" ; systemctl status -l "$SCS" ; }
-_scs() { _scx "status" ; }; complete -F _scs scs
-# STOP, but shows a status afterwards
-sc0() { SCS="${1:-${SCS}}" ; systemctl stop "$SCS" ; scs ; }
-_sc0() { _scx "stop" ; }; complete -F _sc0 sc0
-# Reusable command to show status afterwards, and tail the log during reload. Exit with CTRL-c
-# - We use daemon-reload automatically, because very often the thing you modified for a restart is the unit file.
-# - We use reset-failed, because for some incomprehensible reason, the restart-count limit imposed by StartLimitInterval[Sec] also affects manual restarts.
-stail() { SCS="${2:-${SCS}}" ; sdr ; systemctl reset-failed "$SCS" ; journalctl -n 0 -xfu "$SCS" & systemctl "$1" "$SCS" ; scs ; fg %journalctl ; }
-# START
-sc1() { stail start "${1:-${SCS}}" ; }
-_sc1() { _scx "start" ; }; complete -F _sc1 sc1
-# RELOAD
-scr() { stail reload-or-restart "${1:-${SCS}}" ; }
-_scr() { _scx "reload-or-restart" ; }; complete -F _scr scr
-# RESTART
-scR() { stail restart "${1:-${SCS}}" ; }
-complete -F _scr scR # reusing _scr
-# journalctl alias for $SCS unit
-jcu() { SCS="${1:-${SCS}}" ; journalctl -xeu "$SCS" ; }
-complete -F _journalctl jc
-# LOG "tail -f". Tries to fill the screen.
-jcf() { SCS="${1:-${SCS}}" ; journalctl -n "${LINES:-45}" -xefu "$SCS" ; }
-complete -F _journalctl jcf
-# "generic" journalctl alias
-jc() { journalctl -xe "$@" ; }
-
 # Only if not on busybox
 [ -L $(type -p grep) ] || alias grep="grep --color"
 # No alt screen, no line-numbers
 [ -L $(type -p less) ] || alias less="less -Xn"
 
-# Now fix bash competion for our systemd aliases.
-# Even without bash-completion, most linux package managers put these there from the systemd packages - take advantage.
-[ -f /usr/share/bash-completion/completions/systemctl ] && . /usr/share/bash-completion/completions/systemctl
-[ -f /usr/share/bash-completion/completions/journalctl ] && . /usr/share/bash-completion/completions/journalctl
+# Use bash-completion, if available
+[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
 
 # Shell options.
 # histverify (NOT USED NOW): Poor man's history expansion (which bash doesn't do on TAB)
@@ -193,7 +147,7 @@ bind -m vi '"\201":next-history'
 bind -m vi '"\202":end-of-line'
 bind -m vi 'k:"\200\202"'
 bind -m vi 'j:"\201\202"'
-# NOTE: use `tput rmkx` or `reset` when the terminal is sending \eOA instead of \e[A (stuck in "app mode"), see https://vi.stackexchange.com/questions/15324/up-arrow-key-code-why-a-becomes-oa
+# NOTE: use `tput rmkx` or `reset` when the terminal is sending \eOA instead of \e[A (stuck in "app mode")
 bind -m vi '"\e[A":"\200\202"'
 bind -m vi '"\e[B":"\201\202"'
 bind -m vi-insert '"\e[A":history-search-backward'
@@ -203,6 +157,65 @@ bind -m vi-insert "C-l:clear-screen"
 
 # Restore default completion for cd, since bash-completion doesn't handle wildcards
 compopt -o bashdefault cd
+
+# START of better systemd.
+# Makes it almost usable, works around brain-dead-ness, even add some comfort:
+# - Unlike simple aliases, we still bash-complete.
+# - We use $SC to store (automatically) the unit we're working on, so no need for typing all the time, or history athletics. One rarely works on multiple services at once.
+# - Functions start, reload and restart show the status of how it went, and also tails the log/journal afterwards. Exit tail with CTRL-c.
+
+# Generic helper functions to set up bash-autocomplete for our aliases
+_scx() { COMP_WORDS=("systemctl" "$1" "${COMP_WORDS[@]:1}") ; ((COMP_CWORD++)) ; _systemctl ; }
+_jcx() { COMP_WORDS=("journalctl" "$1" "${COMP_WORDS[@]:1}") ; ((COMP_CWORD++)) ; _journalctl ; }
+
+# "SystemCtl", generic alias, because who has time to type THAT much?
+sc() { SC="${@: -1}" ; systemctl "$@" ; }
+complete -F _systemctl sc
+# "User-level SystemCtl" alias, becuase, there's NOT even a short-option or something...
+usc() { SC="${@: -1}" ; systemctl --user "$@" ; }
+_usc() { _scx --user ; }
+complete -F _usc usc
+# "SystemCtl List" services, because it should be simple
+scl() { systemctl list-units --type service --all ; }
+# Systemctl Daemon-Reload", because systemd can't do it on its own... Do user or system depending on UID
+sdr() { [ $UID -eq 0 ] && systemctl daemon-reload || systemctl --user daemon-reload ; }
+
+# JournalCtl for Unit
+jcu() { SC="${1:-${SC}}" ; journalctl -xe --unit "$SC" ; }
+_jcu() { _jcx "--unit" ; }
+complete -F _jcu jcu
+# User-level JournalCtrl for Unit
+ujcu() { SC="${1:-${SC}}" ; journalctl -xe --user-unit "$SC" ; }
+_ujcu() { _jcx "--user-unit" ; }
+complete -F _ujcu ujcu
+
+# Reusable command to show status afterwards, and tail the log during reload. Exit with CTRL-c
+# - We use daemon-reload automatically, because very often the thing you modified for a restart is the unit file.
+# - We use reset-failed, because for some incomprehensible reason, the restart-count limit imposed by StartLimitInterval[Sec] also affects manual restarts.
+stail() { SC="${2:-${SC}}" ; sdr ; systemctl reset-failed "$SC" ; journalctl -n 0 -xfu "$SC" & systemctl "$1" "$SC" ; scs ; fg %journalctl ; }
+# Param #1: desired function name
+# Param #2: command to call
+# Param #3: command action to call
+# Param #4+: any further options to pass to action
+_mksc() {
+	eval "$1() { SC=\"\${1:-\${SC}}\" ; $2 $3 ${@:4} \"\$SC\" ; }"
+	eval "_$1() { _scx \"$3\" ; }"
+	eval "complete -F _$1 $1"
+}
+# Definitions:
+_mksc scs systemctl status -l # status, but don't trim lines
+_mksc sc0 systemctl stop
+_mksc sc1 stail start
+_mksc scr stail reload-or-restart
+_mksc scR stail restart
+# Override sc0 to add an additional `scs` to show status afterwards
+sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
+
+# Now fix bash competion for our systemd aliases.
+# Even without bash-completion, most linux package managers put these there from the systemd packages - take advantage.
+[ -f /usr/share/bash-completion/completions/systemctl ] && . /usr/share/bash-completion/completions/systemctl
+[ -f /usr/share/bash-completion/completions/journalctl ] && . /usr/share/bash-completion/completions/journalctl
+# END of better systemd.
 
 # END of part to be injected
 
