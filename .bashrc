@@ -22,6 +22,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 	# Force load bash-completion on OS X
 	# We need to do this BEFORE the generic part, or else `compopt` is unknown
 	[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+	# If we have `brew install coreutils`, then use the linux-compatible `ls`
+	# NOTE: Have this before defining `lll`, so that uses gls too
+	[ -f /usr/local/bin/gls ] && alias ls="gls --color"
 fi
 
 # START of part to be injected
@@ -209,12 +212,6 @@ alias tmux="tmux -2"
 
 # Locally we don't need these (but leave them in the inject part)
 unalias tig
-
-# OS X specifics, after
-if [[ "$OSTYPE" == "darwin"* ]]; then
-	# If we have `brew install coreutils`, then use the linux-compatible `ls`
-	[ -f /usr/local/bin/gls ] && alias ls="gls --color"
-fi
 
 # hl - highlight command
 source ~/.kkrc/hl
