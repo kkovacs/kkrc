@@ -105,6 +105,8 @@ alias mysql="INPUTRC=/dev/fd/9 mysql 9<<<'set editing-mode vi'"
 alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-view = line-number:no,interval=5 id:yes date:relative author:abbreviated commit-title:yes,graph,refs,overflow=no"'
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
 alias gs="git status -sb"
+# Mark server-side commits as "hotfix", because they are
+alias git='git -c user.email=hotfix@example.com -c user.name=hotfix'
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
 m() { mount "$@" | grep '^\/dev\/' ; }
 d() { df -h "$@" | grep -v 'snap\|tmpfs\|udev' ; }
@@ -228,6 +230,7 @@ alias tmux="tmux -2"
 
 # Locally we don't need these (but leave them in the inject part)
 unalias tig
+unalias git
 unset VIMINIT
 
 # hl - highlight command
