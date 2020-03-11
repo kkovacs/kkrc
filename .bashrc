@@ -186,13 +186,16 @@ scl() { systemctl list-units --type service --all ; }
 sdr() { [ $UID -eq 0 ] && systemctl daemon-reload || systemctl --user daemon-reload ; }
 
 # JournalCtl for Unit
-jcu() { SC="${1:-${SC}}" ; journalctl -xe --unit "$SC" ; }
-_jcu() { _jcx "--unit" ; }
-complete -F _jcu jcu
+jc() { SC="${1:-${SC}}" ; journalctl -xu "$SC" ; }
+_jc() { _jcx "--unit" ; }
+complete -F _jc jc
+# ...with "tail -f"
+jcf() { SC="${1:-${SC}}" ; journalctl -xefu "$SC" ; }
+complete -F _jc jcf
 # User-level JournalCtrl for Unit
-ujcu() { SC="${1:-${SC}}" ; journalctl -xe --user-unit "$SC" ; }
-_ujcu() { _jcx "--user-unit" ; }
-complete -F _ujcu ujcu
+ujc() { SC="${1:-${SC}}" ; journalctl -x --user-unit "$SC" ; }
+_ujc() { _jcx "--user-unit" ; }
+complete -F _ujc ujc
 
 # Reusable command to show status afterwards, and tail the log during reload. Exit with CTRL-c
 # - We use daemon-reload automatically, because very often the thing you modified for a restart is the unit file.
