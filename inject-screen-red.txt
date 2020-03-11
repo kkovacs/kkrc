@@ -1,1 +1,3 @@
 :caption always "%-Lw%{+b Wr} %n%f:%t %{-}%+Lw %=%{+b Wr} %H %{-}"
+:hardstatus string "%{+b rW} %= THIS IS A PRODUCTION SYSTEM %= %{-}"
+:hardstatus alwayslastline
