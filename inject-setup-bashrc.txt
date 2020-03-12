@@ -1,7 +1,7 @@
  function lineinfile() { regexp=${1//\//\\/} ; line=${2//\//\\/} ; sed -i -e '/.*'"${regexp}"'.*/{s//'"${line}"'/;:a;n;ba;q}' -e '$a'"${line}" "$3" ; }
- [ ! -e .bashrc.orig ] && cp .bashrc .bashrc.orig
- lineinfile 'HISTSIZE=' 'HISTSIZE=' .bashrc
- lineinfile 'HISTFILESIZE=' 'HISTFILESIZE=10000' .bashrc
- lineinfile 'HISTTIMEFORMAT=' 'HISTTIMEFORMAT="%F %T "' .bashrc
- LN=$(logname) && [ "$(id -u)" -eq 0 -a "${LN}" != "${USER}" ] && lineinfile 'alias git=' 'alias git="echo Do not git as root."' .bashrc
- cat .bashrc
+ [ ! -e ~/.bashrc.orig ] && cp ~/.bashrc ~/.bashrc.orig
+ lineinfile 'HISTSIZE=' 'HISTSIZE=' ~/.bashrc
+ lineinfile 'HISTFILESIZE=' 'HISTFILESIZE=10000' ~/.bashrc
+ lineinfile 'HISTTIMEFORMAT=' 'HISTTIMEFORMAT="%F %T "' ~/.bashrc
+ lineinfile 'function git' 'function git { [[ -d .git \&\& ! -O .git \&\& "$1" != "log" \&\& "$1" != "blame" \&\& "$1" != "diff" \&\& "$1" != "show" \&\& "$1" != "status" ]] \&\& echo "Please use the user that owns .git!" \&\& return 1; command git "$@" ; }' ~/.bashrc
+ cat ~/.bashrc
