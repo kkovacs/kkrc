@@ -3,5 +3,5 @@
  lineinfile 'HISTSIZE=' 'HISTSIZE=' ~/.bashrc
  lineinfile 'HISTFILESIZE=' 'HISTFILESIZE=10000' ~/.bashrc
  lineinfile 'HISTTIMEFORMAT=' 'HISTTIMEFORMAT="%F %T "' ~/.bashrc
- lineinfile 'function git' 'function git { [[ -d .git \&\& ! -O .git \&\& "$1" != "log" \&\& "$1" != "blame" \&\& "$1" != "diff" \&\& "$1" != "show" \&\& "$1" != "status" ]] \&\& echo "Please use the user that owns .git!" \&\& return 1; command git "$@" ; }' ~/.bashrc
+ lineinfile 'function git' 'function git { [[ -O .git || " log blame diff show status init clone " =~ " $1 " ]] \&\& command git "$@" \&\& return 0; echo "Please use the unix user that owns .git" \&\& return 1 ; }' ~/.bashrc
  cat ~/.bashrc
