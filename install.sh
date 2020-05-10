@@ -5,10 +5,11 @@ cd "$(dirname $0)"
 
 # .bashrc is a special case, since it usually exists. If it's not ours,
 # rename it to .bashrc.orig
+printf "Installing .bashrc: "
 if [ -L ~/.bashrc ]; then
-	echo "OK: No need to remove original .bashrc\n"
+	printf "\033[00;32mOK:\033[00m No need to remove original .bashrc\n"
 else
-	echo "INFO: Renaming .bashrc to .bashrc.orig\n"
+	printf "\033[00;33mINFO:\033[00m Renaming .bashrc to .bashrc.orig\n"
 	mv ~/.bashrc ~/.bashrc.orig
 fi
 
@@ -17,28 +18,26 @@ process() {
 	local file="$1"
 	local softlink="$2"
 
-	echo "Installing $file..."
+	printf "Installing $file: "
 
 	if [ -L "$softlink" ]; then
-		echo "OK: Your $softlink is already a soft link, nice!"
+		printf "\033[00;32mOK:\033[00m Your $softlink is already a soft link, nice!\n"
 	else
 		if [ -e "$softlink" ]; then
-			echo "WARNING: You have $softlink - please move it away."
+			printf "\033[00;31mWARNING: You have $softlink - please move it away.\033[00m\n"
 		else
 			# NOTE: No quotes on first param or ~ expansion not always happens
 			ln -s ~/.kkrc/$file "$softlink"
-			echo "OK: Installed."
+			printf "\033[00;32mOK:\033[00m Installed.\n"
 		fi
 	fi
-
-	# Just for pretty formatting
-	echo
 }
 
 # Process all files/dirs
 . ./kkrc-files
 
 # Update git submodules
+echo "Updating git submodules:"
 if [ -e ~/.kkrc/.vim/bundle/vim-pathogen/README.markdown ]; then
 	git submodule foreach git pull origin master
 else
