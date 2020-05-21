@@ -106,7 +106,7 @@ alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
 alias gs="git status -sb"
 # Watch out for using git as a different user than the repository. Avoid mandatory reconfiguration of git with user/email for hotfixes.
-function git { [[ -O .git || " log blame diff show status init clone " =~ " $1 " ]] && command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@" && return 0; echo "Please use the unix user that owns .git" && return 1 ; }
+function git { if [[ -O "$(command git rev-parse --show-toplevel)/.git" || " log blame diff show status init clone " =~ " $1 " ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
 m() { mount "$@" | grep '^\/dev\/' ; }
 d() { df -h "$@" | grep -v 'snap\|tmpfs\|udev' ; }

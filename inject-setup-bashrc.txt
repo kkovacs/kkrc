@@ -3,5 +3,5 @@
  lineinfile 'HISTSIZE=' 'HISTSIZE=' ~/.bashrc
  lineinfile 'HISTFILESIZE=' 'HISTFILESIZE=10000' ~/.bashrc
  lineinfile 'HISTTIMEFORMAT=' 'HISTTIMEFORMAT="%F %T "' ~/.bashrc
- lineinfile 'function git' 'function git { [[ -O .git || " log blame diff show status init clone " =~ " $1 " ]] \&\& command git "$@" \&\& return 0; echo "Please use the unix user that owns .git" \&\& return 1 ; }' ~/.bashrc
+ lineinfile 'function git' 'function git { if [[ -O "$(command git rev-parse --show-toplevel)/.git" || " log blame diff show status init clone " =~ " $1 " ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }' ~/.bashrc
  cat ~/.bashrc
