@@ -161,6 +161,11 @@ map <silent> <leader>h0 :call clearmatches()<cr>
 " Clear all highlights
 nmap <silent> <leader>/ :nohlsearch<cr>
 
+" Folding: Map Space to fold toggle
+nmap <space> za
+" Folding: Outline view: map Enter to close all folds
+nmap <cr> zM
+
 " GUI, colors, other extras
  " Needed for Base16
 let base16colorspace=256
