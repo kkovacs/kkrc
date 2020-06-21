@@ -10,3 +10,6 @@
 [submodule ".vim/bundle/vim-pug"]
 	path = .vim/bundle/vim-pug
 	url = https://github.com/digitaltoad/vim-pug.git
+[submodule ".vim/bundle/table-mode"]
+	path = .vim/bundle/table-mode
+	url = git@github.com:dhruvasagar/vim-table-mode.git
