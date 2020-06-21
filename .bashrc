@@ -102,6 +102,8 @@ alias hc="history -c"
 alias psql="INPUTRC=/dev/fd/9 psql 9<<<'set editing-mode vi'"
 # MySQL with readline
 alias mysql="INPUTRC=/dev/fd/9 mysql 9<<<'set editing-mode vi'"
+# MySQL with libedit. XXX Leaves a tmp dir behind, but libedit looks for `~/.editrc` and there is no way to override :(
+#alias mysql='(export HOME=$(mktemp -d); printf "bind -v\nbind \"^R\" em-inc-search-prev\nbind \\t rl_complete" >~/.editrc; mysql "$*")'
 # This is getting even uglier, but must have on remote machines
 alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-view = line-number:no,interval=5 id:yes date:relative author:abbreviated commit-title:yes,graph,refs,overflow=no"'
 alias ts="tig status"
