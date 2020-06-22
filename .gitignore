@@ -22,100 +22,100 @@ tags
 *~
 
 # Python
-*.py[cod]
+#*.py[cod]
 
 # node-cluster
-/pids
-*.sock
+#/pids
+#*.sock
 
 # Compiled source
-*.com
-*.class
-*.dll
-*.exe
-*.out
-*.o
-*.so
-*.lib
-*.lai
-*.la
-*.a
-*.slo
-*.lo
-*.o
+#*.com
+#*.class
+#*.dll
+#*.exe
+#*.out
+#*.o
+#*.so
+#*.lib
+#*.lai
+#*.la
+#*.a
+#*.slo
+#*.lo
+#*.o
 
 # Packages
-*.7z
-*.dmg
-*.gz
-*.iso
-*.jar
-*.rar
-*.tar
-*.zip
-*.jar
-*.war
-*.ear
+#*.7z
+#*.dmg
+#*.gz
+#*.iso
+#*.jar
+#*.rar
+#*.tar
+#*.zip
+#*.jar
+#*.war
+#*.ear
 
 # Logs and databases
-*.log
-*.sqlite
+#*.log
+#*.sqlite
 
 # node.js
-/node_modules
-lib-cov
-*.seed
-*.log
-*.pid
-*.gz
-npm-debug.log
+#/node_modules
+#lib-cov
+#*.seed
+#*.log
+#*.pid
+#*.gz
+#npm-debug.log
 
 # Rails
-*.rbc
-*.sassc
-.sass-cache
-capybara-*.html
-.rspec
-/.bundle
-/vendor/bundle
-/log/*
-/tmp/*
-/db/*.sqlite3
-/public/system/*
-/coverage/
-/spec/tmp/*
-rerun.txt
-pickle-email-*.html
+#*.rbc
+#*.sassc
+#.sass-cache
+#capybara-*.html
+#.rspec
+#/.bundle
+#/vendor/bundle
+#/log/*
+#/tmp/*
+#/db/*.sqlite3
+#/public/system/*
+#/coverage/
+#/spec/tmp/*
+#rerun.txt
+#pickle-email-*.html
 
 # PHP composer
-/vendor
+#/vendor
 
 # PHP CodeIgniter
-*/config/development
-*/logs/log-*.php
-*/logs/!index.html
-*/cache/*
-*/cache/!index.html
+#*/config/development
+#*/logs/log-*.php
+#*/logs/!index.html
+#*/cache/*
+#*/cache/!index.html
 
 # Erlang
-.eunit
-*.o
-*.beam
-*.plt
+#.eunit
+#*.o
+#*.beam
+#*.plt
 
 # Golang
-*.o
-*.a
-*.so
-_obj
-_test
-*.[568vq]
-[568vq].out
-*.cgo1.go
-*.cgo2.c
-_cgo_defun.c
-_cgo_gotypes.go
-_cgo_export.*
-_testmain.go
-*.test
-*.prof
+#*.o
+#*.a
+#*.so
+#_obj
+#_test
+#*.[568vq]
+#[568vq].out
+#*.cgo1.go
+#*.cgo2.c
+#_cgo_defun.c
+#_cgo_gotypes.go
+#_cgo_export.*
+#_testmain.go
+#*.test
+#*.prof
