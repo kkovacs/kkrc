@@ -12,4 +12,4 @@
 	url = https://github.com/digitaltoad/vim-pug.git
 [submodule ".vim/bundle/table-mode"]
 	path = .vim/bundle/table-mode
-	url = git@github.com:dhruvasagar/vim-table-mode.git
+	url = https://github.com/dhruvasagar/vim-table-mode.git
