@@ -237,7 +237,6 @@ alias tmux="tmux -2"
 
 # Locally we don't need these (but leave them in the inject part)
 unalias tig
-unset -f git
 unset VIMINIT
 
 # hl - highlight command

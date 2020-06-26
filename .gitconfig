@@ -25,6 +25,3 @@
 [push]
 	default = matching
 	followTags = true
-[user]
-	email = kkovacs@kkovacs.eu
-	name = KK
