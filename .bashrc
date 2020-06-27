@@ -112,8 +112,8 @@ alias gs="git status -sb"
 # Watch out for using git as a different user than the repository. Avoid mandatory reconfiguration of git with user/email for hotfixes.
 function git { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " log blame diff show status init clone " =~ " $1 " ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
-m() { mount "$@" | grep '^\/dev\/' ; }
-d() { df -h "$@" | grep -v 'snap\|tmpfs\|udev' ; }
+M() { mount "$@" | grep '^\/dev\/' ; }
+D() { df -h "$@" | grep -v 'snap\|tmpfs\|udev' ; }
 
 # Only if not on busybox
 [ -L $(type -p grep) ] || alias grep="grep --color"
@@ -228,6 +228,11 @@ sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 [ -f /usr/share/bash-completion/completions/systemctl ] && . /usr/share/bash-completion/completions/systemctl
 [ -f /usr/share/bash-completion/completions/journalctl ] && . /usr/share/bash-completion/completions/journalctl
 # END of better systemd.
+
+# docker shortcut and matching bash completion
+alias d="sudo docker"
+complete -F _docker d
+[ -f /usr/share/bash-completion/completions/docker ] && . /usr/share/bash-completion/completions/docker
 
 # END of part to be injected
 
