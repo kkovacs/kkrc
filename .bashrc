@@ -229,10 +229,8 @@ sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 [ -f /usr/share/bash-completion/completions/journalctl ] && . /usr/share/bash-completion/completions/journalctl
 # END of better systemd.
 
-# docker shortcut and matching bash completion
-alias d="sudo docker"
-complete -F _docker d
-[ -f /usr/share/bash-completion/completions/docker ] && . /usr/share/bash-completion/completions/docker
+# docker shortcut
+alias docker="sudo docker"
 
 # END of part to be injected
 
