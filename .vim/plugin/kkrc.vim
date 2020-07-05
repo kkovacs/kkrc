@@ -31,6 +31,8 @@ set showcmd
 set nocursorline
 " No viminfo
 set viminfo=
+" Don't ruin my carefully opened/closed folds when searching. I can use <space> (defined later) to peek.
+set foldopen=hor,insert,undo
 " So the stronger encryption never gets frogotten
 " Also I can't believe CentOS software is so ANCIENT
 if v:version >= 704
