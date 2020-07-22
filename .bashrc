@@ -115,6 +115,10 @@ function git { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.g
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
 M() { mount "$@" | grep '^\/dev\/' ; }
 D() { df -h "$@" | grep -v 'snap\|tmpfs\|udev' ; }
+# Free memory
+F() { free -h ; }
+# Kubernetes overview. Using an alias instead of a function because often kubectl is an alias itself... (minikube, etc)
+alias K="kubectl get all --output=wide"
 
 # Only if not on busybox
 [ -L $(type -p grep) ] || alias grep="grep --color"
@@ -238,6 +242,8 @@ alias docker="sudo docker"
 # Commands which are not required in remote inject
 alias json="python -mjson.tool"
 alias tmux="tmux -2"
+# When I don't want to pollute my known_hosts file (temporary VMs, etc)
+alias sshh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
 # Locally we don't need these (but leave them in the inject part)
 unalias tig
