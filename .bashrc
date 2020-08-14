@@ -243,7 +243,7 @@ alias docker="sudo docker"
 alias json="python -mjson.tool"
 alias tmux="tmux -2"
 # When I don't want to pollute my known_hosts file (temporary VMs, etc)
-alias sshh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+alias sssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
 # Locally we don't need these (but leave them in the inject part)
 unalias tig
