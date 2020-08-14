@@ -273,8 +273,9 @@ ssh() {
 	#tmux rename-window "$SAVED" >/dev/null 2>/dev/null
 	# To switch back to auto-renaming after disconnection:
 	#tmux set-window-option automatic-rename "on" >/dev/null 2>/dev/null
-	# Restore from alternate mode, if set
-	printf '\e[?47l'
+	# Restore from alternate mode (if set),
+	# and move cursor to the last line (in case ssh losing connection in the middle of a full-screen app like VI, let's not leave the cursor in the middle of the screen).
+	printf '\e[?47l\e[99B'
 }
 
 # Strictly NOT in inject, just LOCAL: open files from vim :term back in VIM.
