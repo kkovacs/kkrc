@@ -86,9 +86,6 @@ export VIMINIT=":set nobackup noswapfile encoding=utf8 viminfo="
 alias vim="vim -n -i NONE"
 
 # Set up some handy aliases
-# screen with ssh auth sock transfer, to be used for injection. NOTE: watch out for conflicting session names
-#alias s="screen -S kk -X register s \" export SSH_AUTH_SOCK=$SSH_AUTH_SOCK\" ; screen -xR kk"
-alias s="screen -xR"
 alias l="ls -lrt"
 alias la="ls -lrtA -I*" # For Linux
 #alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
@@ -110,6 +107,9 @@ alias ts="tig status"
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
 alias gs="git status -sb"
 alias gf="git fetch --all -v"
+# screen with ssh auth sock name transfer, to be used with `CTRL+A` `:paste s`
+alias s="screen -X register s \" export SSH_AUTH_SOCK=$SSH_AUTH_SOCK\" ; screen -xR"
+#alias s="screen -xR"
 # Watch out for using git as a different user than the repository. Avoid mandatory reconfiguration of git with user/email for hotfixes.
 function git { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " log blame diff show status init clone " =~ " $1 " ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
