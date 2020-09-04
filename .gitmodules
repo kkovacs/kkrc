@@ -10,3 +10,6 @@
 [submodule ".vim/bundle/table-mode"]
 	path = .vim/bundle/table-mode
 	url = https://github.com/dhruvasagar/vim-table-mode.git
+[submodule ".vim/bundle/editorconfig-vim"]
+	path = .vim/bundle/editorconfig-vim
+	url = https://github.com/editorconfig/editorconfig-vim
