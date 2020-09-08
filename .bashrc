@@ -236,6 +236,7 @@ sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 
 # docker shortcut
 alias docker="sudo docker"
+alias docker-compose="sudo docker-compose"
 
 # END of part to be injected
 
