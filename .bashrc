@@ -81,9 +81,12 @@ export LS_COLORS="di=1;34:ln=1;35:so=1;32:pi=1;33:ex=1;31:bd=34;46:cd=34;43:su=3
 export QUOTING_STYLE=shell-escape
 
 # FOR INJECT: Lighter vim
-export VIMINIT=":set nobackup noswapfile encoding=utf8 viminfo="
-# No swapfile, no viminfo
-alias vim="vim -n -i NONE"
+# NOTE: this prevented the use of kkrc on the server side, since if there is a
+# VIMINIT env var, then ~/.vimrc doesn't get read. But I leave it here because
+# it might be useful if the server has a wildly configured vim.
+#export VIMINIT=":set nobackup noswapfile encoding=utf8 viminfo="
+# No swapfile, no viminfo and a few other things
+alias vim='vim -n -i NONE "+set nobackup noswapfile encoding=utf8"'
 
 # Set up some handy aliases
 alias l="ls -lrt"
@@ -248,7 +251,7 @@ alias sssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
 # Locally we don't need these (but leave them in the inject part)
 unalias tig
-unset VIMINIT
+#unset VIMINIT
 
 # hl - highlight command
 source ~/.kkrc/hl
@@ -256,18 +259,21 @@ export -f hl
 
 # Automatically set TMUX window title on SSH
 ssh() {
-	# Store current window name
-	local SAVED=$(tmux display-message -p '#W')
-	local ARGS=($@)
-	local NAME="ssh"
-	local I
-	# Try to find the server name
-	for I in ${ARGS} ; do
-		[[ $I == "--" ]] && break
-		NAME="$I"
-	done
-	# Set window name
-	tmux rename-window "${NAME}" >/dev/null 2>/dev/null
+	# Only if running under TMUX
+	if [ ! -z "$TMUX" ]; then
+		# Store current window name
+		local SAVED=$(tmux display-message -p '#W')
+		local ARGS=($@)
+		local NAME="ssh"
+		local I
+		# Try to find the server name
+		for I in ${ARGS} ; do
+			[[ $I == "--" ]] && break
+			NAME="$I"
+		done
+		# Set window name
+		tmux rename-window "${NAME}" >/dev/null 2>/dev/null
+	fi
 	# Do it
 	command ssh "$@"
 	# To Restore window name automatically:
@@ -275,7 +281,7 @@ ssh() {
 	# To switch back to auto-renaming after disconnection:
 	#tmux set-window-option automatic-rename "on" >/dev/null 2>/dev/null
 	# Restore from alternate mode (if set),
-	# and move cursor to the last line (in case ssh losing connection in the middle of a full-screen app like VI, let's not leave the cursor in the middle of the screen).
+	# and move cursor to the last line (so if ssh lost connection in the middle of a full-screen app like VI, then don't leave the cursor in the middle of some content).
 	printf '\e[?47l\e[99B'
 }
 
