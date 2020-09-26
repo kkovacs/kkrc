@@ -251,6 +251,12 @@ alias sssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 unalias tig
 #unset VIMINIT
 
+# Quickly create/list/delete VMs on DigitalOcean.
+# NOTE: You can set "export DIGITALOCEAN_ACCESS_TOKEN=..." in ~/.bashrc.local , or use `doctl auth` to log in
+do-mk() { doctl compute droplet create "${1:-tmp1}" --region ams3 --ssh-keys $(doctl compute ssh-key list --format=ID --no-header | paste -sd "," -) --size ${2:-s-1vcpu-2gb} --image ubuntu-20-04-x64 --wait -v ; ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@$(doctl compute droplet list --format=PublicIPv4 --no-header "${1:-tmp1}") ; }
+do-ls() { doctl compute droplet list ; }
+do-rm() { doctl compute droplet delete $(doctl compute droplet list --format=ID --no-header "${1:-tmp1}") ; }
+
 # hl - highlight command
 source ~/.kkrc/hl
 export -f hl
