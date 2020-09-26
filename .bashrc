@@ -1,5 +1,3 @@
-# I don't use bash a lot, so this is just the basics.
-
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
