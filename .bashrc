@@ -107,7 +107,8 @@ alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-
 alias ts="tig status"
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
 alias gs="git status -sb"
-alias gf="git fetch --all -v"
+alias gf="git fetch --all -v; gl"
+alias gp="git pull --ff-only -v"
 # screen with ssh auth sock name transfer, to be used with `CTRL+A` `:paste s`
 alias s="screen -X register s \" export SSH_AUTH_SOCK=$SSH_AUTH_SOCK\" ; screen -xR"
 #alias s="screen -xR"
