@@ -1,5 +1,6 @@
 # Stuff
 .vim/.netrwhist
+.vim/spell/
 .vagrant
 
 # Windows
