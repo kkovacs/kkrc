@@ -136,7 +136,8 @@ alias K="kubectl get all --output=wide"
 # cdspell, dirspell: Spell checking on tab expansion
 # checkwinsize: Set LINES and COLUMNS
 # cmdhist: Save multi-line commands as one command
-shopt -s globstar cdspell dirspell checkwinsize cmdhist
+# extglob: better/more parameter substitution pattern matching options, for example *([0-9])
+shopt -s globstar cdspell dirspell checkwinsize cmdhist extglob
 
 # Configure readline
 bind 'TAB:menu-complete'
