@@ -1,0 +1,21 @@
+{
+    "telemetry.enableTelemetry": false,
+    "window.zoomLevel": 0,
+    "editor.renderControlCharacters": false,
+    "editor.minimap.enabled": false,
+    "editor.autoClosingBrackets": "never",
+    "editor.autoClosingQuotes": "never",
+    "editor.autoClosingOvertype": "never",
+    "files.insertFinalNewline": true,
+    "editor.renderFinalNewline": false,
+    "workbench.colorCustomizations": {
+        "[Default Dark+]": {
+            "tab.activeBackground": "#505050",
+            "tab.inactiveBackground": "#303030"
+        }
+    },
+    "git.confirmSync": false,
+    "vim.enableNeovim": true,
+    "vim.neovimPath": "/usr/local/bin/nvim",
+    "diffEditor.ignoreTrimWhitespace": false
+}

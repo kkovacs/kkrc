@@ -1,0 +1,7 @@
+[
+    {
+        "key": "ctrl+p",
+        "command": "editor.action.triggerSuggest",
+        "when": "editorTextFocus && vim.active && !inDebugRepl && vim.mode == 'Insert'"
+    }
+]
