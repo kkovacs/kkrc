@@ -1,0 +1,9 @@
+ function lineinfile() { regexp=${1//\//\\/} ; line=${2//\//\\/} ; sed -i -e '/.*'"${regexp}"'.*/{s//'"${line}"'/;:a;n;ba;q}' -e '$a'"${line}" "$3" ; }
+ lineinfile 'alias kubectl=' 'alias kubectl="minikube kubectl --"' ~/.bashrc
+ lineinfile 'minikube kubectl completion' 'source <(minikube kubectl completion bash)' ~/.bashrc
+ wget https://github.com/kubernetes/minikube/releases/download/v1.12.0/minikube_latest_amd64.deb -O /tmp/minikube_latest_amd64.deb \
+&& dpkg -i /tmp/minikube_latest_amd64.deb \
+&& apt-get update && apt-get install -y docker.io conntrack \
+&& minikube start --driver=none \
+&& minikube addons enable registry
+ source ~/.bashrc
