@@ -215,7 +215,7 @@ let g:markdown_fenced_languages = ['yaml', 'json', 'xml', 'python', 'bash=sh']
 " Jupyter notebook inspiration - send commands into tmux.
 " XXX: "open -a iTerm" is Mac-specific
 " Send current line
-nmap <silent> S :silent .w !sed 's/^[[:space:]]*//' \| tmux load-buffer -b jupyter - ; open -a iTerm ; tmux paste-buffer -d -b jupyter<cr>
+nmap <silent> S :silent .w !sed 's/^\t//' \| tmux load-buffer -b jupyter - ; open -a iTerm ; tmux paste-buffer -d -b jupyter<cr>
 " Send visual selection (line-wise)
 " HACK: The Home/End hack is to avoid not being able to pass a range to :silent.
-vmap <silent> S :<home>silent <end>w !sed 's/^[[:space:]]*//' \| tmux load-buffer -b jupyter - ; open -a iTerm ; tmux paste-buffer -d -b jupyter<cr>
+vmap <silent> S :<home>silent <end>w !sed 's/^\t//' \| tmux load-buffer -b jupyter - ; open -a iTerm ; tmux paste-buffer -d -b jupyter<cr>
