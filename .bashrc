@@ -117,7 +117,7 @@ function gg { git grep -I "$@" -- :^vendor/ :^node_modules/ :^*.sql ; }
 alias s="screen -X register s \" export SSH_AUTH_SOCK=$SSH_AUTH_SOCK\" ; screen -xR"
 #alias s="screen -xR"
 # Watch out for using git as a different user than the repository. Avoid mandatory reconfiguration of git with user/email for hotfixes.
-function git { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " log blame diff show status init clone " =~ " $1 " ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
+function git { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " grep log blame diff show status init clone " =~ " $1 " ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
 M() { mount "$@" | grep '^\/dev\/' ; }
 D() { df -h "$@" | grep -v 'snap\|tmpfs\|udev' ; }
