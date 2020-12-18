@@ -123,6 +123,8 @@ M() { mount "$@" | grep '^\/dev\/' ; }
 D() { df -h "$@" | grep -v 'snap\|tmpfs\|udev' ; }
 # Free memory
 F() { free -h ; }
+# Docker containers overview
+alias C="sudo docker ps -as"
 # Kubernetes overview. Using an alias instead of a function because often kubectl is an alias itself... (minikube, etc)
 alias K="kubectl get all --output=wide"
 
@@ -240,10 +242,6 @@ sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 [ -f /usr/share/bash-completion/completions/systemctl ] && . /usr/share/bash-completion/completions/systemctl
 [ -f /usr/share/bash-completion/completions/journalctl ] && . /usr/share/bash-completion/completions/journalctl
 # END of better systemd.
-
-# docker shortcut
-alias docker="sudo docker"
-alias docker-compose="sudo docker-compose"
 
 # END of part to be injected
 
