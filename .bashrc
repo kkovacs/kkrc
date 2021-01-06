@@ -124,7 +124,7 @@ D() { df -h "$@" | grep -v 'snap\|tmpfs\|udev' ; }
 # Free memory
 F() { free -h ; }
 # Process list overview (for Linux)
-alias P="ps axfwwo pid,user,start,rss,stat,cmd | less -FSXRn +G"
+alias P="ps axfwwo pid,user,start,rss,stat,cmd | less -SXRn"
 # Docker containers overview
 alias C="sudo docker ps -as"
 # Kubernetes overview. Using an alias instead of a function because often kubectl is an alias itself... (minikube, etc)
