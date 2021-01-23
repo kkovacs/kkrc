@@ -1,7 +1,10 @@
+# I use on some machines, but but don't want to auto-install it to avoid bloat
+/.vim/bundle/vim-gnupg/
+
 # Stuff
-.vim/.netrwhist
-.vim/spell/
-.vagrant
+/.vim/.netrwhist
+/.vim/spell/
+/.vagrant
 
 # Windows
 Thumbs.db
