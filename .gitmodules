@@ -1,12 +1,9 @@
-[submodule ".vim/bundle/vim-pathogen"]
-	path = .vim/bundle/vim-pathogen
-	url = https://github.com/tpope/vim-pathogen
 [submodule ".vim/bundle/vim-sensible"]
-	path = .vim/bundle/vim-sensible
+	path = .vim/pack/kkrc/start/vim-sensible
 	url = https://github.com/tpope/vim-sensible
 [submodule ".vim/bundle/table-mode"]
-	path = .vim/bundle/table-mode
+	path = .vim/pack/kkrc/start/table-mode
 	url = https://github.com/dhruvasagar/vim-table-mode.git
 [submodule ".vim/bundle/editorconfig-vim"]
-	path = .vim/bundle/editorconfig-vim
+	path = .vim/pack/kkrc/start/editorconfig-vim
 	url = https://github.com/editorconfig/editorconfig-vim.git
