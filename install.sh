@@ -38,8 +38,8 @@ process() {
 
 # Update git submodules
 echo "Updating git submodules:"
-if [ -e ~/.kkrc/.vim/bundle/vim-pathogen/README.markdown ]; then
-	git submodule foreach git pull origin master --ff-only
+if [ -e ~/.kkrc/.vim/pack/kkrc/start/vim-sensible/README.markdown ]; then
+	git submodule update --remote --merge
 else
 	git submodule update --recursive --init
 fi
