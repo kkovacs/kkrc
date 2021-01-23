@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Base16 Colors - Shell color setup script
 # mrmrs (http://clrs.cc)
 

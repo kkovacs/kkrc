@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Change to own dir
 cd "$(dirname $0)"
