@@ -12,3 +12,14 @@ process .psqlrc ~/.psqlrc
 process .inputrc ~/.inputrc
 process .i3 ~/.i3
 process .ansible.cfg ~/.ansible.cfg
+
+# Damn you Microsoft for not being able to keep everything in one place
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+	mkdir -p "$HOME/.config/Code/User/"
+	process other/settings.json $HOME/.config/Code/User/settings.json
+	process other/keybindings.json $HOME/.config/Code/User/keybindings.json
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+	mkdir -p "$HOME/Library/Application Support/Code/User/"
+	process other/settings.json "$HOME/Library/Application Support/Code/User/settings.json"
+	process other/keybindings.json "$HOME/Library/Application Support/Code/User/keybindings.json"
+fi
