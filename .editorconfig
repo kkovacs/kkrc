@@ -15,7 +15,7 @@ trim_trailing_whitespace = false
 indent_style = space
 indent_size = 2
 
-[*.{py,php,js,jsx,ts,tsx,css,less,sass,scss,vue,py}]
+[*.{py,php,js,jsx,ts,tsx,css,less,sass,scss,vue}]
 indent_style = space
 indent_size = 4
 
