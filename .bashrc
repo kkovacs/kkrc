@@ -110,9 +110,9 @@ alias gs="git status -sb"
 alias gf="git fetch --all -v; gl"
 alias gp="git pull --ff-only -v"
 # Better grep
-alias gr="grep -I --exclude-dir=vendor --exclude-dir=node_modules --exclude-dir=.git --exclude=*.sql"
+alias gr="grep -I --exclude-dir=vendor --exclude-dir=node_modules --exclude-dir=.git --exclude=*.sql --exclude=*.min.*"
 # Better git grep
-function gg { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql ; }
+function gg { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
 # screen with ssh auth sock name transfer, to be used with `CTRL+A` `:paste s`
 alias s="screen -X register s \" export SSH_AUTH_SOCK=$SSH_AUTH_SOCK\" ; screen -xR"
 #alias s="screen -xR"
