@@ -114,10 +114,11 @@ map <silent> <leader>s :set scrollbind<cr>
 " Turn off scrollbind
 map <silent> <leader>S :set noscrollbind<cr>
 
-" Turn on my text mode
-map <silent> <leader>t :setlocal nu linebreak breakindent wrap<cr>:noremap <buffer> <silent>j gj<cr>:noremap <buffer> <silent> k gk<cr>
+" NOTE: My "text" mode was renamed to "plaintext" so the "\t..." keys are free for TableMode
+" Turn on my plain-text mode
+map <silent> <leader>p :setlocal nu linebreak breakindent wrap<cr>:noremap <buffer> <silent>j gj<cr>:noremap <buffer> <silent> k gk<cr>
 " Turn off my text mode
-map <silent> <leader>T :setlocal nonu nolinebreak nobreakindent<cr>:unmap <buffer> j<cr>:unmap <buffer> k<cr>
+map <silent> <leader>P :setlocal nonu nolinebreak nobreakindent<cr>:unmap <buffer> j<cr>:unmap <buffer> k<cr>
 
 " switch to N char tabs (useful when browsing inelegant code)
 map <leader>2 :setlocal sw=2 ts=2<cr>
