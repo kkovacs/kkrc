@@ -206,11 +206,14 @@ autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 " Fix YAML to 2-space
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 
-" Fenced languages for markdown (
-let g:markdown_fenced_languages = ['yaml', 'json', 'xml', 'python', 'bash=sh']
+" Fenced languages for markdown
+let g:markdown_fenced_languages = ['yaml', 'json', 'xml', 'python', 'bash', 'sh', 'javascript', 'js=javascript', 'c', 'go', 'golang=go', 'java', 'sql']
 
-" No automatic folding for .md files
-"let g:vim_markdown_folding_disabled=1
+" Markdown folding: best of both worlds:
+" Let's do folding of .md files...
+let g:markdown_folding = 1
+" ...but don't just collapse everything on load.
+autocmd FileType markdown setlocal foldlevel=99
 
 " Jupyter notebook inspiration - send commands into tmux.
 " XXX: "open -a iTerm" is Mac-specific
