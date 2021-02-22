@@ -107,7 +107,7 @@ alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-
 alias ts="tig status"
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
 alias gs="git status -sb"
-alias gf="git fetch --all -v; gl"
+alias gf="git fetch --all -v"
 alias gp="git pull --ff-only -v"
 # Better grep
 alias gr="grep -I --exclude-dir=vendor --exclude-dir=node_modules --exclude-dir=.git --exclude=*.sql --exclude=*.min.*"
