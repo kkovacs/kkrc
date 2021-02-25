@@ -41,5 +41,7 @@ echo "Updating git submodules:"
 if [ -e ~/.kkrc/.vim/pack/kkrc/start/vim-sensible/README.markdown ]; then
 	git submodule update --remote --merge
 else
-	git submodule update --recursive --init
+	git submodule update --init
+	# XXX Not using --recursive for now, because we don't need vim plugins' test-subrepos and stuff.
+	#WAS: git submodule update --recursive --init
 fi
