@@ -128,7 +128,7 @@ alias P="ps axfwwo pid,user,start,rss,stat,cmd | less -SXRn"
 # Docker containers overview
 alias C="sudo docker ps -as"
 # Kubernetes overview. Using an alias instead of a function because often kubectl is an alias itself... (minikube, etc)
-alias K="kubectl get all --output=wide"
+alias K="kubectl get all --output=wide --all-namespaces"
 
 # Only if not on busybox
 [ -L $(type -p grep) ] || alias grep="grep --color"
@@ -259,7 +259,7 @@ unalias tig
 
 # Quickly create/list/delete VMs on DigitalOcean.
 # NOTE: You can set "export DIGITALOCEAN_ACCESS_TOKEN=..." in ~/.bashrc.local , or use `doctl auth` to log in
-do-mk() { doctl compute droplet create "${1:-tmp1}" --region ams3 --ssh-keys $(doctl compute ssh-key list --format=ID --no-header | paste -sd "," -) --size ${2:-s-1vcpu-2gb} --image ubuntu-20-04-x64 --wait -v ; }
+do-mk() { doctl compute droplet create "${1:-tmp1}" --region ams3 --ssh-keys $(doctl compute ssh-key list --format=ID --no-header | paste -sd "," -) --size ${2:-s-2vcpu-2gb} --image ubuntu-20-04-x64 --wait -v ; }
 do-ssh() { ( HN="${1:-tmp1}"; shift; ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@$(doctl compute droplet list --format=PublicIPv4 --no-header "${HN}") $@ ) ; }
 do-ls() { doctl compute droplet list --format Name,ID,PublicIPv4,Memory,VCPUs,Disk,Region,Status; doctl account get --format Email,DropletLimit,Status ; }
 do-rm() { doctl compute droplet delete $(doctl compute droplet list --format=ID --no-header "${1:-tmp1}") ; }
