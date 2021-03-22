@@ -229,3 +229,18 @@ vmap <silent> S :<home>silent <end>w !sed 's/^\t//' \| tmux load-buffer -b jupyt
 
 " Highlight "todo" markers in markdown
 autocmd FileType markdown syn match Todo "\<XXX\>"
+
+" Color markdown headings by level
+autocmd FileType markdown syn match markdownH1 "^# \zs"
+autocmd FileType markdown syn match markdownH2 "^## \zs"
+autocmd FileType markdown syn match markdownH3 "^### \zs"
+autocmd FileType markdown syn match markdownH4 "^#### \zs"
+autocmd FileType markdown syn match markdownH5 "^##### \zs"
+autocmd FileType markdown syn match markdownH6 "^###### \zs"
+" H1 & H2 inverse, the remainder are basic colors, from more prominent to more subtle
+highlight markdownH1 ctermbg=243 guibg=#666666
+highlight markdownH2 ctermbg=238 guibg=#333333
+highlight markdownH3 ctermfg=71 guifg=#5faf5f
+highlight markdownH4 ctermfg=63 guifg=#605df6
+highlight markdownH5 ctermfg=24 guifg=#255e87
+highlight markdownH6 ctermfg=23 guifg=#295f5e
