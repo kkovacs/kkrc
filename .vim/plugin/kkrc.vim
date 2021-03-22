@@ -226,3 +226,6 @@ nmap <silent> S :silent .w !sed 's/^\t//' \| tmux load-buffer -b jupyter - ; ope
 " Send visual selection (line-wise)
 " HACK: The Home/End hack is to avoid not being able to pass a range to :silent.
 vmap <silent> S :<home>silent <end>w !sed 's/^\t//' \| tmux load-buffer -b jupyter - ; open -a iTerm ; tmux paste-buffer -d -b jupyter<cr>
+
+" Highlight "todo" markers in markdown
+autocmd FileType markdown syn match Todo "\<XXX\>"
