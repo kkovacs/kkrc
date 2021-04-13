@@ -169,6 +169,8 @@ nmap <silent> <leader>/ :nohlsearch<cr>
 
 " Folding: Map Space to recursive fold toggle to help browsing around
 nmap <space> za
+" Folding: Map "+" to zA, which opens/closes a whole function/chapter.
+nmap + zA
 
 " GUI, colors, other extras
  " Needed for Base16
