@@ -167,10 +167,8 @@ map <silent> <leader>h0 :call clearmatches()<cr>
 " Clear all highlights
 nmap <silent> <leader>/ :nohlsearch<cr>
 
-" Folding: Map Space to fold toggle
+" Folding: Map Space to recursive fold toggle to help browsing around
 nmap <space> za
-" Folding: Outline view: map Enter to close all folds
-nmap <cr> zM
 
 " GUI, colors, other extras
  " Needed for Base16
