@@ -114,12 +114,6 @@ map <silent> <leader>s :set scrollbind<cr>
 " Turn off scrollbind
 map <silent> <leader>S :set noscrollbind<cr>
 
-" NOTE: My "text" mode was renamed to "plaintext" so the "\t..." keys are free for TableMode
-" Turn on my plain-text mode
-map <silent> <leader>p :setlocal nu linebreak breakindent wrap<cr>:noremap <buffer> <silent>j gj<cr>:noremap <buffer> <silent> k gk<cr>
-" Turn off my text mode
-map <silent> <leader>P :setlocal nonu nolinebreak nobreakindent<cr>:unmap <buffer> j<cr>:unmap <buffer> k<cr>
-
 " Manual TableModeRealign, for when I want to use TableMode without using it's special mode
 map <leader>tr :TableModeRealign<cr>
 
