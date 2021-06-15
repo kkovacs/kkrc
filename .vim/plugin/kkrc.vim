@@ -204,6 +204,9 @@ set statusline=%n%m%h%r\ %f\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]\ %{&list?'LI
 " A win against the old frenemy, DoMatchParen
 " highlight MatchParen cterm=underline,bold ctermbg=none ctermfg=red gui=underline,bold guibg=NONE guifg=red
 
+" Jump to last position in files, even when opened by :Lexplore
+autocmd BufReadPost * exe "normal! g`\""
+
 " Disable starting a comment after Enter
 autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
