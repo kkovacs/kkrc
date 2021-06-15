@@ -21,12 +21,13 @@
 :map <silent> <leader>E :setlocal noexpandtab<cr>
 :map <silent> <leader>w :setlocal nowrap<cr>
 :map <silent> <leader>W :setlocal wrap<cr>
+:map <silent> <leader>d :set filetype=markdown<cr>
+:map <silent> <leader>D :doautocmd FileType<cr>
 :map <silent> <leader>r :set relativenumber<cr>
 :map <silent> <leader>R :set norelativenumber<cr>
 :map <silent> <leader>s :set scrollbind<cr>
 :map <silent> <leader>S :set noscrollbind<cr>
-:map <silent> <leader>t :setlocal nu linebreak breakindent wrap<cr>:noremap <buffer> <silent>j gj<cr>:noremap <buffer> <silent> k gk<cr>
-:map <silent> <leader>T :setlocal nonu nolinebreak nobreakindent<cr>:unmap <buffer> j<cr>:unmap <buffer> k<cr>
+:map <leader>tr :TableModeRealign<cr>
 :map <leader>2 :setlocal sw=2 ts=2<cr>
 :map <leader>4 :setlocal sw=4 ts=4<cr>
 :map <leader>8 :setlocal sw=8 ts=8<cr>
@@ -50,6 +51,26 @@
 :nmap <space> za
 :nmap + zA
 :let base16colorspace=256
+:set background=dark
+:syn on
 :set statusline=%n%m%h%r\ %f\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]\ %{&list?'LIST\ ':''}%{&linebreak?'TEXTMODE\ ':''}%{&scrollbind?'SCROLLBIND\ ':''}%{&scrollbind?'SCROLLBIND\ ':''}%{&expandtab?'EXPANDTAB\ ':''}%{&wrap?'':'NOWRAP\ '}%{&paste?'PASTE\ ':''}%{&virtualedit=='all'?'VIRTUALEDIT\ ':''}%{strlen(&mouse)?'MOUSE\ ':''}%y%=C:%c%V\ L:%l/%L\ %p%%
+:autocmd BufReadPost * exe "normal! g`\""
 :autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+:autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+:let g:markdown_fenced_languages=['yaml', 'json', 'xml', 'python', 'bash', 'sh', 'javascript', 'js=javascript', 'c', 'go', 'golang=go', 'java', 'sql']
+:let g:markdown_folding=1
+:autocmd FileType markdown setlocal foldlevel=99
+:autocmd FileType markdown syn match Todo "\<XXX\>"
+:autocmd FileType markdown syn match markdownH1 "^# \zs"
+:autocmd FileType markdown syn match markdownH2 "^## \zs"
+:autocmd FileType markdown syn match markdownH3 "^### \zs"
+:autocmd FileType markdown syn match markdownH4 "^#### \zs"
+:autocmd FileType markdown syn match markdownH5 "^##### \zs"
+:autocmd FileType markdown syn match markdownH6 "^###### \zs"
+:highlight markdownH1 ctermbg=243 guibg=#666666
+:highlight markdownH2 ctermbg=238 guibg=#333333
+:highlight markdownH3 ctermfg=71 guifg=#5faf5f
+:highlight markdownH4 ctermfg=63 guifg=#605df6
+:highlight markdownH5 ctermfg=24 guifg=#255e87
+:highlight markdownH6 ctermfg=23 guifg=#295f5e
 :echo "vim ok"
