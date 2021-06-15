@@ -205,11 +205,11 @@ autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 
 " Fenced languages for markdown
-let g:markdown_fenced_languages = ['yaml', 'json', 'xml', 'python', 'bash', 'sh', 'javascript', 'js=javascript', 'c', 'go', 'golang=go', 'java', 'sql']
+let g:markdown_fenced_languages=['yaml', 'json', 'xml', 'python', 'bash', 'sh', 'javascript', 'js=javascript', 'c', 'go', 'golang=go', 'java', 'sql']
 
 " Markdown folding: best of both worlds:
 " Let's do folding of .md files...
-let g:markdown_folding = 1
+let g:markdown_folding=1
 " ...but don't just collapse everything on load.
 autocmd FileType markdown setlocal foldlevel=99
 
