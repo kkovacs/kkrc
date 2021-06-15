@@ -6,6 +6,7 @@
 :map <silent> 0 :Lexplore<cr>
 :map <silent> - :Lexplore %:p:h<cr>
 :map <silent> _ :tabnew<cr>:Lexplore<cr>
+:map <c-h> <c-w>W
 :map <c-j> j<c-e>
 :map <c-k> k<c-y>
 :map <leader>= viW"zyA = <esc>"=<c-r>z<cr>p

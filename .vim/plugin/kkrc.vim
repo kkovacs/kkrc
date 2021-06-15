@@ -58,6 +58,8 @@ map <silent> - :Lexplore %:p:h<cr>
 " Open a new tab with netrw explorer
 " XXX Workaround because mixing :Lexplore and other :?Explore-s messes things up.
 map <silent> _ :tabnew<cr>:Lexplore<cr>
+" Go one window left, for quick movement, wrap around
+map <c-h> <c-w>W
 
 " I like to scroll the screen and advance the cursor at the same time
 map <c-j> j<c-e>
