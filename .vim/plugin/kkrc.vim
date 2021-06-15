@@ -52,7 +52,7 @@ let g:netrw_preview=1
 let g:netrw_winsize=20
 
 " Toggle left netrw
-map <silent> = :Lexplore<cr>
+map <silent> 0 :Lexplore<cr>
 " Move into netrw effortlessly
 map <silent> - :Lexplore %:p:h<cr>
 " Open a new tab with netrw explorer
