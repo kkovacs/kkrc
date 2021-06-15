@@ -173,7 +173,7 @@ nmap <space> za
 nmap + zA
 
 " GUI, colors, other extras
- " Needed for Base16
+" Needed for Base16
 let base16colorspace=256
 set background=dark
 colorscheme kk-base16-colors
