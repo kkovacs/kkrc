@@ -48,10 +48,16 @@ filetype plugin indent on
 " p and P should split vertically, since we're all widescreen now
 let g:netrw_preview=1
 
+" Smaller Explore window
+let g:netrw_winsize=20
+
+" Toggle left netrw
+map <silent> = :Lexplore<cr>
 " Move into netrw effortlessly
-map <silent> - :Rexplore<cr>
-" Like the previous, but in a new tab
-map <silent> _ :Texplore<cr>
+map <silent> - :Lexplore %:p:h<cr>
+" Open a new tab with netrw explorer
+" XXX Workaround because mixing :Lexplore and other :?Explore-s messes things up.
+map <silent> _ :tabnew<cr>:Lexplore<cr>
 
 " I like to scroll the screen and advance the cursor at the same time
 map <c-j> j<c-e>
