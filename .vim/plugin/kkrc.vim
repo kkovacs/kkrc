@@ -52,12 +52,13 @@ let g:netrw_preview=1
 let g:netrw_winsize=20
 
 " Toggle left netrw
-map <silent> 0 :Lexplore<cr>
+map <silent> _ :Lexplore<cr>
 " Move into netrw effortlessly
 map <silent> - :Lexplore %:p:h<cr>
 " Open a new tab with netrw explorer
 " XXX Workaround because mixing :Lexplore and other :?Explore-s messes things up.
-map <silent> _ :tabnew<cr>:Lexplore<cr>
+" XXX <c-_> ALSO maps ctrl-minus, which is kinda what we want anyway.
+map <silent> <c-_> :tabnew<cr>:Lexplore<cr>
 " Go one window left, for quick movement, wrap around
 map <c-h> <c-w>W
 
