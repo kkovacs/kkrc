@@ -58,7 +58,7 @@ map <silent> - :Lexplore %:p:h<cr>
 " Open a new tab with netrw explorer
 " XXX Workaround because mixing :Lexplore and other :?Explore-s messes things up.
 " XXX <c-_> ALSO maps ctrl-minus, which is kinda what we want anyway.
-map <silent> <c-_> :tabnew<cr>:Lexplore<cr>
+map <silent> <c-_> :exe "tabnew\|silent Lexplore" .. expand("%:p:h")<cr>
 " Go one window left, for quick movement, wrap around
 map <c-h> <c-w>W
 
