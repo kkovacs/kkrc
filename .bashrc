@@ -58,7 +58,7 @@ PS1='\[\033[00;'$([[ "$UID" -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@
 #PS1="\u@\h \w [\j]\$ "
 
 # Set GNU screen title to hostname
-printf $'\ek%s\e\\' "$(hostname)"
+printf '\ek%s\e\\' "${HOSTNAME:${#HOSTNAME}<10?0:-10}"
 
 # "bell" before prompt. Separated from PS1 so it's easier to turn off when needed,
 # and at least clears any erroneous local PROMPT_COMMAND.
