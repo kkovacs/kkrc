@@ -3,7 +3,7 @@
 :filetype plugin indent on
 :let g:netrw_preview=1
 :map <silent> _ :Texplore<cr>
-:map <silent> - :execute exists(":Rexplore")?":Rexplore":":Explore"<cr>
+:map <silent> - :execute exists("w:netrw_rexlocal")?":Rexplore":":Explore"<cr>
 :map <c-j> j<c-e>
 :map <c-k> k<c-y>
 :map <leader>= viW"zyA = <esc>"=<c-r>z<cr>p

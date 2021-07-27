@@ -52,7 +52,7 @@ let g:netrw_preview=1
 map <silent> _ :Texplore<cr>
 
 " Open a netrw window, OR reuse the previous (so cursor is in the right place).
-map <silent> - :execute exists(":Rexplore")?":Rexplore":":Explore"<cr>
+map <silent> - :execute exists("w:netrw_rexlocal")?":Rexplore":":Explore"<cr>
 
 " I like to scroll the screen and advance the cursor at the same time
 map <c-j> j<c-e>
