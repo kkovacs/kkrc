@@ -2,11 +2,8 @@
 :syntax enable
 :filetype plugin indent on
 :let g:netrw_preview=1
-:let g:netrw_winsize=20
-:map <silent> _ :Lexplore<cr>
-:map <silent> - :Lexplore %:p:h<cr>
-:map <silent> <c-_> :exe "tabnew\|silent Lexplore" .. expand("%:p:h")<cr>
-:map <c-h> <c-w>W
+:map <silent> _ :Texplore<cr>
+:map <silent> - :execute exists(":Rexplore")?":Rexplore":":Explore"<cr>
 :map <c-j> j<c-e>
 :map <c-k> k<c-y>
 :map <leader>= viW"zyA = <esc>"=<c-r>z<cr>p
