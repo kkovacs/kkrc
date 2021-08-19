@@ -236,8 +236,8 @@ autocmd FileType markdown syn match markdownH4 "^#### \zs"
 autocmd FileType markdown syn match markdownH5 "^##### \zs"
 autocmd FileType markdown syn match markdownH6 "^###### \zs"
 " H1 & H2 inverse, the remainder are basic colors, from more prominent to more subtle
-highlight markdownH1 ctermbg=243 guibg=#666666
-highlight markdownH2 ctermbg=238 guibg=#333333
+highlight markdownH1 ctermbg=243 guibg=#666666 ctermfg=15 guifg=#ffffff
+highlight markdownH2 ctermbg=238 guibg=#333333 ctermfg=7 guifg=#AAAAAA
 highlight markdownH3 ctermfg=71 guifg=#5faf5f
 highlight markdownH4 ctermfg=63 guifg=#605df6
 highlight markdownH5 ctermfg=24 guifg=#255e87
