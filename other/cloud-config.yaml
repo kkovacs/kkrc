@@ -1,0 +1,27 @@
+#cloud-config
+users:
+- name: user
+  ssh_authorized_keys:
+  - 'ssh-ed25519 YOUR-SSH-KEY-HERE'
+  shell: /bin/bash
+  sudo: "ALL=(ALL) NOPASSWD:ALL"
+package_update: true
+packages:
+- less
+- psmisc
+- screen
+- htop
+- curl
+- wget
+- bash-completion
+- dnsutils
+- git
+- tig
+- socat
+- rsync
+- vim-nox
+- zip
+- unzip
+- unattended-upgrades
+# - docker.io
+# - docker-compose
