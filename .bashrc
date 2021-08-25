@@ -100,7 +100,11 @@ lll() { ls -lrtA --color "$@" | less -FXRn +G ; }
 #alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
 alias h="history"
 alias hc="history -c"
-alias psql="INPUTRC=/dev/fd/9 psql 9<<<'set editing-mode vi'"
+# PostgreSQL with readline
+unalias psql # XXX temporarily
+function psql { INPUTRC=/dev/fd/9 command psql 9<<<'set editing-mode vi' $@ ; }
+# PostgreSQL as above, but as postgres user
+function ppsql { sudo -u postgres -- bash -c "$(declare -f psql); psql $@" ; }
 # MySQL with readline
 alias mysql="INPUTRC=/dev/fd/9 mysql 9<<<'set editing-mode vi'"
 # MySQL with libedit. XXX Leaves a tmp dir behind, but libedit looks for `~/.editrc` and there is no way to override :(
