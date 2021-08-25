@@ -69,6 +69,7 @@ export EDITOR=vim
 export PAGER=less
 export LC_ALL="en_US.UTF-8" # No, don't try export LC_ALL="C", will mess up your UTF-8
 export LANG="en_US.UTF-8"
+export LESS="--mouse"
 export LESSHISTFILE=/dev/null
 
 # Colors! :)
@@ -87,7 +88,7 @@ export QUOTING_STYLE=shell-escape
 # it might be useful if the server has a wildly configured vim.
 #export VIMINIT=":set nobackup noswapfile encoding=utf8 viminfo="
 # No swapfile, no viminfo and a few other things
-alias vim='vim -n -i NONE "+set nobackup noswapfile encoding=utf8"'
+alias vim='vim -n -i NONE "+set nobackup noswapfile encoding=utf8 mouse=a"'
 
 # Set up some handy aliases
 alias l="ls -lrt"
@@ -101,7 +102,7 @@ lll() { ls -lrtA --color "$@" | less -FXRn +G ; }
 alias h="history"
 alias hc="history -c"
 # PostgreSQL with readline
-unalias psql # XXX temporarily
+unalias psql 2>/dev/null # XXX temporarily
 function psql { INPUTRC=/dev/fd/9 command psql 9<<<'set editing-mode vi' "$@" ; }
 # PostgreSQL as above, but as postgres user
 function ppsql { sudo -u postgres -- bash -c "$(declare -f psql); psql $@" ; }
@@ -143,8 +144,6 @@ alias K="kubectl get all --output=wide --all-namespaces"
 
 # Only if not on busybox
 [ -L $(type -p grep) ] || alias grep="grep --color"
-# No alt screen, no line-numbers
-[ -L $(type -p less) ] || alias less="less -Xn"
 
 # Use bash-completion, if available
 [ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion

@@ -31,6 +31,7 @@ termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'   # tell screen how to 
 defbce on    # use current bg color for erased chars
 altscreen on	# use the alternate screen
 hardstatus ignore # switch off
+mousetrack on # handle mouse events
 #defdynamictitle off	# Switch off title change from ANSI codes. Needs screen 4.5+
 
 # Next window on ctrl-space
