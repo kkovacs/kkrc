@@ -1,6 +1,7 @@
 :vbell off
 :bell_msg "^G"
 :defscrollback 10000
+:msgminwait 0
 :termcapinfo vt100 dl=5\E[M
 :hardstatus off
 :bind ^k
