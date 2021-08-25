@@ -102,13 +102,11 @@ alias h="history"
 alias hc="history -c"
 # PostgreSQL with readline
 unalias psql # XXX temporarily
-function psql { INPUTRC=/dev/fd/9 command psql 9<<<'set editing-mode vi' $@ ; }
+function psql { INPUTRC=/dev/fd/9 command psql 9<<<'set editing-mode vi' "$@" ; }
 # PostgreSQL as above, but as postgres user
 function ppsql { sudo -u postgres -- bash -c "$(declare -f psql); psql $@" ; }
 # MySQL with readline
 alias mysql="INPUTRC=/dev/fd/9 mysql 9<<<'set editing-mode vi'"
-# MySQL with libedit. XXX Leaves a tmp dir behind, but libedit looks for `~/.editrc` and there is no way to override :(
-#alias mysql='(export HOME=$(mktemp -d); printf "bind -v\nbind \"^R\" em-inc-search-prev\nbind \\t rl_complete" >~/.editrc; mysql "$*")'
 # This is getting even uglier, but must have on remote machines
 alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-view = line-number:no,interval=5 id:yes date:relative author:abbreviated commit-title:yes,graph,refs,overflow=no"'
 alias ts="tig status"
@@ -273,7 +271,7 @@ unalias tig
 # Quickly create/list/delete VMs on DigitalOcean.
 # NOTE: You can set "export DIGITALOCEAN_ACCESS_TOKEN=..." in ~/.bashrc.local , or use `doctl auth` to log in
 do-mk() { doctl compute droplet create "${1:-tmp1}" --region ams3 --ssh-keys $(doctl compute ssh-key list --format=ID --no-header | paste -sd "," -) --size ${2:-s-2vcpu-2gb} --image ubuntu-20-04-x64 --wait -v ; }
-do-ssh() { ( HN="${1:-tmp1}"; shift; ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@$(doctl compute droplet list --format=PublicIPv4 --no-header "${HN}") $@ ) ; }
+do-ssh() { ( HN="${1:-tmp1}"; shift; ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@$(doctl compute droplet list --format=PublicIPv4 --no-header "${HN}") "$@" ) ; }
 do-ls() { doctl compute droplet list --format Name,ID,PublicIPv4,Memory,VCPUs,Disk,Region,Status; doctl account get --format Email,DropletLimit,Status ; }
 do-rm() { doctl compute droplet delete $(doctl compute droplet list --format=ID --no-header "${1:-tmp1}") ; }
 
