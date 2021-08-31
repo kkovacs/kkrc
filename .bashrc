@@ -105,7 +105,7 @@ alias hc="history -c"
 unalias psql 2>/dev/null # XXX temporarily
 function psql { INPUTRC=/dev/fd/9 command psql 9<<<'set editing-mode vi' "$@" ; }
 # PostgreSQL as above, but as postgres user
-function ppsql { sudo -u postgres -- bash -c "$(declare -f psql); psql $@" ; }
+function ppsql { sudo -u postgres -- bash -c "$(declare -f psql); psql \"\$@\"" bash "$@" ; }
 # MySQL with readline
 alias mysql="INPUTRC=/dev/fd/9 mysql 9<<<'set editing-mode vi'"
 # This is getting even uglier, but must have on remote machines
