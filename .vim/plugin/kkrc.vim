@@ -118,7 +118,7 @@ map <silent> <leader>s :set scrollbind<cr>
 map <silent> <leader>S :set noscrollbind<cr>
 
 " Manual TableModeRealign, for when I want to use TableMode without using it's special mode
-map <leader>tr :TableModeRealign<cr>
+map <leader>tf :TableModeRealign<cr>:TableEvalFormulaLine<cr>
 
 " switch to N char tabs (useful when browsing inelegant code)
 map <leader>2 :setlocal sw=2 ts=2<cr>
