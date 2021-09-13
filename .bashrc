@@ -318,5 +318,9 @@ fi
 # Display screens if any
 screen -ls | grep -v "Socket"
 
+# Turn CAPS LOCK into CTRL on Linux.
+#setxkbmap -option ctrl:nocaps
+# Or. on Ubuntu, put this into /etc/default/keyboard: XKBOPTIONS="ctrl:nocaps"
+
 # Local commands
 if [ -e ~/.bashrc.local ]; then . ~/.bashrc.local; fi
