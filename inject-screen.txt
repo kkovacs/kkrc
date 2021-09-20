@@ -21,6 +21,7 @@
 :defbce on
 :altscreen on
 :hardstatus ignore
+:defmousetrack on
 :mousetrack on
 :bindkey ^@ next
 :bindkey ^_ prev
