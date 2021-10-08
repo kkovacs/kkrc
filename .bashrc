@@ -272,7 +272,7 @@ unalias tig
 
 # Quickly create/list/delete VMs on DigitalOcean.
 # NOTE: You can set "export DIGITALOCEAN_ACCESS_TOKEN=..." in ~/.bashrc.local , or use `doctl auth` to log in
-do-mk() { doctl compute droplet create "${1:-tmp1}" --region ams3 --ssh-keys $(doctl compute ssh-key list --format=ID --no-header | paste -sd "," -) --size ${2:-s-2vcpu-2gb} --image ubuntu-20-04-x64 --wait -v ; }
+do-mk() { doctl compute droplet create "${1:-tmp1}" --region ams3 --ssh-keys $(doctl compute ssh-key list --format=ID --no-header | paste -sd "," -) --size ${2:-s-2vcpu-2gb} --image ${3:-ubuntu-20-04-x64} --wait -v ; }
 do-ssh() { ( HN="${1:-tmp1}"; shift; ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@$(doctl compute droplet list --format=PublicIPv4 --no-header "${HN}") "$@" ) ; }
 do-ls() { doctl compute droplet list --format Name,ID,PublicIPv4,Memory,VCPUs,Disk,Region,Status; doctl account get --format Email,DropletLimit,Status ; }
 do-rm() { doctl compute droplet delete $(doctl compute droplet list --format=ID --no-header "${1:-tmp1}") ; }
