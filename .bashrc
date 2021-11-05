@@ -247,7 +247,7 @@ _mksc() {
 	eval "complete -F _$1 $1"
 }
 # Definitions:
-_mksc scs systemctl status -l # status, but don't trim lines
+_mksc scs systemctl status -l --no-pager # status, but don't trim lines
 _mksc sc0 systemctl stop
 _mksc sc1 stail start
 _mksc scr stail reload-or-restart
