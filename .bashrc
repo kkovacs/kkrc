@@ -142,9 +142,14 @@ D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none' ; }
 F() { free -h ; }
 # Process list overview (for Linux)
 alias P="ps axfwwo pid,user,start,rss,stat,cmd | less -SXRn"
+# If can't use docker as current user, try sudo
+function docker { if [[ -r /var/run/docker.sock ]] ; then command docker "$@" ; else sudo docker "$@" ; fi ; }
+function docker-compose { if [[ -r /var/run/docker.sock ]] ; then command docker-compose "$@" ; else sudo docker-compose "$@" ; fi ; }
 # Docker containers overview
 alias C="docker ps -as"
-alias CC="sudo docker ps -as"
+alias CC="docker-compose ps"
+# List docker and docker-compose images
+alias I="docker images; docker-compose images"
 # Kubernetes overview. Using an alias instead of a function because often kubectl is an alias itself... (minikube, etc)
 alias K="kubectl get all --output=wide --all-namespaces"
 
