@@ -91,6 +91,9 @@ export QUOTING_STYLE=shell-escape
 # No swapfile, no viminfo and a few other things
 alias vim='vim -n -i NONE "+set nobackup noswapfile encoding=utf8 mouse=a"'
 
+# Use bash-completion, if available
+[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
+
 # Set up some handy aliases
 alias l="ls -lrt"
 alias la="ls -lrtA -I*" # For Linux
@@ -147,17 +150,22 @@ function docker { if [[ -r /var/run/docker.sock ]] ; then command docker "$@" ; 
 function docker-compose { if [[ -r /var/run/docker.sock ]] ; then command docker-compose "$@" ; else sudo docker-compose "$@" ; fi ; }
 # Docker containers overview
 alias C="docker ps -as"
-alias CC="docker-compose ps"
+# Docker-compose
+alias dc="docker-compose"
+_completion_loader docker-compose # This is dynamic
+complete -F _docker_compose dc
+alias dc1="dc up -d; dcs"
+alias dc0="dc down"
+alias dcs="dc ps -a"
 # List docker and docker-compose images
-alias I="docker images; docker-compose images"
+alias I="docker images"
+# Docker Swarm
+alias S="docker service ls"
 # Kubernetes overview. Using an alias instead of a function because often kubectl is an alias itself... (minikube, etc)
 alias K="kubectl get all --output=wide --all-namespaces"
 
 # Only if not on busybox
 [ -L $(type -p grep) ] || alias grep="grep --color"
-
-# Use bash-completion, if available
-[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
 
 # Shell options.
 # histverify (NOT USED NOW): Poor man's history expansion (which bash doesn't do on TAB)
