@@ -122,8 +122,8 @@ alias gp="git pull --ff-only -v"
 alias gclean="git reset --hard && git clean -f -d -x"
 # Recursive git
 function G { find . -name .git -type d | while read a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; [ "$#" -lt 1 ] && command git -C "$a" status -sb || command git -C "$a" "$@"; done ; }
-# Recursive git status
-function GS { find . -name .git -type d | while read a; do a="${a%.git}"; if ! command git -C "$a" diff-index --quiet --ignore-submodules HEAD --; then tput smso; echo -e "\n$a"; tput rmso; [ "$#" -lt 1 ] && command git -C "$a" status -sb || command git -C "$a" "$@"; fi ; done ; }
+# Recursive git status. This is to quickly find uncommitted changes, not a detailed view
+function GS { find . -name .git -type d | while read a; do a="${a%.git}"; tput smso; echo -e "$a"; tput rmso; if ! command git -C "$a" diff-index --quiet --ignore-submodules HEAD --; then [ "$#" -lt 1 ] && command git -C "$a" status -sb || command git -C "$a" "$@"; fi ; done ; }
 # Show .gitignore-d files, all of them
 alias gii="git ls-files --exclude-standard --ignored --others"
 # Show .gitignore-d files except vendor and node_modules, because that's TMI
