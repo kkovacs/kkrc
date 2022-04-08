@@ -15,6 +15,10 @@ NOTE: also requires a "defaults/pref/autoconfig.js":
 	pref("general.config.filename", "firefox.cfg");
 	pref("general.config.obscure_value", 0);
 
+# gpg-agent.conf
+
+To ~/.gnupg/gpg-agent.conf
+
 # keybindings.json
 
 VSCode keyboard configuration.
