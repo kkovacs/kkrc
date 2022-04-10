@@ -1,2 +1,2 @@
-:caption always "%{-b mW}%-Lw%{+b Wm} %n%f:%t %{-}%{-b mW}%+Lw %=%{+b Wm} %H %{-}"
+:caption always "%-Lw%{+b Wm} %n%f:%t %{-}%+Lw %=%{+b Wm} %H %{-}"
 :hardstatus ignore
