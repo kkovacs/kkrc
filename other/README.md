@@ -25,6 +25,11 @@ VSCode keyboard configuration.
 
 On OS X:
 	"~/Library/Application Support/Code/User/keybindings.json"
+
+For VIM mode to work properly, you will also need to (see https://github.com/VSCodeVim/Vim#mac):
+
+	defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
+
 On Linux:
 	~/.config/Code/User/keybindings.json
 

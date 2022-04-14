@@ -16,6 +16,7 @@
     },
     "git.confirmSync": false,
     "vim.enableNeovim": true,
-    "vim.neovimPath": "/usr/local/bin/nvim",
-    "diffEditor.ignoreTrimWhitespace": false
+    "vim.neovimPath": "/opt/homebrew/bin/nvim",
+    "diffEditor.ignoreTrimWhitespace": false,
+    "workbench.colorTheme": "Default Dark+"
 }
