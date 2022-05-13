@@ -1,1 +1,2 @@
- function lineinfile() { regexp=${1//\//\\/} ; line=${2//\//\\/} ; sed -i -e '/'"${regexp}"'/{s/.*/'"${line}"'/;:a;n;ba;q}' -e '$a'"${line}" "$3" ; }
+ function lineinfile() { line=${2//\//\\/} ; sed -i -e '/'"${1//\//\\/}"'/{s/.*/'"${line}"'/;:a;n;ba;q}' -e '$a'"${line}" "$3" ; }
+ function blockinfile() { sed -i -ne '/'"${1//\//\\/}"'/{r/dev/stdin' -e ':a;n;/'"${2//\//\\/}"'/{:b;n;p;bb};ba};p' -e '$r/dev/stdin' "$3" ; }

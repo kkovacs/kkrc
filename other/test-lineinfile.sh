@@ -7,13 +7,13 @@ F=$(mktemp)
 
 cat >"$F" <<XXX
 first line
-second\line
+second/line
 third line
 ;commented = 50
 XXX
 
 lineinfile "line" "FIRST LINE" "$F"
-lineinfile 'second\\line' "SECOND LINE" "$F"
+lineinfile 'second/line' "SECOND LINE" "$F"
 lineinfile "fourth" "LAST LINE" "$F"
 lineinfile "rd li" "THIRD\nLINE" "$F"
 lineinfile "^LINE" 'FOURTH LINE' "$F"
