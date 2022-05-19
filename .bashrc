@@ -97,7 +97,7 @@ alias la="ls -lrtA -I*" # For Linux. Hidden files ONLY.
 #alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
 # A version of ls that is still quick to type, BUT uses "less" automatically BUT exits it immediately if text is not long enough.
 # NOTE: use this in the "function ..." form, because if there is an ll alias, that causes an error (even if we unalias in the previos lik
-unalias ll # Many systems has an ll alias, this is NOT temporary
+unalias ll 2>/dev/null # Many systems has an ll alias, this is NOT temporary
 function ll() { ls -lrtA --color "$@" | less -FXRn +G ; }
 #alias lr="ls -AR1 -I .git|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d files\n%s \t\",p-2,\$0);p=0}{p++}END{print p \" files\"}'|less -FXn" # Cut -FX in ash
 #alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
