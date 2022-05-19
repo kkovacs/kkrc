@@ -50,15 +50,11 @@ HISTTIMEFORMAT="%F %T "
 #
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off. Root detection only on setup.
 PS1='\[\033[00;'$([[ "$UID" -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\$ '
-# Or if you dare to use 256 colors:
-#PS1='\[\033[00;'$([[ "$UID" -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@\[\033[38;5;39m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\$ '
-# Or, with CONTINUOUS 'root' detection
-#PROMPT_COMMAND="PS1='\[\033[00;\$([[ "$UID" -eq 0 ]]&&echo -n 31||echo -n 34)m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\\$ '"
 # Or, if ANSI is problematic:
 #PS1="\u@\h \w [\j]\$ "
 
 # Set GNU screen title to hostname
-[[ "$TERM" == screen* ]] && printf '\ek%s\e\\' "${HOSTNAME:${#HOSTNAME}<11?0:-10}"
+[ -z "$STY" ] && printf '\ek%s\e\\' "${HOSTNAME:${#HOSTNAME}<11?0:-10}"
 
 # "bell" before prompt. Separated from PS1 so it's easier to turn off when needed,
 # and at least clears any erroneous local PROMPT_COMMAND.
@@ -80,7 +76,7 @@ export LSCOLORS=ExFxCxDxBxegedabagacad
 # Linux colors -- set always because of zsh's list-colors
 export LS_COLORS="di=1;34:ln=1;35:so=1;32:pi=1;33:ex=1;31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43"
 
-# Most useful quoting style
+# Most useful quoting style, because you can copy/paste it
 export QUOTING_STYLE=shell-escape
 
 # FOR INJECT: Lighter vim
@@ -91,22 +87,22 @@ export QUOTING_STYLE=shell-escape
 # No swapfile, no viminfo and a few other things
 alias vim='vim -n -i NONE "+set nobackup noswapfile encoding=utf8 mouse=a"'
 
-# Use bash-completion, if available
-[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
+# Use bash-completion (but show no errors if not found).
+. /usr/share/bash-completion/bash_completion 2>/dev/null
 
 # Set up some handy aliases
-alias l="ls -lrt"
-alias la="ls -lrtA -I*" # For Linux
+#alias l="ls -lrt" # Shows only non-hidden files.
+alias l="ls -lrtA" # Always shows hidden files too.
+alias la="ls -lrtA -I*" # For Linux. Hidden files ONLY.
 #alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
-alias ll="ls -lrtA"
-# A version of ls/ll that is still quick to type, but uses less automatically
-lll() { ls -lrtA --color "$@" | less -FXRn +G ; }
+# A version of ls that is still quick to type, BUT uses "less" automatically BUT exits it immediately if text is not long enough.
+# NOTE: use this in the "function ..." form, because if there is an ll alias, that causes an error (even if we unalias in the previos lik
+unalias ll # Many systems has an ll alias, this is NOT temporary
+function ll() { ls -lrtA --color "$@" | less -FXRn +G ; }
 #alias lr="ls -AR1 -I .git|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d files\n%s \t\",p-2,\$0);p=0}{p++}END{print p \" files\"}'|less -FXn" # Cut -FX in ash
 #alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
 alias h="history"
-alias hc="history -c"
 # PostgreSQL with readline
-unalias psql 2>/dev/null # XXX temporarily
 function psql { INPUTRC=/dev/fd/9 command psql 9<<<'set editing-mode vi' "$@" ; }
 # PostgreSQL as above, but as postgres user
 function ppsql { sudo -u postgres -- bash -c "$(declare -f psql); psql \"\$@\"" bash "$@" ; }
@@ -129,7 +125,6 @@ alias gii="git ls-files --exclude-standard --ignored --others"
 # Show .gitignore-d files except vendor and node_modules, because that's TMI
 alias gi="gii | egrep -v '^vendor/|^node_modules/'"
 # Quick grep
-unalias gr 2>/dev/null # XXX temporary
 function gr { grep -r -I --exclude-dir=vendor --exclude-dir=node_modules --exclude-dir=.git --exclude=*.sql --exclude=*.min.* "$@" . ; }
 # Better git grep
 function gg { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
@@ -152,7 +147,7 @@ function docker-compose { if [[ -r /var/run/docker.sock ]] ; then command docker
 alias C="docker ps -as"
 # Docker-compose
 alias dc="docker-compose"
-_completion_loader docker-compose # This is dynamic
+_completion_loader docker-compose 2>/dev/null # This is some new dynamic style? Show no error if not found.
 complete -F _docker_compose dc
 alias dc1="dc up -d; dcs"
 alias dc0="dc down"
@@ -270,14 +265,14 @@ sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 
 # Now fix bash competion for our systemd aliases.
 # Even without bash-completion, most linux package managers put these there from the systemd packages - take advantage.
-[ -f /usr/share/bash-completion/completions/systemctl ] && . /usr/share/bash-completion/completions/systemctl
-[ -f /usr/share/bash-completion/completions/journalctl ] && . /usr/share/bash-completion/completions/journalctl
+# Display no error if not found, since it's not fully standard.
+. /usr/share/bash-completion/completions/systemctl 2>/dev/null
+. /usr/share/bash-completion/completions/journalctl 2>/dev/null
 # END of better systemd.
 
 # END of part to be injected
 
 # Commands which are not required in remote inject
-alias json="python -mjson.tool"
 alias tmux="tmux -2"
 # When I don't want to pollute my known_hosts file (temporary VMs, etc)
 alias sssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
