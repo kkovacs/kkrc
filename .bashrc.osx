@@ -1,0 +1,51 @@
+#!/bin/bash
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH:/Users/$USER/go/bin:/Users/$USER/Documents/enc/bin"
+export SSH_AUTH_SOCK="/Users/$USER/.gnupg/S.gpg-agent.ssh"
+
+# This is my preferred way of working with Ubuntu multipass on OS X.
+function vm()
+{
+	local name dir
+	case "$1" in
+		"ls" | "list" | "")
+			multipass list
+			;;
+		"stop")
+			while [ $# -gt 1 ]; do
+				shift
+				multipass stop "$1"
+			done
+			multipass list
+			;;
+		"rm" | "kill")
+			while [ $# -gt 1 ]; do
+				shift
+				multipass stop "$1"
+				multipass delete -v -p "$1"
+			done
+			multipass list
+			;;
+		*)
+			# Start a new VM
+			name="${1}"
+			multipass launch -v -n "${name}" 22.04
+			dir="${2:-/Users/user/wrk}"
+			multipass mount "$dir" "$name:/persist"
+			tmux rename-window "${name}"
+			multipass shell "${name}"
+			;;
+	esac
+}
+
+# Get/set DNS on OS X
+function dns()
+{
+	if [ $# -eq 1 ]; then
+		networksetup -setdnsservers Wi-Fi "$1"
+	elif [ $# -eq 2 ]; then
+		networksetup -setdnsservers "$1" "$2"
+	fi
+	networksetup -getdnsservers Wi-Fi
+}
+
+#alias nets="networksetup -listallhardwareports"
