@@ -33,8 +33,9 @@ function vm()
 		*)
 			# Start a new VM
 			name="${1}"
-			multipass launch -v -n "${name}" 22.04
 			dir="${2:-/Users/user/wrk}"
+			shift 2
+			multipass launch -v -n "${name}" "$@" 22.04
 			multipass mount "$dir" "$name:/persist"
 			tmux rename-window "${name}"
 			multipass shell "${name}"
