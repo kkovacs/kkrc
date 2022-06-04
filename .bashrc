@@ -124,8 +124,11 @@ function GS { find . -name .git -type d | while read a; do a="${a%.git}"; tput s
 alias gii="git ls-files --exclude-standard --ignored --others"
 # Show .gitignore-d files except vendor and node_modules, because that's TMI
 alias gi="gii | egrep -v '^vendor/|^node_modules/'"
-# Quick grep
-function gr { grep -r -I --exclude-dir=vendor --exclude-dir=node_modules --exclude-dir=.git --exclude=*.sql --exclude=*.min.* "$@" . ; }
+# Quick grep, with case and ignore case.
+# NOTE: $gr_exclude is not quoted on purpose (so don't write multi-word excludes)
+export gr_exclude="-I --exclude-dir=vendor --exclude-dir=node_modules --exclude-dir=.git --exclude=*.sql --exclude=*.min.*"
+function gr { grep -r $gr_exclude "$@" . 2>/dev/null | less -FSXn +"/${!#}" ; }
+function gri { grep -r -i $gr_exclude "$@" . 2>/dev/null | less -FSXnI +"/${!#}" ; }
 # Better git grep
 function gg { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
 # screen with ssh auth sock name transfer, to be used with `CTRL+A` `:paste s`
