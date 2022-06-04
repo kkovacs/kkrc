@@ -125,10 +125,10 @@ alias gii="git ls-files --exclude-standard --ignored --others"
 # Show .gitignore-d files except vendor and node_modules, because that's TMI
 alias gi="gii | egrep -v '^vendor/|^node_modules/'"
 # Quick grep, with case and ignore case.
-# NOTE: $gr_exclude is not quoted on purpose (so don't write multi-word excludes)
-export gr_exclude="-I --exclude-dir=vendor --exclude-dir=node_modules --exclude-dir=.git --exclude=*.sql --exclude=*.min.*"
-function gr { grep -r $gr_exclude "$@" . 2>/dev/null | less -FSXn +"/${!#}" ; }
-function gri { grep -r -i $gr_exclude "$@" . 2>/dev/null | less -FSXnI +"/${!#}" ; }
+# NOTE: $GR_EXCLUDE is not quoted on purpose (so don't write multi-word excludes)
+export GR_EXCLUDE="-I --exclude-dir=.git --exclude=*.min.* --exclude=*.sql --exclude-dir=vendor --exclude-dir=node_modules"
+function gr { grep -r $GR_EXCLUDE "$@" . 2>/dev/null | less -FSXn +"/${!#}" ; }
+function gri { grep -r -i $GR_EXCLUDE "$@" . 2>/dev/null | less -FSXnI +"/${!#}" ; }
 # Better git grep
 function gg { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
 # screen with ssh auth sock name transfer, to be used with `CTRL+A` `:paste s`
@@ -161,6 +161,9 @@ alias I="docker images"
 alias S="docker service ls"
 # Kubernetes overview. Using an alias instead of a function because often kubectl is an alias itself... (minikube, etc)
 alias K="kubectl get all --output=wide --all-namespaces"
+# Replicate zsh's "vared" command (with autocompletion)
+function vared { read -e -p "$1=" -i "${!1}" $1 ; }
+complete -v vared
 
 # Only if not on busybox
 [ -L $(type -p grep) ] || alias grep="grep --color"
