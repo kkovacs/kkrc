@@ -120,6 +120,9 @@ map <silent> <leader>S :set noscrollbind<cr>
 " Manual TableModeRealign, for when I want to use TableMode without using it's special mode
 map <leader>tf :TableModeRealign<cr>:TableEvalFormulaLine<cr>
 
+" Toggle Tagbar
+map <leader>tb :TagbarToggle<cr>
+
 " switch to N char tabs (useful when browsing inelegant code)
 map <leader>2 :setlocal sw=2 ts=2<cr>
 map <leader>4 :setlocal sw=4 ts=4<cr>

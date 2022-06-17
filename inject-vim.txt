@@ -25,7 +25,8 @@
 :map <silent> <leader>R :set norelativenumber<cr>
 :map <silent> <leader>s :set scrollbind<cr>
 :map <silent> <leader>S :set noscrollbind<cr>
-:map <leader>tr :TableModeRealign<cr>
+:map <leader>tf :TableModeRealign<cr>:TableEvalFormulaLine<cr>
+:map <leader>tb :TagbarToggle<cr>
 :map <leader>2 :setlocal sw=2 ts=2<cr>
 :map <leader>4 :setlocal sw=4 ts=4<cr>
 :map <leader>8 :setlocal sw=8 ts=8<cr>
