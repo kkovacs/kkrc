@@ -1,14 +1,17 @@
+#!/bin/bash
+
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
 # Set up colors
-if [ ! -n "$SSH_CLIENT" ] && [ ! -n "$SSH_TTY" ] && [ -z $VIM_TERMINAL ]; then
-	BASE16_SHELL="$HOME/.kkrc/base16-colors.dark.sh"
-	[[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
+if [ -z "$SSH_CLIENT" ] && [ -z "$SSH_TTY" ] && [ -z "$VIM_TERMINAL" ]; then
+	# shellcheck disable=SC1090
+	. ~/.kkrc/base16-colors.dark.sh 2>/dev/null
 fi
 
 # If there was a .bashrc we moved away at install, run that first
 # (so we can override)
+# shellcheck disable=SC1090
 if [ -e ~/.bashrc.orig ]; then . ~/.bashrc.orig; fi
 
 # Ignore both duplicated and whitespace
@@ -19,7 +22,8 @@ HISTCONTROL=ignoreboth
 if [[ "$OSTYPE" == "darwin"* ]]; then
 	# Force load bash-completion on OS X
 	# We need to do this BEFORE the generic part, or else `compopt` is unknown
-	[[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]] && . "/opt/homebrew/etc/profile.d/bash_completion.sh"
+	# shellcheck disable=SC1091
+	. "/opt/homebrew/etc/profile.d/bash_completion.sh" 2>/dev/null
 	# If we have `brew install coreutils`, then use the linux-compatible `ls`
 	# NOTE: Have this before defining `lll`, so that uses gls too
 	[ -f /opt/homebrew/bin/gls ] && alias ls="gls --color"
@@ -54,6 +58,8 @@ PS1='\[\033[00;'$([[ "$UID" -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@
 #PS1="\u@\h \w [\j]\$ "
 
 # Set GNU screen title to hostname
+# Shellcheck mis-detects this, so:
+# shellcheck disable=SC1003
 [ -z "$STY" ] && printf '\ek%s\e\\' "${HOSTNAME:${#HOSTNAME}<11?0:-10}"
 
 # "bell" before prompt. Separated from PS1 so it's easier to turn off when needed,
@@ -88,6 +94,7 @@ export QUOTING_STYLE=shell-escape
 alias vim='vim -n -i NONE "+set nobackup noswapfile encoding=utf8 mouse=a"'
 
 # Use bash-completion (but show no errors if not found).
+# shellcheck disable=SC1091
 . /usr/share/bash-completion/bash_completion 2>/dev/null
 
 # Set up some handy aliases
@@ -98,6 +105,8 @@ alias la="ls -lrtA -I*" # For Linux. Hidden files ONLY.
 # A version of ls that is still quick to type, BUT uses "less" automatically BUT exits it immediately if text is not long enough.
 # NOTE: use this in the "function ..." form, because if there is an ll alias, that causes an error (even if we unalias in the previos lik
 unalias ll 2>/dev/null # Many systems has an ll alias, this is NOT temporary
+# No, we WANT to use ls, so:
+# shellcheck disable=2012
 function ll() { ls -lrtA --color "$@" | less -FXRn +G ; }
 #alias lr="ls -AR1 -I .git|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d files\n%s \t\",p-2,\$0);p=0}{p++}END{print p \" files\"}'|less -FXn" # Cut -FX in ash
 #alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
@@ -117,25 +126,27 @@ alias gf="git fetch --all -v"
 alias gp="git pull --ff-only -v"
 alias gclean="git reset --hard && git clean -f -d -x"
 # Recursive git
-function G { find . -name .git -type d | while read a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; [ "$#" -lt 1 ] && command git -C "$a" status -sb || command git -C "$a" "$@"; done ; }
+function G { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
 # Recursive git status. This is to quickly find uncommitted changes, not a detailed view
-function GS { find . -name .git -type d | while read a; do a="${a%.git}"; tput smso; echo -e "$a"; tput rmso; if ! command git -C "$a" diff-index --quiet --ignore-submodules HEAD --; then [ "$#" -lt 1 ] && command git -C "$a" status -sb || command git -C "$a" "$@"; fi ; done ; }
+function GS { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "$a"; tput rmso; if ! command git -C "$a" diff-index --quiet --ignore-submodules HEAD --; then if [ "$#" -lt 3 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; fi ; done ; }
 # Show .gitignore-d files, all of them
 alias gii="git ls-files --exclude-standard --ignored --others"
 # Show .gitignore-d files except vendor and node_modules, because that's TMI
 alias gi="gii | egrep -v '^vendor/|^node_modules/'"
 # Quick grep, with case and ignore case.
-# NOTE: $GR_EXCLUDE is not quoted on purpose (so don't write multi-word excludes)
-export GR_EXCLUDE="-I --exclude-dir=.git --exclude=*.min.* --exclude=*.sql --exclude-dir=vendor --exclude-dir=node_modules"
-function gr { grep -r $GR_EXCLUDE "$@" . 2>/dev/null | less -FSXn +"/${!#}" ; }
-function gri { grep -r -i $GR_EXCLUDE "$@" . 2>/dev/null | less -FSXnI +"/${!#}" ; }
+# NOTE: GR_EXCLUDE is an array!
+export GR_EXCLUDE=(-I --exclude-dir=.git --exclude=*.min.* --exclude=*.sql --exclude-dir=vendor --exclude-dir=node_modules)
+function gr { grep -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXn +"/${!#}" ; }
+function gri { grep -r -i "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXnI +"/${!#}" ; }
 # Better git grep
 function gg { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
 # screen with ssh auth sock name transfer, to be used with `CTRL+A` `:paste s`
-alias s="screen -X register s \" export SSH_AUTH_SOCK=$SSH_AUTH_SOCK\" ; screen -xR"
+# We WANT this to expand when defined, so:
+# shellcheck disable=SC2139
+alias s="screen -X register s \" export SSH_AUTH_SOCK=\\\"$SSH_AUTH_SOCK\\\"\" ; screen -xR"
 #alias s="screen -xR"
 # Watch out for using git as a different user than the repository. Avoid mandatory reconfiguration of git with user/email for hotfixes.
-function git { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " grep log blame diff show status init clone " =~ " $1 " ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
+function git { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " grep log blame diff show status init clone " == *" $1 "* ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
 M() { mount "$@" | grep '^\/dev\/' ; }
 D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none' ; }
@@ -144,7 +155,10 @@ F() { free -h ; }
 # Process list overview (for Linux)
 alias P="ps axfwwo pid,user,start,rss,stat,cmd | less -SXRn"
 # If can't use docker as current user, try sudo
+# We define a shell command, but we don't mind that sudo will not use it, so:
+# shellcheck disable=SC2033,SC2032
 function docker { if [[ -r /var/run/docker.sock ]] ; then command docker "$@" ; else sudo docker "$@" ; fi ; }
+# shellcheck disable=SC2033,SC2032
 function docker-compose { if [[ -r /var/run/docker.sock ]] ; then command docker-compose "$@" ; else sudo docker-compose "$@" ; fi ; }
 # Docker containers overview
 alias C="docker ps -as"
@@ -162,11 +176,11 @@ alias S="docker service ls"
 # Kubernetes overview. Using an alias instead of a function because often kubectl is an alias itself... (minikube, etc)
 alias K="kubectl get all --output=wide --all-namespaces"
 # Replicate zsh's "vared" command (with autocompletion)
-function vared { read -e -p "$1=" -i "${!1}" $1 ; }
+function vared { read -r -e -p "$1=" -i "${!1}" "$1" ; }
 complete -v vared
 
 # Only if not on busybox
-[ -L $(type -p grep) ] || alias grep="grep --color"
+[ -L "$(type -p grep)" ] || alias grep="grep --color"
 
 # Shell options.
 # histverify (NOT USED NOW): Poor man's history expansion (which bash doesn't do on TAB)
@@ -224,16 +238,16 @@ _scx() { COMP_WORDS=("systemctl" "$1" "${COMP_WORDS[@]:1}") ; ((COMP_CWORD++)) ;
 _jcx() { COMP_WORDS=("journalctl" "$1" "${COMP_WORDS[@]:1}") ; ((COMP_CWORD++)) ; _journalctl ; }
 
 # "SystemCtl", generic alias, because who has time to type THAT much?
-sc() { SC="${@: -1}" ; systemctl "$@" ; }
+sc() { SC="${*: -1}" ; systemctl "$@" ; }
 complete -F _systemctl sc
 # "User-level SystemCtl" alias, becuase, there's NOT even a short-option or something...
-usc() { SC="${@: -1}" ; systemctl --user "$@" ; }
+usc() { SC="${*: -1}" ; systemctl --user "$@" ; }
 _usc() { _scx --user ; }
 complete -F _usc usc
 # "SystemCtl List" services, because it should be simple
 scl() { systemctl list-units --type service --all ; }
 # Systemctl Daemon-Reload", because systemd can't do it on its own... Do user or system depending on UID
-sdr() { [ $UID -eq 0 ] && systemctl daemon-reload || systemctl --user daemon-reload ; }
+sdr() { if [ $UID -eq 0 ]; then systemctl daemon-reload; else systemctl --user daemon-reload; fi ; }
 
 # JournalCtl for Unit
 jc() { SC="${1:-${SC}}" ; journalctl -xu "$SC" ; }
@@ -256,7 +270,7 @@ stail() { SC="${2:-${SC}}" ; sdr ; systemctl reset-failed "$SC" ; journalctl -n 
 # Param #3: command action to call
 # Param #4+: any further options to pass to action
 _mksc() {
-	eval "$1() { SC=\"\${1:-\${SC}}\" ; $2 $3 ${@:4} \"\$SC\" ; }"
+	eval "$1() { SC=\"\${1:-\${SC}}\" ; $2 $3 ${*:4} \"\$SC\" ; }"
 	eval "_$1() { _scx \"$3\" ; }"
 	eval "complete -F _$1 $1"
 }
@@ -272,7 +286,9 @@ sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 # Now fix bash competion for our systemd aliases.
 # Even without bash-completion, most linux package managers put these there from the systemd packages - take advantage.
 # Display no error if not found, since it's not fully standard.
+# shellcheck disable=SC1091
 . /usr/share/bash-completion/completions/systemctl 2>/dev/null
+# shellcheck disable=SC1091
 . /usr/share/bash-completion/completions/journalctl 2>/dev/null
 # END of better systemd.
 
@@ -289,31 +305,32 @@ unalias tig
 
 # Quickly create/list/delete VMs on DigitalOcean.
 # NOTE: You can set "export DIGITALOCEAN_ACCESS_TOKEN=..." in ~/.bashrc.local , or use `doctl auth` to log in
-do-mk() { doctl compute droplet create "${1:-tmp1}" --region ams3 --ssh-keys $(doctl compute ssh-key list --format=ID --no-header | paste -sd "," -) --image ${2:-ubuntu-20-04-x64} --size ${3:-s-2vcpu-2gb} --wait -v ; }
-do-ssh() { ( HN="${1:-tmp1}"; shift; ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@$(doctl compute droplet list --format=PublicIPv4 --no-header "${HN}") "$@" ) ; }
+do-mk() { doctl compute droplet create "${1:-tmp1}" --region ams3 --ssh-keys "$(doctl compute ssh-key list --format=ID --no-header | paste -sd "," -)" --image "${2:-ubuntu-20-04-x64}" --size "${3:-s-2vcpu-2gb}" --wait -v ; }
+do-ssh() { ( HN="${1:-tmp1}"; shift; ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "root@$(doctl compute droplet list --format=PublicIPv4 --no-header "${HN}")" "$@" ) ; }
 do-ls() { doctl compute droplet list --format Name,ID,PublicIPv4,Memory,VCPUs,Disk,Region,Status; doctl account get --format Email,DropletLimit,Status ; }
-do-rm() { doctl compute droplet delete $(doctl compute droplet list --format=ID --no-header "${1:-tmp1}") ; }
+do-rm() { doctl compute droplet delete "$(doctl compute droplet list --format=ID --no-header "${1:-tmp1}")" ; }
 
 # hl - highlight command
+# shellcheck disable=SC1090
 source ~/.kkrc/hl
 export -f hl
 
 # Automatically set TMUX window title on SSH
 ssh() {
 	# Only if running under TMUX
-	if [ ! -z "$TMUX" ]; then
+	if [ -n "$TMUX" ]; then
 		# Store current window name
-		local SAVED=$(tmux display-message -p '#W')
-		local ARGS=($@)
+		#local SAVED=$(tmux display-message -p '#W')
+		local ARGS=("$@")
 		local NAME="ssh"
 		local I
 		# Try to find the server name
-		for I in ${ARGS} ; do
+		for I in "${ARGS[@]}" ; do
 			[[ $I == "--" ]] && break
 			NAME="$I"
 		done
 		# Set window name
-		tmux rename-window "${NAME}" >/dev/null 2>/dev/null
+		tmux rename-window "${NAME}" >/dev/null 2>&1
 	fi
 	# Do it
 	command ssh "$@"
@@ -327,7 +344,7 @@ ssh() {
 }
 
 # Strictly NOT in inject, just LOCAL: open files from vim :term back in VIM.
-if [ ! -z $VIM_TERMINAL ]; then
+if [ -n "$VIM_TERMINAL" ]; then
 	unalias vim
 	function vim() {
 		printf '\e]51;["drop", "%s"]\g' "$(realpath "$1")"
@@ -343,4 +360,5 @@ screen -ls | grep -v "Socket"
 # Or. on Ubuntu, put this into /etc/default/keyboard: XKBOPTIONS="ctrl:nocaps"
 
 # Local commands
+# shellcheck disable=SC1090
 if [ -e ~/.bashrc.local ]; then . ~/.bashrc.local; fi
