@@ -242,6 +242,8 @@ autocmd FileType markdown syn match markdownH3 "^### \zs"
 autocmd FileType markdown syn match markdownH4 "^#### \zs"
 autocmd FileType markdown syn match markdownH5 "^##### \zs"
 autocmd FileType markdown syn match markdownH6 "^###### \zs"
+" Use space to mark files in netrw
+autocmd FileType netrw nmap <buffer> <space> mf
 " H1 & H2 inverse, the remainder are basic colors, from more prominent to more subtle
 highlight markdownH1 ctermbg=243 guibg=#666666 ctermfg=15 guifg=#ffffff
 highlight markdownH2 ctermbg=238 guibg=#333333 ctermfg=7 guifg=#AAAAAA
