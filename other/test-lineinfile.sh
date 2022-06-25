@@ -12,13 +12,13 @@ third line
 ;commented = 50
 XXX
 
-lineinfile "line" "FIRST LINE" "$F"
-lineinfile 'second/line' "SECOND LINE" "$F"
-lineinfile "fourth" "LAST LINE" "$F"
-lineinfile "rd li" "THIRD\nLINE" "$F"
-lineinfile "^LINE" 'FOURTH LINE' "$F"
-lineinfile 'commented \?=' "commented=100 // Added by lineinfile" "$F"
-lineinfile "THIRD" "& LINE" "$F"
+_lineinfile "line" "FIRST LINE" "$F"
+_lineinfile 'second/line' "SECOND LINE" "$F"
+_lineinfile "fourth" "LAST LINE" "$F"
+_lineinfile "rd li" "THIRD\nLINE" "$F"
+_lineinfile "^LINE" 'FOURTH LINE' "$F"
+_lineinfile 'commented \?=' "commented=100 // Added by lineinfile" "$F"
+_lineinfile "THIRD" "& LINE" "$F"
 
 cat "$F"
 rm "$F"
