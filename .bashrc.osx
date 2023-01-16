@@ -30,15 +30,29 @@ function vm()
 			done
 			multipass list
 			;;
+		"ip")
+			multipass info "$2" | grep '^IPv4' | awk '{print $2}'
+			;;
+		"ssh")
+			name="${2}"
+			shift; shift;
+			# NOTE: Using "ubuntu" user, because multipass's "mount" uses it.
+			# NOTE: Agent forwarding ON by default
+			ssh -A ubuntu@$(vm ip "${name}") "$@"
+			;;
 		*)
 			# Start a new VM
 			name="${1}"
 			dir="${2:-/Users/user/wrk}"
 			shift; shift;
-			multipass launch -v -n "${name}" "$@" 22.04
+			# Sorry for identation, it's necessary because of the HEREDOC
+			eval "cat <<EOF
+$(<~/.kkrc/other/cloud-config.multipass.yml)
+EOF" | multipass launch --cloud-init - -v -n "${name}" "$@" 22.04
 			multipass mount "$dir" "$name:/persist"
 			tmux rename-window "${name}"
-			multipass shell "${name}"
+			#multipass shell "${name}"
+			vm ssh "${name}"
 			;;
 	esac
 }

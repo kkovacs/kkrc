@@ -1,0 +1,24 @@
+#cloud-config
+users:
+# NOTE: Using "ubuntu" user, because multipass's "mount" uses it.
+- name: ubuntu
+  ssh_authorized_keys:
+  - '$(cat ~/.ssh/id_ed25519.pub)'
+  shell: /bin/bash
+  sudo: "ALL=(ALL) NOPASSWD:ALL"
+package_update: true
+packages:
+- less
+- psmisc
+- screen
+- htop
+- curl
+- wget
+- bash-completion
+- dnsutils
+- git
+- tig
+- socat
+- rsync
+- openvpn
+- wireguard
