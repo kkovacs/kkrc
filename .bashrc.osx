@@ -49,7 +49,12 @@ function vm()
 			eval "cat <<EOF
 $(<~/.kkrc/other/cloud-config.multipass.yml)
 EOF" | multipass launch --cloud-init - -v -n "${name}" "$@" 22.04
-			multipass mount "$dir" "$name:/persist"
+			# Check if mount was already set up or not
+			if multipass info "$name" | grep "Mounts: *--"; then
+				multipass stop "$name" # Stop/start needed for native mount
+				multipass mount --type native "$dir" "$name:/persist"
+				multipass start "$name" # Stop/start needed for native mount
+			fi
 			tmux rename-window "${name}"
 			#multipass shell "${name}"
 			vm ssh "${name}"
