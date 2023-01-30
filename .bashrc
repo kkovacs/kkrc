@@ -298,6 +298,8 @@ sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 alias tmux="tmux -2"
 # When I don't want to pollute my known_hosts file (temporary VMs, etc)
 alias sssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+# SSH reverse-compatible with RSA (routers with dropbear, etc)
+alias ssh-with-rsa-enabled="ssh -o PubkeyAcceptedAlgorithms=+ssh-rsa -o HostkeyAlgorithms=+ssh-rsa"
 
 # Locally we don't need these (but leave them in the inject part)
 unalias tig
