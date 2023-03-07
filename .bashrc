@@ -149,7 +149,7 @@ alias s="screen -X register s \" export SSH_AUTH_SOCK=\\\"$SSH_AUTH_SOCK\\\"\" ;
 function git { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " grep log blame diff show status init clone " == *" $1 "* ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
 M() { mount "$@" | grep '^\/dev\/' ; }
-D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none' ; }
+D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none\|^overlay\|^shm' ; }
 # Free memory
 F() { free -h ; }
 # Process list overview (for Linux)
