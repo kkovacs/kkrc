@@ -136,8 +136,8 @@ alias gi="gii | egrep -v '^vendor/|^node_modules/'"
 # Quick grep, with case and ignore case.
 # NOTE: GR_EXCLUDE is an array!
 export GR_EXCLUDE=(-I --exclude-dir=.git --exclude=*.min.* --exclude=*.sql --exclude=*.log --exclude=tags --exclude-dir=cache --exclude-dir=vendor --exclude-dir=node_modules)
-function gr { grep -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXn +"/${!#}" ; }
-function gri { grep -r -i "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXnI +"/${!#}" ; }
+function gr { command grep --color=auto -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null ; }
+function ggr { command grep --color=force -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXnr ; }
 # Better git grep
 function gg { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
 # screen with ssh auth sock name transfer, to be used with `CTRL+A` `:paste s`
@@ -149,7 +149,7 @@ alias s="screen -X register s \" export SSH_AUTH_SOCK=\\\"$SSH_AUTH_SOCK\\\"\" ;
 function git { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " grep log blame diff show status init clone " == *" $1 "* ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
 M() { mount "$@" | grep '^\/dev\/' ; }
-D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none' ; }
+D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none\|^overlay\|^shm' ; }
 # Free memory
 F() { free -h ; }
 # Process list overview (for Linux)
