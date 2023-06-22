@@ -1,30 +1,31 @@
 
 ! Leave Mode_switch alone, i3wm will handle that
-remove Mod5 = Mode_switch
+!remove Mod5 = Mode_switch
 ! XXX Doesn't matter for some reason, it gets put back. See hack in .i3/config
 !remove Mod4 = Mode_switch
 
 ! Map CapsLock to Control_L
-clear Lock
-keysym Caps_Lock = Control_L
-add Control = Control_L
+!clear Lock
+!keysym Caps_Lock = Control_L
+!add Control = Control_L
 
 ! Left WIN (Super_L) key to Mode_switch (this brings out the 2nd and 3rd items of the keycode lines)
-keysym Super_L = Mode_switch
+!keysym Super_L = Mode_switch
 
 ! Let's make the Menu key a separate Shift,
 ! but reassign it first to avoid the original function
-keysym Menu = Super_L
-add Mod3 = Super_L
+!keysym Menu = Super_L
+!remove Mod1 = Alt_L
+!add Mod5 = Alt_L
 
 ! Dead keys -- set accents like on the mac os x
 !keycode  25 = w W dead_abovedot
-keycode  26 = e E dead_acute
-keycode  30 = u U dead_diaeresis
+keycode  26 = e E NoSymbol dead_acute
+keycode  30 = u U NoSymbol dead_diaeresis
 !keycode  31 = i I dead_horn
 !keycode  38 = a A dead_macron
 !keycode  43 = h H dead_macron
-keycode  44 = j J dead_doubleacute j
+keycode  44 = j J NoSymbol dead_doubleacute
 !keycode  45 = k K dead_abovering
 !keycode  52 = z Z dead_hook
 !keycode  53 = x X dead_belowdot
@@ -38,16 +39,16 @@ keycode  44 = j J dead_doubleacute j
 keycode  94 = Shift_L Shift_L Shift_L Shift_L Shift_L Shift_L
 
 ! Special symbols on the number keys, like Euro
-keycode  10 = 1 exclam U00A1 U2044 
-keycode  11 = 2 at U2122 U20AC 
-keycode  12 = 3 numbersign U00A3 U2039 
-keycode  13 = 4 dollar U00A2 U2040 
-keycode  14 = 5 percent U00A7 U2044 
+keycode  10 = 1 exclam U00A1 U2044
+keycode  11 = 2 at U2122 U20AC
+keycode  12 = 3 numbersign U00A3 U2039
+keycode  13 = 4 dollar U00A2 U2040
+keycode  14 = 5 percent U00A7 U2044
 keycode  15 = 6 asciicircum dead_circumflex dead_circumflex
-keycode  16 = 7 ampersand U00B6 U2021 
-keycode  17 = 8 asterisk U2022 U00B0 
-keycode  18 = 9 parenleft U00AA U00B7 
-keycode  19 = 0 parenright U00BA U201A 
+keycode  16 = 7 ampersand U00B6 U2021
+keycode  17 = 8 asterisk U2022 U00B0
+keycode  18 = 9 parenleft U00AA U00B7
+keycode  19 = 0 parenright U00BA U201A
 keycode  20 = minus underscore U2013 U2014
 keycode  21 = equal plus U2260 U00B1
 
