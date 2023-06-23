@@ -7,7 +7,7 @@
     "editor.autoClosingQuotes": "never",
     "editor.autoClosingOvertype": "never",
     "files.insertFinalNewline": true,
-    "editor.renderFinalNewline": false,
+    "editor.renderFinalNewline": "off",
     "workbench.colorCustomizations": {
         "[Default Dark+]": {
             "tab.activeBackground": "#505050",
