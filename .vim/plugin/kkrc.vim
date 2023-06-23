@@ -43,6 +43,9 @@ endif
 if v:version >= 730
 	set cryptmethod=blowfish2
 endif
+if v:version >= 802
+	set cryptmethod=xchacha20
+endif
 
 " Allow filetype plugin loading
 filetype plugin indent on
