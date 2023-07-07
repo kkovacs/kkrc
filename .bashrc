@@ -177,6 +177,8 @@ alias S="docker service ls"
 alias K="kubectl get all --output=wide --all-namespaces"
 # LVM
 alias lv="pvs; echo; vgs; echo; lvs -o lv_name,pool_lv,size,data_percent,metadata_percent,origin"
+# lsblk
+alias lb="lsblk -Mf"
 # Replicate zsh's "vared" command (with autocompletion)
 function vared { read -r -e -p "$1=" -i "${!1}" "$1" ; }
 complete -v vared
