@@ -175,6 +175,8 @@ alias I="docker images"
 alias S="docker service ls"
 # Kubernetes overview. Using an alias instead of a function because often kubectl is an alias itself... (minikube, etc)
 alias K="kubectl get all --output=wide --all-namespaces"
+# LVM
+alias lv="lvs -o lv_name,size,data_percent,metadata_percent,devices,origin -a"
 # Replicate zsh's "vared" command (with autocompletion)
 function vared { read -r -e -p "$1=" -i "${!1}" "$1" ; }
 complete -v vared
