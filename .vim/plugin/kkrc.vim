@@ -43,8 +43,11 @@ endif
 if v:version >= 730
 	set cryptmethod=blowfish2
 endif
-if v:version >= 802
+if v:version >= 802 && has("sodium")
+	" First set the older version
 	set cryptmethod=xchacha20
+	" Then try to set the newer v2, but don't always show and error it in case it fails (XXX unfortunately there is no test for the feature)
+	silent! set cryptmethod=xchacha20v2
 endif
 
 " Allow filetype plugin loading
