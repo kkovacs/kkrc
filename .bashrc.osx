@@ -5,7 +5,8 @@
 # . ~/.kkrc/.bashrc.osx
 
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH:/Users/$USER/go/bin:/Users/$USER/Documents/enc/bin"
-export SSH_AUTH_SOCK="/Users/$USER/.gnupg/S.gpg-agent.ssh"
+# NOTE: Use this if you can't add `IdentityAgent ~/.gnupg/S.gpg-agent.ssh` to your `.ssh/config`
+#export SSH_AUTH_SOCK="/Users/$USER/.gnupg/S.gpg-agent.ssh"
 
 # This is my preferred way of working with Ubuntu multipass on OS X.
 function vm()
