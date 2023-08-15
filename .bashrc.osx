@@ -4,7 +4,7 @@
 # It's recommended to load from .bashrc.local :
 # . ~/.kkrc/.bashrc.osx
 
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH:/Users/$USER/go/bin:/Users/$USER/Documents/enc/bin"
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 # NOTE: Use this if you can't add `IdentityAgent ~/.gnupg/S.gpg-agent.ssh` to your `.ssh/config`
 #export SSH_AUTH_SOCK="/Users/$USER/.gnupg/S.gpg-agent.ssh"
 
