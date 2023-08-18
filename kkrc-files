@@ -6,7 +6,7 @@ process .bashrc ~/.bashrc
 process .hgrc ~/.hgrc
 process .tmux.conf ~/.tmux.conf
 process .gitconfig ~/.gitconfig
-#process .Xmodmap ~/.Xmodmap # Doesn't work anymore on Ubuntu. See: https://www.emacswiki.org/emacs/MovingTheCtrlKey
+process .Xmodmap ~/.Xmodmap
 process .tigrc ~/.tigrc
 process .psqlrc ~/.psqlrc
 process .inputrc ~/.inputrc

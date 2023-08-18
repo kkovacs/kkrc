@@ -10,7 +10,7 @@
 !add Control = Control_L
 
 ! Left WIN (Super_L) key to Mode_switch (this brings out the 2nd and 3rd items of the keycode lines)
-!keysym Super_L = Mode_switch
+keysym Super_L = Mode_switch
 
 ! Let's make the Menu key a separate Shift,
 ! but reassign it first to avoid the original function
@@ -20,12 +20,12 @@
 
 ! Dead keys -- set accents like on the mac os x
 !keycode  25 = w W dead_abovedot
-keycode  26 = e E NoSymbol dead_acute
-keycode  30 = u U NoSymbol dead_diaeresis
+keycode  26 = e E dead_acute
+keycode  30 = u U dead_diaeresis
 !keycode  31 = i I dead_horn
 !keycode  38 = a A dead_macron
 !keycode  43 = h H dead_macron
-keycode  44 = j J NoSymbol dead_doubleacute
+keycode  44 = j J dead_doubleacute
 !keycode  45 = k K dead_abovering
 !keycode  52 = z Z dead_hook
 !keycode  53 = x X dead_belowdot
