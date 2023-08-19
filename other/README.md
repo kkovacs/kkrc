@@ -57,3 +57,12 @@ https://www.microsoft.com/en-us/download/details.aspx?id=102134
 It's not a perfect match because I can set up "dead key" accents only on AltGr.
 Because of this, I also use Microsoft PowerToys to redefine for example WIN+E
 to AltGr+E, etc.
+
+An alternative is to use the "Romanian (Developer)" keyboard, which is
+basically US but has all the dead keys, even if in wrong places. That can be
+fixed with Microsoft PowerToys though.
+
+# scancodemap-swap-altl-winl.reg
+
+Windows registry file to swap the left Alt and the left Win keys, so they match
+MAC layout which I'm more used to.
