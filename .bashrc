@@ -135,7 +135,7 @@ alias gii="git ls-files --exclude-standard --ignored --others"
 alias gi="gii | egrep -v '^vendor/|^node_modules/'"
 # Quick grep, with case and ignore case.
 # NOTE: GR_EXCLUDE is an array!
-export GR_EXCLUDE=(-I --exclude-dir=.git --exclude=*.min.* --exclude=*.sql --exclude=*.log --exclude=tags --exclude-dir=cache --exclude-dir=vendor --exclude-dir=node_modules)
+export GR_EXCLUDE=(-I --exclude-dir=.git --exclude=*.min.* --exclude=*.sql --exclude=*.log --exclude=tags --exclude-dir=cache --exclude-dir=vendor --exclude-dir=node_modules --exclude-dir=storage)
 function gr { command grep --color=auto -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null ; }
 function ggr { command grep --color=force -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXnr ; }
 # Better git grep
