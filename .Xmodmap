@@ -1,16 +1,20 @@
+! NOTE: If you mess up, you can reset the keyboard with:
+! setxkbmap -layout us
 
-! Leave Mode_switch alone, i3wm will handle that
-!remove Mod5 = Mode_switch
-! XXX Doesn't matter for some reason, it gets put back. See hack in .i3/config
-!remove Mod4 = Mode_switch
+! Choose one (also see .bashrc for kbd-* aliases):
+! A) FOR PC-style hardware keyboard:
+! Left WIN (Super_L) key to Mode_switch (this brings out the 2nd and 3rd items of the keycode lines)
+!keysym Super_L = Mode_switch
+! B) FOR MAC-style hardware keyboard:
+! Left Alt (Alt_L) key to Mode_switch (this brings out the 2nd and 3rd items of the keycode lines)
+!keysym Alt_L = Mode_switch
+! Set Left WIN (Super_L) to Alt (mod1)
+!keysym Super_L = Alt_L
 
 ! Map CapsLock to Control_L
-!clear Lock
-!keysym Caps_Lock = Control_L
-!add Control = Control_L
-
-! Left WIN (Super_L) key to Mode_switch (this brings out the 2nd and 3rd items of the keycode lines)
-keysym Super_L = Mode_switch
+clear Lock
+keysym Caps_Lock = Control_L
+add Control = Control_L
 
 ! Let's make the Menu key a separate Shift,
 ! but reassign it first to avoid the original function

@@ -309,6 +309,14 @@ alias ssh-with-rsa-enabled="ssh -o PubkeyAcceptedAlgorithms=+ssh-rsa -o HostkeyA
 unalias tig
 #unset VIMINIT
 
+# Linux hardware keyboard setup options.
+# Reset to US keyboard
+alias kbd-reset="setxkbmap -layout us"
+# A) For PC-style hardware (Order: Win, Alt, Space)
+alias kbd-pc="kbd-reset;xmodmap -e 'keysym Super_L = Mode_switch' ~/.Xmodmap"
+# B) For MAC-style hardware (Order: Alt, Win, Space)
+alias kbd-mac="kbd-reset;xmodmap -e 'keysym Alt_L = Mode_switch' -e 'keysym Super_L = Alt_L' ~/.Xmodmap"
+
 # Quickly create/list/delete VMs on DigitalOcean.
 # NOTE: You can set "export DIGITALOCEAN_ACCESS_TOKEN=..." in ~/.bashrc.local , or use `doctl auth` to log in
 do-mk() { doctl compute droplet create "${1:-tmp1}" --region ams3 --ssh-keys "$(doctl compute ssh-key list --format=ID --no-header | paste -sd "," -)" --image "${2:-ubuntu-22-04-x64}" --size "${3:-s-2vcpu-2gb}" --wait -v ; }
