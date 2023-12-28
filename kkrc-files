@@ -15,11 +15,17 @@ process .ansible.cfg ~/.ansible.cfg
 
 # Damn you Microsoft for not being able to keep everything in one place
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+	# For system-level install
 	mkdir -p "$HOME/.config/Code/User/"
 	process other/settings.json $HOME/.config/Code/User/settings.json
 	process other/keybindings.json $HOME/.config/Code/User/keybindings.json
 elif [[ "$OSTYPE" == "darwin"* ]]; then
+	# For system-level install
 	mkdir -p "$HOME/Library/Application Support/Code/User/"
 	process other/settings.json "$HOME/Library/Application Support/Code/User/settings.json"
 	process other/keybindings.json "$HOME/Library/Application Support/Code/User/keybindings.json"
+	# For portable (which I prefer)
+	mkdir -p "$HOME/Applications/code-portable-data/User/"
+	process other/settings.json "$HOME/Applications/code-portable-data/User/settings.json"
+	process other/keybindings.json "$HOME/Applications/code-portable-data/User/keybindings.json"
 fi

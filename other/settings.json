@@ -6,6 +6,7 @@
     "editor.autoClosingBrackets": "never",
     "editor.autoClosingQuotes": "never",
     "editor.autoClosingOvertype": "never",
+    "window.restoreWindows": "none"
     "files.insertFinalNewline": true,
     "editor.renderFinalNewline": "off",
     "workbench.colorCustomizations": {
