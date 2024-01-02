@@ -242,12 +242,12 @@ vmap <silent> S :<home>silent <end>w !sed 's/^\t//' \| tmux load-buffer -b jupyt
 autocmd FileType markdown syn match Todo "\<XXX\>"
 
 " Color markdown headings by level
-autocmd FileType markdown syn match markdownH1 "^# \zs"
-autocmd FileType markdown syn match markdownH2 "^## \zs"
-autocmd FileType markdown syn match markdownH3 "^### \zs"
-autocmd FileType markdown syn match markdownH4 "^#### \zs"
-autocmd FileType markdown syn match markdownH5 "^##### \zs"
-autocmd FileType markdown syn match markdownH6 "^###### \zs"
+"autocmd FileType markdown syn match markdownH1 "^# \zs"
+"autocmd FileType markdown syn match markdownH2 "^## \zs"
+"autocmd FileType markdown syn match markdownH3 "^### \zs"
+"autocmd FileType markdown syn match markdownH4 "^#### \zs"
+"autocmd FileType markdown syn match markdownH5 "^##### \zs"
+"autocmd FileType markdown syn match markdownH6 "^###### \zs"
 " Use space to mark files in netrw
 autocmd FileType netrw nmap <buffer> <space> mf
 " H1 & H2 inverse, the remainder are basic colors, from more prominent to more subtle
