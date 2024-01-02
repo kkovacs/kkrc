@@ -85,6 +85,10 @@ export LS_COLORS="di=1;34:ln=1;35:so=1;32:pi=1;33:ex=1;31:bd=34;46:cd=34;43:su=3
 # Most useful quoting style, because you can copy/paste it
 export QUOTING_STYLE=shell-escape
 
+# Debian/Ubuntu should just restart things during upgrade.
+# It's pointless and dangerous to ask the user (because the update gets stuck).
+export NEEDRESTART_MODE=a
+
 # FOR INJECT: Lighter vim
 # NOTE: this prevented the use of kkrc on the server side, since if there is a
 # VIMINIT env var, then ~/.vimrc doesn't get read. But I leave it here because
