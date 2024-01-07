@@ -179,6 +179,10 @@ alias I="docker images"
 alias S="docker service ls"
 # Kubernetes overview. Using an alias instead of a function because often kubectl is an alias itself... (minikube, etc)
 alias K="kubectl get all --output=wide"
+# Kubernetes overview, including system
+alias KA="kubectl get all --output=wide --all-namespaces"
+# Kubernetes nodes (not included in "all")
+alias KN="kubectl get nodes --output=wide"
 # LVM
 alias lv="pvs; echo; vgs; echo; lvs -o lv_name,pool_lv,size,data_percent,metadata_percent,origin"
 # lsblk
