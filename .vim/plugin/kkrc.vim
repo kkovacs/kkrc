@@ -37,10 +37,11 @@ set foldopen=hor,insert,undo
 set mouse=a
 " So the stronger encryption never gets frogotten
 " Also I can't believe CentOS software is so ANCIENT
-if v:version >= 704
+
+if has('cryptv') && v:version >= 704
 	set cryptmethod=blowfish
 endif
-if v:version >= 730
+if has('cryptv') && v:version >= 730
 	set cryptmethod=blowfish2
 endif
 if v:version >= 802 && has("sodium")
