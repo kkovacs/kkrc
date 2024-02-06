@@ -1,5 +1,6 @@
 process .vimrc ~/.vimrc
 process .vim ~/.vim
+process .vim ~/.config/nvim
 process .zshrc ~/.zshrc
 process .screenrc ~/.screenrc
 process .bashrc ~/.bashrc
