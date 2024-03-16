@@ -167,7 +167,7 @@ function docker-compose { if [[ -r /var/run/docker.sock ]] ; then command docker
 # Docker containers overview
 alias C="docker ps -as"
 # Docker-compose
-alias dc="docker-compose"
+alias dc="docker compose"
 _completion_loader docker-compose 2>/dev/null # This is some new dynamic style? Show no error if not found.
 complete -F _docker_compose dc
 alias dc1="dc up -d; dcs"
