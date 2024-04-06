@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Change to own dir
-cd "$(dirname $0)"
+cd "$(dirname "$0")" || exit 1
 
 # .bashrc is a special case, since it usually exists. If it's not ours,
 # rename it to .bashrc.orig

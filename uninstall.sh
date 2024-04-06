@@ -2,8 +2,8 @@
 
 # Change to own dir
 curdir="$(pwd)"
-kkrcdir="$(dirname $0)"
-cd "$kkrcdir"
+kkrcdir="$(dirname "$0")"
+cd "$kkrcdir" || exit 1
 
 # Installs the softlinks in place.
 process() {
@@ -29,15 +29,15 @@ process() {
 # .bashrc.orig is a special case, since that's where we moved the original.
 # Now rename it back
 if [ -f ~/.bashrc.orig ]; then
-        echo "OK: Renaming .bashrc.orig to .bashrc\n"
+        printf "OK: Renaming .bashrc.orig to .bashrc\n"
         mv ~/.bashrc.orig ~/.bashrc
 else
-        echo "INFO: No .bashrc.orig found\n"
+        printf "INFO: No .bashrc.orig found\n"
 fi
 
 # Last step
 echo "Ready to run 'rm -rf $kkrcdir'? (y/n)"
-read A
+read -r A
 if [ "$A" = "y" ]; then
         cd "$curdir"
         rm -rf "$kkrcdir"
