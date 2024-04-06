@@ -51,6 +51,11 @@ if v:version >= 802 && has("sodium")
 	silent! set cryptmethod=xchacha20v2
 endif
 
+" Since 9.1, editorconfig is bundled with vim, but not enabled by default.
+if v:version >= 901
+	packadd! editorconfig
+endif
+
 " Allow filetype plugin loading
 filetype plugin indent on
 

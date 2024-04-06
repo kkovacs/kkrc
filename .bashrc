@@ -95,7 +95,8 @@ export NEEDRESTART_MODE=a
 # it might be useful if the server has a wildly configured vim.
 #export VIMINIT=":set nobackup noswapfile encoding=utf8 viminfo="
 # No swapfile, no viminfo and a few other things
-alias vim='vim -n -i NONE "+set nobackup noswapfile encoding=utf8 mouse=a"'
+# Fortunately packadd does not give an error on pre-9.1 versions (before editorconfig was added to vim by default)
+alias vim='vim -n -i NONE "+set nobackup noswapfile encoding=utf8 mouse=a" +"packadd editorconfig"'
 
 # Use bash-completion (but show no errors if not found).
 # shellcheck disable=SC1091
