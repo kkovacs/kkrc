@@ -1,32 +1,36 @@
-process .vimrc ~/.vimrc
-process .vim ~/.vim
-process .vim ~/.config/nvim
-process .zshrc ~/.zshrc
-process .screenrc ~/.screenrc
-process .bashrc ~/.bashrc
-process .hgrc ~/.hgrc
-process .tmux.conf ~/.tmux.conf
-process .gitconfig ~/.gitconfig
-process .Xmodmap ~/.Xmodmap
-process .tigrc ~/.tigrc
-process .psqlrc ~/.psqlrc
-process .inputrc ~/.inputrc
-process .i3 ~/.i3
-process .ansible.cfg ~/.ansible.cfg
+# Ensure .config directory for nvim
+mkdir -p ~/.config
+
+# Softlink all the files
+mysoftlink .vimrc ~/.vimrc
+mysoftlink .vim ~/.vim
+mysoftlink .vim ~/.config/nvim
+mysoftlink .zshrc ~/.zshrc
+mysoftlink .screenrc ~/.screenrc
+mysoftlink .bashrc ~/.bashrc
+mysoftlink .hgrc ~/.hgrc
+mysoftlink .tmux.conf ~/.tmux.conf
+mysoftlink .gitconfig ~/.gitconfig
+mysoftlink .Xmodmap ~/.Xmodmap
+mysoftlink .tigrc ~/.tigrc
+mysoftlink .psqlrc ~/.psqlrc
+mysoftlink .inputrc ~/.inputrc
+mysoftlink .i3 ~/.i3
+mysoftlink .ansible.cfg ~/.ansible.cfg
 
 # Damn you Microsoft for not being able to keep everything in one place
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	# For system-level install
 	mkdir -p "$HOME/.config/Code/User/"
-	process other/settings.json $HOME/.config/Code/User/settings.json
-	process other/keybindings.json $HOME/.config/Code/User/keybindings.json
+	mysoftlink other/settings.json $HOME/.config/Code/User/settings.json
+	mysoftlink other/keybindings.json $HOME/.config/Code/User/keybindings.json
 elif [[ "$OSTYPE" == "darwin"* ]]; then
 	# For system-level install
 	mkdir -p "$HOME/Library/Application Support/Code/User/"
-	process other/settings.json "$HOME/Library/Application Support/Code/User/settings.json"
-	process other/keybindings.json "$HOME/Library/Application Support/Code/User/keybindings.json"
+	mysoftlink other/settings.json "$HOME/Library/Application Support/Code/User/settings.json"
+	mysoftlink other/keybindings.json "$HOME/Library/Application Support/Code/User/keybindings.json"
 	# For portable (which I prefer)
 	mkdir -p "$HOME/Applications/code-portable-data/User/"
-	process other/settings.json "$HOME/Applications/code-portable-data/User/settings.json"
-	process other/keybindings.json "$HOME/Applications/code-portable-data/User/keybindings.json"
+	mysoftlink other/settings.json "$HOME/Applications/code-portable-data/User/settings.json"
+	mysoftlink other/keybindings.json "$HOME/Applications/code-portable-data/User/keybindings.json"
 fi
