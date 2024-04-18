@@ -6,7 +6,7 @@ kkrcdir="$(dirname "$0")"
 cd "$kkrcdir" || exit 1
 
 # Installs the softlinks in place.
-process() {
+mysoftlink() {
         local file="$1"
         local softlink="$2"
 
