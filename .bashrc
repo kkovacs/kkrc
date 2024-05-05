@@ -184,6 +184,8 @@ alias K="kubectl get all --output=wide"
 alias KA="kubectl get all --output=wide --all-namespaces"
 # Kubernetes nodes (not included in "all")
 alias KN="kubectl get nodes --output=wide"
+# Firefox private window
+alias ff="firefox --new-instance --private-window &"
 # LVM
 alias lv="pvs; echo; vgs; echo; lvs -o lv_name,pool_lv,size,data_percent,metadata_percent,origin"
 # lsblk
