@@ -109,7 +109,7 @@ alias la="ls -lrtA -I*" # For Linux. Hidden files ONLY.
 #alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
 # A version of ls that is still quick to type, BUT uses "less" automatically BUT exits it immediately if text is not long enough.
 # NOTE: use this in the "function ..." form, because if there is an ll alias, that causes an error (even if we unalias in the previos lik
-unalias ll 2>/dev/null # Many systems has an ll alias, this is NOT temporary
+unalias ll 2>/dev/null # Many systems has an ll alias, THIS IS NOT TEMPORARY
 # No, we WANT to use ls, so:
 # shellcheck disable=2012
 function ll() { ls -lrtA --color "$@" | less -FXRn +G ; }
@@ -130,10 +130,12 @@ alias gs="git status -sb"
 alias gf="git fetch --all -v"
 alias gp="git pull --ff-only -v"
 alias gclean="git reset --hard && git clean -f -d -x"
+
 # Recursive git
 function G { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
 # Recursive git status. This is to quickly find uncommitted changes, not a detailed view
 function GS { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "$a"; tput rmso; if ! command git -C "$a" diff-index --quiet --ignore-submodules HEAD --; then if [ "$#" -lt 3 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; fi ; done ; }
+
 # Show .gitignore-d files, all of them
 alias gii="git ls-files --exclude-standard --ignored --others"
 # Show .gitignore-d files except vendor and node_modules, because that's TMI
@@ -145,11 +147,14 @@ function gr { command grep --color=auto -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null
 function ggr { command grep --color=force -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXnr ; }
 # Better git grep
 function gg { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
-# screen with ssh auth sock name transfer, to be used with `CTRL+A` `:paste s`
+
+# GNU screen with SSH_AUTH_SOCK filename transfer, to be used with `CTRL+A` `:paste s`, tmux-bound to <c-q><c-r>a
+# You can append a PID if there are multiple screen-s.
+unalias s 2>/dev/null # XXX Tempotarily, while I have running sessions having the alias
 # We WANT this to expand when defined, so:
 # shellcheck disable=SC2139
-alias s="screen -X register s \" export SSH_AUTH_SOCK=\\\"$SSH_AUTH_SOCK\\\"\" ; screen -xR"
-#alias s="screen -xR"
+function s() { screen ${1:+-S} $1 -X register s " export SSH_AUTH_SOCK=\"$SSH_AUTH_SOCK\"" ; screen -xR "$1" ; }
+
 # Watch out for using git as a different user than the repository. Avoid mandatory reconfiguration of git with user/email for hotfixes.
 function git { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " grep log blame diff show status init clone " == *" $1 "* ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
