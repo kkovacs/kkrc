@@ -53,6 +53,7 @@ HISTTIMEFORMAT="%F %T "
 # fully set up.
 #
 # Colored prompt. Displays user@host, current dir, and job count. Same as KKRC's zsh prompt with RPROMPT turned off. Root detection only on setup.
+# NOTE: If you want a different colored hostname somewhere, copy this line to .bashrc.local, and change the "32m" part to, say "34m".
 PS1='\[\033[00;'$([[ "$UID" -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@\[\033[00;32m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\$ '
 # Or, if ANSI is problematic:
 #PS1="\u@\h \w [\j]\$ "
