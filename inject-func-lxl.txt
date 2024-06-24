@@ -1,2 +1,0 @@
- alias lxl='lxc list -c ns46tSbNm,image.release,volatile.lxdbr0.hwaddr:lxdbr0,volatile.eth0.hwaddr:eth0'
-lxl

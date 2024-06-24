@@ -165,6 +165,8 @@ D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none\|^overlay\|^shm' ; }
 F() { free -h ; }
 # Process list overview (for Linux)
 alias P="ps axfwwo pid,user,start,rss,stat,cmd | less -SXRn"
+# lxd/lxc list conatiners
+alias lxl='lxc list -c ns46tSbNm,image.release,volatile.lxdbr0.hwaddr:lxdbr0,volatile.eth0.hwaddr:eth0'
 # If can't use docker as current user, try sudo
 # We define a shell command, but we don't mind that sudo will not use it, so:
 # shellcheck disable=SC2033,SC2032
