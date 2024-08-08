@@ -1,0 +1,16 @@
+# Helper function for downloads that include CPU type in the file name.
+# Usage: whichcpu <text-for-i686> <text-for-arm64> (to be continued)
+function whichcpu {
+    local M="$(uname -m)"
+    case "$M" in
+        "x86_64")
+            echo "${1:-$M}"
+            ;;
+        "aarch64" | "arm64")
+            echo "${2:-$M}"
+            ;;
+        *)
+            echo "$M"
+            ;;
+esac
+}
