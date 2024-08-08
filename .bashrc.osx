@@ -49,7 +49,7 @@ function vm()
 			# Sorry for identation, it's necessary because of the HEREDOC
 			eval "cat <<EOF
 $(<~/.kkrc/other/cloud-config.multipass.yml)
-EOF" | multipass launch --cloud-init - -v -n "${name}" "$@" 24.04
+EOF" | multipass launch --disk 10G --memory 2G --cloud-init - -v -n "${name}" "$@" 24.04
 			# Check if mount was already set up or not
 			if multipass info "$name" | grep "Mounts: *--"; then
 				multipass stop "$name" # Stop/start needed for native mount
