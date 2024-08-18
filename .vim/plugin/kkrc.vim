@@ -263,3 +263,7 @@ highlight markdownH3 ctermfg=71 guifg=#5faf5f
 highlight markdownH4 ctermfg=63 guifg=#605df6
 highlight markdownH5 ctermfg=24 guifg=#255e87
 highlight markdownH6 ctermfg=23 guifg=#295f5e
+
+" Disable Copilot by default, because I don't want my everything uploaded.
+" Enable manualy with: ":Copilot enable"
+let g:copilot_enabled = v:false
