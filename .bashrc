@@ -168,7 +168,7 @@ alias P="ps axfwwo pid,user,start,rss,stat,cmd | less -SXRn"
 # lxd/lxc list conatiners
 alias lxl='lxc list -c ns46tSbNm,image.release'
 # lxd/lxc show port forwards XXX not pretty if no forwards
-function lxp { for ip in "$(lxc network forward list lxdbr0 -f csv | awk -F, -e '{ print $1 }')"; do lxc network forward show lxdbr0 "$ip"; done ; }
+function lxp { for ip in $(lxc network forward list lxdbr0 -f csv | awk -F, -e '{ print $1 }'); do lxc network forward show lxdbr0 "$ip"; done ; }
 # With MAC addresses:
 #alias lxl='lxc list -c ns46tSbNm,image.release,volatile.lxdbr0.hwaddr:lxdbr0,volatile.eth0.hwaddr:eth0'
 # If can't use docker as current user, try sudo
