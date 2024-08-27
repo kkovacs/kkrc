@@ -201,7 +201,13 @@ if has("gui_running")
 		set guifont=Monaco:h11
 	elseif has("gui_gtk")
 	elseif has("gui_win32")
+		" Font available since Vista
 		set guifont=Consolas:h11
+		" Terminal-like paste of system clipboard
+		imap <c-a-v> <c-r>+
+		nmap <c-a-v> "+p
+		" Start maximized
+		autocmd GUIEnter * simalt ~x
 	endif
 endif
 
