@@ -66,6 +66,8 @@ PS1='\[\033[00;'$([[ "$UID" -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@
 # "bell" before prompt. Separated from PS1 so it's easier to turn off when needed,
 # and at least clears any erroneous local PROMPT_COMMAND.
 export PROMPT_COMMAND="printf '\a'"
+# Better "set -x" prompt
+export PS4=$'+\tLine $LINENO at $(date -Isecond): '
 
 # Set up some necessary environment variables
 export EDITOR=vim
