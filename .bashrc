@@ -186,6 +186,7 @@ complete -F _docker_compose dc
 alias dc1="dc up -d; dcs"
 alias dc0="dc down"
 alias dcs="dc ps -a"
+alias dci="dc images; echo; docker images"
 # List docker and docker-compose images
 alias I="docker images"
 # Docker Swarm
