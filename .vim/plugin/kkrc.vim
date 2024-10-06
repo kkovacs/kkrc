@@ -79,10 +79,17 @@ map <silent> <s-c-tab> :tabprevious<cr>
 " My little calculator
 map <leader>= viW"zyA = <esc>"=<c-r>z<cr>p
 
-" cd into current file's diectory for this buffer only (!)
+" cd into current file's directory for this buffer only (!)
 map <leader>c :lchdir <c-r>=expand('%:p:h')<cr><cr>
-" cd into current file's diectory globally
+" cd into current file's directory globally
 map <leader>C :chdir <c-r>=expand('%:p:h')<cr><cr>
+
+" Copilot status
+map <leader>g :Copilot status<cr>
+" Enable Copilot
+map <leader>G :Copilot enable<cr>
+" Disable Copilot
+map <leader><c-g> :Copilot disable<cr>
 
 " Turn on "list" display
 map <silent> <leader>l :setlocal list<cr>
