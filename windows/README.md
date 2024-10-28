@@ -17,6 +17,18 @@ This registry file only replaces Caps Lock with Right Ctrl.
 This registry file makes Windows Explorer open the "Downloads" folder instead
 of whatever when a new window is opened.
 
+# winget.bat
+
+Install mandatory (for me) software from winget.
+
+To download the latest winget installer itself: <https://aka.ms/getwinget>
+
+Powershell:
+
+```powershell
+Add-AppxPackage https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+```
+
 # apple-like-us-abc-extended-keyboard.klc
 
 NOTE: I usually use PowerToys "remap keys" instead of this, since that doesn't
