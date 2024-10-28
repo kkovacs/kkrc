@@ -17,3 +17,8 @@ winget.exe install Git.Git --scope user
 winget.exe install DuckDB.cli --scope user
 winget.exe install DuckDuckGo.DesktopBrowser --scope user
 winget.exe install MullvadVPN.MullvadBrowser --scope user
+
+REM Install OpenSSH - special case
+winget.exe install Microsoft.OpenSSH.Beta
+REM Stop and disable OpenSSH server
+powershell.exe -Command "& {Stop-Service 'sshd' ; Set-Service -StartupType Disabled 'sshd'}"
