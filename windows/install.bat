@@ -5,24 +5,24 @@ IF %ERRORLEVEL% NEQ 0 powershell.exe -Command "& {Add-AppxPackage https://github
 REM Update winget packages information
 winget.exe update
 
-REM Install stuff that requires administrator
+REM Install software that requires administrator
 winget.exe install Microsoft.WindowsTerminal
 winget.exe install vim.vim
 winget.exe install Neovim.Neovim
 winget.exe install Git.Git
 
-REM Install stuff that can be installed on the user-level
-winget.exe install Microsoft.PowerToys --scope user
-winget.exe install Microsoft.VisualStudioCode --scope user
-winget.exe install DuckDB.cli --scope user
-winget.exe install DuckDuckGo.DesktopBrowser --scope user
-winget.exe install MullvadVPN.MullvadBrowser --scope user
+REM Install software that can be installed on the user-level
+winget.exe install --scope user Microsoft.PowerToys
+winget.exe install --scope user Microsoft.VisualStudioCode
+winget.exe install --scope user DuckDB.cli
+winget.exe install --scope user DuckDuckGo.DesktopBrowser
+winget.exe install --scope user MullvadVPN.MullvadBrowser
 
 REM Install OpenSSH - special case
 winget.exe install Microsoft.OpenSSH.Beta
-REM Stop and disable OpenSSH server
+REM Stop and disable the installed OpenSSH server, we only need the agent
 powershell.exe -Command "& {Start-Process powershell -Verb runAs -ArgumentList ('& {Stop-Service sshd ; Set-Service -StartupType Disabled sshd}') }"
 
 REM Import registry entries
-regedt32.exe /S Open_File_Explorer_to_Downloads.reg
 regedt32.exe /S scancodemap-ultimate.reg
+regedt32.exe /S Open_File_Explorer_to_Downloads.reg

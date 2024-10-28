@@ -1,4 +1,4 @@
-REM V1 is not running in a real VM, but is apparently problematic.
+REM V1 is not running in a real VM, but is less problematic.
 wsl.exe --set-default-version 1
 REM Install the default Ubuntu
 wsl.exe --install
