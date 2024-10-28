@@ -1,13 +1,16 @@
-# Install winget in case it's missing
-powershell.exe -Command "& {Add-AppxPackage https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle}"
+REM Install winget in case it's missing
+WHERE winget.exe
+IF %ERRORLEVEL% NEQ 0 powershell.exe -Command "& {Add-AppxPackage https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle}"
 
-# Install stuff that requires administrator
+REM Update information
 winget.exe update
+
+REM Install stuff that requires administrator
 winget.exe install Microsoft.WindowsTerminal
 winget.exe install vim.vim
 winget.exe install Neovim.Neovim
 
-# Install stuff that can be installed on the user-level
+REM Install stuff that can be installed on the user-level
 winget.exe install Microsoft.PowerToys --scope user
 winget.exe install Microsoft.VisualStudioCode --scope user
 winget.exe install Git.Git --scope user
