@@ -21,4 +21,4 @@ winget.exe install MullvadVPN.MullvadBrowser --scope user
 REM Install OpenSSH - special case
 winget.exe install Microsoft.OpenSSH.Beta
 REM Stop and disable OpenSSH server
-powershell.exe -Command "& {Start-Process powershell -Verb runAs -ArgumentList ('& {Stop-Service \'sshd\' ; Set-Service -StartupType Disabled \'sshd\'}') }"
+powershell.exe -Command "& {Start-Process powershell -Verb runAs -ArgumentList ('& {Stop-Service sshd ; Set-Service -StartupType Disabled sshd}') }"
