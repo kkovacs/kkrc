@@ -2,7 +2,7 @@ REM Install winget in case it's missing
 WHERE winget.exe
 IF %ERRORLEVEL% NEQ 0 powershell.exe -Command "& {Add-AppxPackage https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle}"
 
-REM Update information
+REM Update winget packages information
 winget.exe update
 
 REM Install stuff that requires administrator
@@ -22,3 +22,7 @@ REM Install OpenSSH - special case
 winget.exe install Microsoft.OpenSSH.Beta
 REM Stop and disable OpenSSH server
 powershell.exe -Command "& {Start-Process powershell -Verb runAs -ArgumentList ('& {Stop-Service sshd ; Set-Service -StartupType Disabled sshd}') }"
+
+REM Import registry entries
+regedt32.exe /S Open_File_Explorer_to_Downloads.reg
+regedt32.exe /S scancodemap-ultimate.reg
