@@ -15,7 +15,7 @@ Add-AppxPackage https://github.com/microsoft/winget-cli/releases/latest/download
 Scancode map that does:
 
 - Sets Caps Lock to Right Ctrl.
-- Sets Left Win to Left Alt.
+- Sets Left Win to Right Alt.
 - Sets Menu to Left Win. (In case there is no Right Win button and we still need the functionality.)
 
 More info: <https://github.com/Lamer87/Keyboard_ScanCodes_for_remapping>

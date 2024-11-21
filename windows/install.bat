@@ -11,6 +11,7 @@ winget.exe install vim.vim
 winget.exe install Neovim.Neovim
 winget.exe install Git.Git
 winget.exe install MullvadVPN.MullvadBrowser
+winget.exe install WinScp.WinScp
 
 REM Install software that can be installed on the user-level
 winget.exe install --scope user Microsoft.PowerToys
