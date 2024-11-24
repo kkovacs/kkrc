@@ -1,6 +1,6 @@
 REM Install winget in case it's missing
 WHERE winget.exe
-IF %ERRORLEVEL% NEQ 0 powershell.exe -Command "& {Add-AppxPackage https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle}"
+IF %ERRORLEVEL% NEQ 0 powershell.exe -Command "& {Add-AppxPackage https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle -DependencyPath https://github.com/microsoft/microsoft-ui-xaml/releases/download/v2.8.6/Microsoft.UI.Xaml.2.8.x64.appx}"
 
 REM Update winget packages information
 winget.exe update
