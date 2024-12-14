@@ -27,3 +27,24 @@
 	followTags = true
 [init]
 	defaultBranch = main
+
+[gpg]
+	format = ssh
+
+# Enable these to sign commits with your SSH key for GitHub.
+# edit the  name/email pairs, then use:
+#     git rebase -i HEAD~n
+# where n is the number of commits to re-sign, and then keep repeating:
+#     git commit --amend -S
+#     git rebase --continue
+#
+#[user]
+#	name = user
+#	email = user@example.com
+#
+#[committer]
+#	name = user
+#	email = user@example.com
+#
+#[commit]
+#	gpgsign = true
