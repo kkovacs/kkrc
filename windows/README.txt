@@ -1,10 +1,13 @@
-# winget.bat
+# install.bat
 
 Install mandatory (for me) software from winget.
 
-To download the latest winget installer itself: https://aka.ms/getwinget
+Often it's better to download the latest winget installer manually before
+running `install.bat`: https://aka.ms/getwinget
 
-Or from Powershell (but this requires other DLLs to install separately):
+Not recommended, but from Powershell (this requires other DLLs to install
+separately -- because on Windows apparently you need to install a UI library for
+your command line tool...):
 
 ```powershell
 Add-AppxPackage https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
