@@ -3,6 +3,12 @@
 # Change to own dir
 cd "$(dirname "$0")" || exit 1
 
+# Asked to configure the OS too?
+if [[ "$1" == "--os" ]]; then
+	# Run script. (We are already in the right directory.)
+	./os-setup.sh
+fi
+
 # .bashrc is a special case, since it usually exists. If it's not ours,
 # rename it to .bashrc.orig
 printf "Installing .bashrc: "
