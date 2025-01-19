@@ -1,20 +1,26 @@
-" Encrypt and decrypt "*.age" files with "age" (https://github.com/FiloSottile/age)
+" age.vim - Automatically encrypt and decrypt "*.age" files with "age".
+" Maintainer: Kristof Kovacs <kkovacs@kkovacs.eu>
+" URL: https://github.com/kkovacs/kkrc/blob/master/.vim/plugin/age.vim
+" License: MIT
+" Reference: https://age-encryption.org
 "
-" Uses the ~/.ssh/age.key file as identity if found, or password encryption otherwise.
+" If ~/.ssh/age.key exists, it is used as identity, else simple password
+" encryption is used.
 "
-" The recommended way is to use a PASSWORDED KEY, to eliminate the risk of
-" accidentally re-encrypting files with a mistyped password.
+" The recommended way is to use a PASSWORDED KEY (to eliminate the risk of
+" accidentally re-encrypting files with a mistyped password).
 "
-" Generate your own passworded age key with:
-" age-keygen | age -p -o age.key
+" To generate your own passworded age-key:
 "
-" One way to get password-store-like files is to use a ".md.age" extension,
-" because then you have VIM folding.
+"     age-keygen | age -p -o ~/.ssh/age.key && chmod 600 ~/.ssh/age.key
 "
-" This script is vaguely based on (= ideas stolen from):
-" openssl.vim by Daniel Perelman and Noah Spurrier (https://github.com/dperelman/openssl.vim)
-" vim-encpipe by Łukasz Jan Niemier (https://github.com/hauleth/vim-encpipe/)
-" vim-gnupg by James McCoy (https://github.com/jamessan/vim-gnupg)
+" For somewhat password-store-like functionality, use a ".md.age" extension,
+" so you get VIM folding.
+"
+" CREDITS: This script is vaguely based on (alphabetic order):
+" - openssl.vim by Daniel Perelman and Noah Spurrier (https://github.com/dperelman/openssl.vim)
+" - vim-encpipe by Łukasz Jan Niemier (https://github.com/hauleth/vim-encpipe/)
+" - vim-gnupg by James McCoy (https://github.com/jamessan/vim-gnupg)
 
 " Prevent double loading of script
 augroup age_encrypted
