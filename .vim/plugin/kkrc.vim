@@ -84,13 +84,6 @@ map <leader>c :lchdir <c-r>=expand('%:p:h')<cr><cr>
 " cd into current file's directory globally
 map <leader>C :chdir <c-r>=expand('%:p:h')<cr><cr>
 
-" Copilot status
-map <leader>g :Copilot status<cr>
-" Enable Copilot
-map <leader>G :Copilot enable<cr>
-" Disable Copilot
-map <leader><c-g> :Copilot disable<cr>
-
 " Turn on "list" display
 map <silent> <leader>l :setlocal list<cr>
 " Turn off list display
@@ -278,6 +271,33 @@ highlight markdownH4 ctermfg=63 guifg=#605df6
 highlight markdownH5 ctermfg=24 guifg=#255e87
 highlight markdownH6 ctermfg=23 guifg=#295f5e
 
-" Disable Copilot by default, because I don't want my everything uploaded.
-" Enable manualy with: ":Copilot enable"
+" *** AI: Github Copilot ***
+" https://github.com/github/copilot.vim
+"
+" Disable by default, because I don't want my everything uploaded. Enable with: ":Copilot enable"
 let g:copilot_enabled = v:false
+" Status
+map <leader>g :Copilot status<cr>
+" Enable
+map <leader>G :Copilot enable<cr>
+" Disable
+map <leader><c-g> :Copilot disable<cr>
+
+" *** AI: vim-ollama ***
+" https://github.com/gergap/vim-ollama
+"
+" Disable by default
+let g:ollama_enabled = 0
+" Toggle (no status unfortunately)
+map <leader>o :Ollama toggle<cr>
+" Enable
+map <leader>O :Ollama enable<cr>
+" Disable
+map <leader><c-o> :Ollama disable<cr>
+" Ollama URI (default is localhost)
+"let g:ollama_host = "http://127.0.0.1:11434"
+" Coder model to use
+let g:ollama_model = 'qwen2.5-coder:7b'
+" Chat model to be the same (we probably chat about code anyway, don't we?)
+let g:ollama_chat_model = g:ollama_model
+
