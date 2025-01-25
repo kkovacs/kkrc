@@ -276,28 +276,30 @@ highlight markdownH6 ctermfg=23 guifg=#295f5e
 "
 " Disable by default, because I don't want my everything uploaded. Enable with: ":Copilot enable"
 let g:copilot_enabled = v:false
-" Status
-map <leader>g :Copilot status<cr>
 " Enable
-map <leader>G :Copilot enable<cr>
+map <leader>g :Copilot enable<cr>
 " Disable
-map <leader><c-g> :Copilot disable<cr>
+map <leader>G :Copilot disable<cr>
+" Status
+map <leader><c-g> :Copilot status<cr>
 
 " *** AI: vim-ollama ***
 " https://github.com/gergap/vim-ollama
 "
+" sudo apt install -y python3-httpx && git clone https://github.com/gergap/vim-ollama.git ~/.vim/pack/kkrc/start/vim-ollama
+"
 " Disable by default
 let g:ollama_enabled = 0
-" Toggle (no status unfortunately)
-map <leader>o :Ollama toggle<cr>
-" Enable
-map <leader>O :Ollama enable<cr>
-" Disable
-map <leader><c-o> :Ollama disable<cr>
-" Ollama URI (default is localhost)
-"let g:ollama_host = "http://127.0.0.1:11434"
+" Ollama URI
+"let g:ollama_host = 'http://localhost:11434'
 " Coder model to use
 let g:ollama_model = 'qwen2.5-coder:7b'
 " Chat model to be the same (we probably chat about code anyway, don't we?)
 let g:ollama_chat_model = g:ollama_model
+" Enable
+map <leader>o :Ollama enable<cr>
+" Disable
+map <leader>O :Ollama disable<cr>
+" Toggle (no status unfortunately)
+map <leader><c-o> :Ollama toggle<cr>
 
