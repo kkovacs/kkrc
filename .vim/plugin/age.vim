@@ -52,6 +52,7 @@ function! s:AgeReadPre()
     setl viminfo=
     setl clipboard=
     setl noswapfile
+    setl nobackup
     setl noundofile
     setl noshelltemp
     setl shell=/bin/sh
