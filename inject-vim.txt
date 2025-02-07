@@ -76,4 +76,14 @@
 :highlight markdownH4 ctermfg=63 guifg=#605df6
 :highlight markdownH5 ctermfg=24 guifg=#255e87
 :highlight markdownH6 ctermfg=23 guifg=#295f5e
+:let g:copilot_enabled = v:false
+:map <leader>g :Copilot enable<cr>
+:map <leader>G :Copilot disable<cr>
+:map <leader><c-g> :Copilot status<cr>
+:let g:ollama_enabled = 0
+:let g:ollama_model = 'qwen2.5-coder:7b'
+:let g:ollama_chat_model = g:ollama_model
+:map <leader>o :Ollama enable<cr>
+:map <leader>O :Ollama disable<cr>
+:map <leader><c-o> :Ollama toggle<cr>
 :echo "vim ok"
