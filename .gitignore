@@ -1,6 +1,9 @@
 # I use on some machines, but but don't want to auto-install it to avoid bloat
 /.vim/pack/kkrc/start/vim-gnupg
 
+# Ignore sensitive files
+/.vim/ai-token
+
 # Stuff
 /.vim/.netrwhist
 /.vim/spell/
