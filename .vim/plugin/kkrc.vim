@@ -303,3 +303,10 @@ map <leader>O :Ollama disable<cr>
 " Toggle (no status unfortunately)
 map <leader><c-o> :Ollama toggle<cr>
 
+" *** AI: vim-ai ***
+" https://github.com/gergap/vim-ollama
+"
+"  git clone https://github.com/madox2/vim-ai.git ~/.vim/pack/kkrc/start/vim-ai
+"
+" Config file
+let g:vim_ai_roles_config_file = '~/.kkrc/.vim/vim-ai-roles.ini'"
