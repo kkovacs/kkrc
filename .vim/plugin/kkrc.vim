@@ -309,4 +309,4 @@ map <leader><c-o> :Ollama toggle<cr>
 "  git clone https://github.com/madox2/vim-ai.git ~/.vim/pack/kkrc/start/vim-ai
 "
 " Config file
-let g:vim_ai_roles_config_file = '~/.kkrc/.vim/vim-ai-roles.ini'"
+let g:vim_ai_roles_config_file = '~/.kkrc/.vim/ai-roles.ini'"
