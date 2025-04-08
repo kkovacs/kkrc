@@ -189,7 +189,7 @@ alias dcs="dc ps -a"
 alias dci="dc images; echo; docker images"
 alias dcl="dc logs -f"
 # ZFS utilities
-alias zdu="zfs list -t all -o space"
+alias zl="zfs list -t all -o space"
 # List docker and docker-compose images
 alias I="docker images"
 # Docker Swarm
