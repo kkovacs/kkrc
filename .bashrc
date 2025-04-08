@@ -188,8 +188,6 @@ alias dc0="dc down"
 alias dcs="dc ps -a"
 alias dci="dc images; echo; docker images"
 alias dcl="dc logs -f"
-# ZFS utilities
-alias zl="zfs list -t all -o space"
 # List docker and docker-compose images
 alias I="docker images"
 # Docker Swarm
@@ -200,12 +198,16 @@ alias K="kubectl get all --output=wide"
 alias KA="kubectl get all --output=wide --all-namespaces"
 # Kubernetes nodes (not included in "all")
 alias KN="kubectl get nodes --output=wide"
+# The missing pip upgrade
+alias pipupgrade="pip install --upgrade \$(pip freeze | awk -F'[==]' '{print \$1}')"
 # Firefox private window
 alias ff="firefox --new-instance --private-window &"
-# LVM
-alias lv="pvs; echo; vgs; echo; lvs -o lv_name,pool_lv,size,data_percent,metadata_percent,origin"
-# lsblk
+# lsblk tree
 alias lb="lsblk -Mf"
+# LVM "du"
+alias lvl="pvs; echo; vgs; echo; lvs -o lv_name,pool_lv,size,data_percent,metadata_percent,origin"
+# ZFS "du"
+alias zl="zfs list -t all -o space"
 # Replicate zsh's "vared" command (with autocompletion)
 function vared { read -r -e -p "$1=" -i "${!1}" "$1" ; }
 complete -v vared
