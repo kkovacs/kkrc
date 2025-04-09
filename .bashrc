@@ -397,8 +397,10 @@ if [ -n "$VIM_TERMINAL" ]; then
 	export -f vim
 fi
 
-# Display screens if any
-screen -ls | grep -v "Socket"
+# Display screens if any, and we're not already running under GNU screen.
+if [ ! -n "$STY" ]; then
+	screen -ls | grep -v "Socket"
+fi
 
 # Turn CAPS LOCK into CTRL on Linux.
 #setxkbmap -option ctrl:nocaps
