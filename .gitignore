@@ -126,3 +126,4 @@ tags
 #_testmain.go
 #*.test
 #*.prof
+.aider*
