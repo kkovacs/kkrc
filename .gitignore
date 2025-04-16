@@ -128,4 +128,6 @@ tags
 #*.prof
 
 # Aider-related
-#.aider*
+.aider.chat.history.md
+.aider.input.history
+.aider.tags.cache.*/
