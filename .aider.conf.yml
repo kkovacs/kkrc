@@ -1,12 +1,13 @@
 # Models based on https://aider.chat/docs/leaderboards/ at 2025-04-15
 alias:
+  - "free:openrouter/mistralai/mistral-7b-instruct:free" # the only free that actually works
   - "gemini:openrouter/google/gemini-2.5-pro-preview-03-25" # best
   - "deepseek:openrouter/deepseek/deepseek-chat-v3-0324" # cheap
   #- "cl:openrouter/anthropic/claude-3.7-sonnet"
   #- "o3:openrouter/openai/o3-mini-high"
 
 # Default model (possibly alias):
-model: gemini
+model: free
 
 # Other global life quality settings:
 vim: true
@@ -18,4 +19,4 @@ analytics-disable: true
 api-key:
   - openrouter=XXX
 
-# Local:
+# Local config:
