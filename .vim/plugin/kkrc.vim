@@ -286,22 +286,14 @@ map <leader><c-g> :Copilot status<cr>
 " *** AI: vim-ollama ***
 " https://github.com/gergap/vim-ollama
 "
-" sudo apt install -y python3-httpx && git clone https://github.com/gergap/vim-ollama.git ~/.vim/pack/kkrc/start/vim-ollama
-"
 " Disable by default
 let g:ollama_enabled = 0
-" Ollama URI
-"let g:ollama_host = 'http://localhost:11434'
-" Coder model to use
-let g:ollama_model = 'qwen2.5-coder:7b'
-" Chat model to be the same (we probably chat about code anyway, don't we?)
-let g:ollama_chat_model = g:ollama_model
 " Enable
 map <leader>o :Ollama enable<cr>
 " Disable
 map <leader>O :Ollama disable<cr>
-" Toggle (no status unfortunately)
-map <leader><c-o> :Ollama toggle<cr>
+" Status
+map <leader><c-o> :Ollama config<cr>
 
 " *** AI: vim-ai ***
 " https://github.com/gergap/vim-ollama
