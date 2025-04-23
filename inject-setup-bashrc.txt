@@ -1,6 +1,6 @@
- cp ~/.bashrc ~/.bashrc."$(date +%Y%m%d)"
+ [ ! -e ~/.bashrc."$(date +%Y%m%d)" ] && cp ~/.bashrc ~/.bashrc."$(date +%Y%m%d)"
  _lineinfile 'HISTSIZE=' 'HISTSIZE=' ~/.bashrc
  _lineinfile 'HISTFILESIZE=' 'HISTFILESIZE=10000' ~/.bashrc
  _lineinfile 'HISTTIMEFORMAT=' 'HISTTIMEFORMAT="%F %T "' ~/.bashrc
- _lineinfile 'function git' 'function git { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " config grep log blame diff show status init clone " =~ " $1 " ]]; then command git "$@"; else echo "Please use the unix user that owns .git"; return 1; fi } # Prevent messing up git repos with different unix user (often root)' ~/.bashrc
+ _lineinfile 'function git' 'function git { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " config grep log blame diff show status init clone " =~ " $1 " ]]; then command git "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }' ~/.bashrc
  diff  ~/.bashrc."$(date +%Y%m%d)" ~/.bashrc
