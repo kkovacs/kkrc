@@ -1,10 +1,11 @@
 # Models based on https://aider.chat/docs/leaderboards/ at 2025-04-15
 alias:
   - "free:openrouter/mistralai/mistral-7b-instruct:free" # the only free that actually works
-  - "gemini:openrouter/google/gemini-2.5-pro-preview-03-25" # best
-  - "deepseek:openrouter/deepseek/deepseek-chat-v3-0324" # cheap
-  #- "cl:openrouter/anthropic/claude-3.7-sonnet"
-  #- "o3:openrouter/openai/o3-mini-high"
+  - "ds:openrouter/deepseek/deepseek-chat-v3-0324" # $1.5
+  - "o3m:openrouter/openai/o3-mini-high" # $4.40
+  - "o4m:openrouter/openai/o4-mini-high" # $4.40
+  - "gi:openrouter/google/gemini-2.5-pro-preview-03-25" # $10-15
+  - "cl:openrouter/anthropic/claude-3.7-sonnet" # $15
 
 # Default model (possibly alias):
 model: free
