@@ -12,6 +12,7 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 function vm()
 {
 	local name dir
+	# Subcommands
 	case "$1" in
 		"ls" | "list" | "")
 			multipass list
@@ -52,9 +53,16 @@ $(<~/.kkrc/other/cloud-config.multipass.yml)
 EOF" | multipass launch --disk 10G --memory 2G --cloud-init - -v -n "${name}" "$@" 24.04
 			# Check if mount was already set up or not
 			if multipass info "$name" | grep "Mounts: *--"; then
-				multipass stop "$name" # Stop/start needed for native mount
-				multipass mount --type native "$dir" "$name:/persist"
-				multipass start "$name" # Stop/start needed for native mount
+				# Native mount
+				# Allow privileged mounts
+				# XXX Not enough to prevent "Operation not permitted" :(
+				#multipass set local.privileged-mounts=Yes
+				# XXX not working at the moment, "failed to open ... Operation not permitted"
+				#multipass stop "$name" # Stop/start needed for native mount
+				#multipass mount --type native "$dir" "$name:/persist"
+				#multipass start "$name" # Stop/start needed for native mount
+				# Non-native mount (significantly slower)
+				multipass mount "$dir" "$name:/persist"
 			fi
 			tmux rename-window "${name}"
 			#multipass shell "${name}"
