@@ -207,7 +207,7 @@ alias lb="lsblk -Mf"
 # LVM "du"
 alias lvl="pvs; echo; vgs; echo; lvs -o lv_name,pool_lv,size,data_percent,metadata_percent,origin"
 # ZFS "du"
-alias zl="zfs list -t all -o space"
+alias zl="zfs list -t all -o space,compressratio"
 # Replicate zsh's "vared" command (with autocompletion)
 function vared { read -r -e -p "$1=" -i "${!1}" "$1" ; }
 complete -v vared
