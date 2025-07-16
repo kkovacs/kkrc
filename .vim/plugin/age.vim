@@ -105,6 +105,7 @@ function! s:AgeWritePre()
         setl shellredir&
         setl shell&
         setl cmdheight&
+        unlet b:line_before_save
         redraw!
         " Display error
         throw "Encryption error!"
@@ -120,6 +121,7 @@ function! s:AgeWritePost()
     setl cmdheight&
     " Jump back to saved line number
     call setpos('.', b:line_before_save)
+    unlet b:line_before_save
     redraw!
 endfunction
 
