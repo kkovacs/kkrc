@@ -88,6 +88,8 @@ function! s:AgeReadPost()
 endfunction
 
 function! s:AgeWritePre()
+    " Save current line number to jump back to after encryption
+    let b:line_before_save = getcurpos()
     setl cmdheight=3
     setl shell=/bin/sh
     setl bin
@@ -116,6 +118,8 @@ function! s:AgeWritePost()
     setl shellredir&
     setl shell&
     setl cmdheight&
+    " Jump back to saved line number
+    call setpos('.', b:line_before_save)
     redraw!
 endfunction
 
