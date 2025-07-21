@@ -29,5 +29,6 @@ analytics-disable: true
 # Configure API key(s) here:
 api-key:
   - openrouter=XXX
+  - gemini=XXX
 
 # Local config:
