@@ -5,17 +5,18 @@ alias:
   #- "free:openrouter/deepseek/deepseek-chat:free"
   # Non-free
   - "devstral:openrouter/mistralai/devstral-small" # USD 0.12
-  - "qwen:openrouter/qwen/qwen-2.5-coder-32b-instruct" # USD 0.15
   - "gemma:openrouter/google/gemma-3-27b-it" # USD 0.2
-  - "gemini:openrouter/google/gemini-2.0-flash-001" # USD 0.4
-  - "4o:openrouter/openai/gpt-4o-mini" # USD 0.6
-  - "llama4:openrouter/meta-llama/llama-4-maverick" # USD 0.6
+  - "qwen:openrouter/qwen/qwen-3-coder" # USD 0.3
+  - "gpt:openrouter/openai/gpt-4o-mini" # USD 0.6
+  - "llama:openrouter/meta-llama/llama-4-maverick" # USD 0.6
   - "deepseek:openrouter/deepseek/deepseek-chat-v3-0324" # USD 1.5
+  - "devstral-big:openrouter/mistralai/devstral-medium" # USD 2.0
+  - "gemini:openrouter/google/gemini-2.5-flash" # USD 2.5
   - "claude:openrouter/anthropic/claude-3.5-haiku" # USD 4
   - "o3:openrouter/openai/o3-mini-high" # USD 4.40
   - "o4:openrouter/openai/o4-mini-high" # USD 4.40
   - "gemini-big:openrouter/google/gemini-2.5-pro-preview" # USD 10-15
-  - "claude-big:openrouter/anthropic/claude-3.7-sonnet" # USD 15
+  - "claude-big:openrouter/anthropic/claude-sonnet-4" # USD 15
 
 # Default model (possibly alias):
 model: free
