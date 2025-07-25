@@ -6,7 +6,7 @@ alias:
   # Non-free
   - "devstral:openrouter/mistralai/devstral-small" # USD 0.12
   - "gemma:openrouter/google/gemma-3-27b-it" # USD 0.2
-  - "qwen:openrouter/qwen/qwen-3-coder" # USD 0.3
+  - "qwen:openrouter/qwen/qwen3-coder" # USD 0.3
   - "gpt:openrouter/openai/gpt-4o-mini" # USD 0.6
   - "llama:openrouter/meta-llama/llama-4-maverick" # USD 0.6
   - "deepseek:openrouter/deepseek/deepseek-chat-v3-0324" # USD 1.5
