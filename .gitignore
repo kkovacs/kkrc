@@ -2,7 +2,8 @@
 /.vim/pack/kkrc/start/vim-gnupg
 
 # Ignore sensitive files
-/.vim/ai-token*
+/.vim/ai-token.google
+/.vim/ai-token.openrouter
 
 # Stuff
 /.vim/.netrwhist
