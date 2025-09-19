@@ -302,3 +302,5 @@ map <leader><c-o> :Ollama config<cr>
 "
 " Config file
 let g:vim_ai_roles_config_file = '~/.kkrc/.vim/ai-models.ini'"
+" Chat with default model
+map <leader>a :AIC<cr>
