@@ -304,3 +304,5 @@ map <leader><c-o> :Ollama config<cr>
 let g:vim_ai_roles_config_file = '~/.kkrc/.vim/ai-models.ini'"
 " Chat with default model
 map <leader>a :AIC<cr>
+" Force stop chat (used to be ctrl-c, but was changed for some reason)
+map <leader>A :AIStopChat<cr>
