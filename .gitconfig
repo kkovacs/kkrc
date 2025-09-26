@@ -17,10 +17,11 @@
 	co = checkout
 	br = branch
 	d = diff
-        l = log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative
-        # Or, before 1.8.3 (Damn, CentOS, it's 2014!): l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-        ll = log --all --graph --decorate --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset %n' --abbrev-commit --date=relative
-        glog = log --all --graph --decorate --pretty=oneline --abbrev-commit
+	l = log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative
+	# Or, before 1.8.3 (Damn, CentOS, it's 2014!): l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+	ll = log --all --graph --decorate --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset %n' --abbrev-commit --date=relative
+	glog = log --all --graph --decorate --pretty=oneline --abbrev-commit
+	wdiff = difftool -t wdiff
 
 [push]
 	default = matching
@@ -31,12 +32,15 @@
 [gpg]
 	format = ssh
 
+[difftool "wdiff"]
+	cmd = wdiff -n "$LOCAL" "$REMOTE" | vim -c ':set ft=wdiff' -
+
 # Enable these to sign commits with your SSH key for GitHub.
 # edit the  name/email pairs, then use:
-#     git rebase -i HEAD~n
+#	git rebase -i HEAD~n
 # where n is the number of commits to re-sign, and then keep repeating:
-#     git commit --amend -S
-#     git rebase --continue
+#	git commit --amend -S
+#	git rebase --continue
 #
 #[user]
 #	name = user
