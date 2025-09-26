@@ -27,9 +27,9 @@ dark-mode: true
 watch-files: true
 analytics-disable: true
 
-# Configure API key(s) here:
-api-key:
-  - openrouter=XXX
-  - gemini=XXX
+# Configure API key(s) here, if not set in environment variables:
+#api-key:
+#  - openrouter=XXX
+#  - gemini=XXX
 
 # Local config:
