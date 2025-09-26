@@ -132,10 +132,8 @@ alias gf="git fetch --all -v"
 alias gp="git pull --ff-only -v"
 alias gclean="git reset --hard && git clean -f -d -x"
 
-# Helper alias for age-encryption given the main key ("my age")
-alias mage="age -i ~/.ssh/age.key"
 # Load age-encrypted environment variables (or run encrypted things, it's eval)
-function e { eval $(mage -d ~/.env.age | grep -i "$1.*=" ) ; }
+function E { set -a ; eval $(age -i ~/.ssh/age.key -d ${2:-~/.env.age} | grep -i "$1.*=") ; set +a ; }
 
 # Recursive git
 function G { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
