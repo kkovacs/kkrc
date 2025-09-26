@@ -33,7 +33,7 @@
 	format = ssh
 
 [difftool "wdiff"]
-	cmd = wdiff -n "$LOCAL" "$REMOTE" | vim -c ':set ft=wdiff' -
+	cmd = wdiff "$LOCAL" "$REMOTE" | vim -c ':set ft=wdiff' -
 
 # Enable these to sign commits with your SSH key for GitHub.
 # edit the  name/email pairs, then use:
