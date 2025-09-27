@@ -132,7 +132,7 @@ alias gf="git fetch --all -v"
 alias gp="git pull --ff-only -v"
 alias gclean="git reset --hard && git clean -f -d -x"
 
-# Load age-encrypted environment variables (or run encrypted things, it's eval)
+# Load age-encrypted environment variables in shell
 function E { set -a ; eval $(age -i ~/.ssh/age.key -d ${2:-~/.env.age} | grep -i "$1.*=") ; set +a ; }
 
 # Recursive git
