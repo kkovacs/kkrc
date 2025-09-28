@@ -50,7 +50,7 @@ rp on; rp
 
 # Set up some necessary environment variables
 export EDITOR=vim
-export LC_ALL="en_US.UTF-8"
+export LC_ALL="C.UTF-8"
 
 # Keep some history...
 export HISTSIZE=1000
