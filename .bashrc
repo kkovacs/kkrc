@@ -70,8 +70,8 @@ export PROMPT_COMMAND="printf '\a'"
 # Set up some necessary environment variables
 export EDITOR=vim
 export PAGER=less
-export LC_ALL="en_US.UTF-8" # No, don't try export LC_ALL="C", will mess up your UTF-8
-export LANG="en_US.UTF-8"
+export LC_ALL="C.UTF-8" # No, don't try export LC_ALL="C", will mess up your UTF-8
+export LANG="C.UTF-8"
 # Not supported widely enough yet :(
 #export LESS="--mouse"
 export LESSHISTFILE=/dev/null
