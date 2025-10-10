@@ -6,54 +6,63 @@
 :silent! set cryptmethod=xchacha20v2
 :filetype plugin indent on
 :let g:netrw_preview=1
-:map <silent> _ :Texplore<cr>
-:map <silent> - :execute exists("w:netrw_rexlocal")?":Rexplore":":Explore"<cr>
+:nmap <silent> _ :Texplore<cr>
+:nmap <silent> - :execute exists("w:netrw_rexlocal")?":Rexplore":":Explore"<cr>
 :map <c-j> j<c-e>
 :map <c-k> k<c-y>
+:nmap <silent> <c-tab> :tabnext<cr>
+:nmap <silent> <s-c-tab> :tabprevious<cr>
 :map <leader>= viW"zyA = <esc>"=<c-r>z<cr>p
-:map <leader>c :lchdir <c-r>=expand('%:p:h')<cr><cr>
-:map <leader>C :chdir <c-r>=expand('%:p:h')<cr><cr>
-:map <silent> <leader>l :setlocal list<cr>
-:map <silent> <leader>L :setlocal nolist<cr>
-:map <silent> <leader>p :setlocal paste<cr>
-:map <silent> <leader>P :setlocal nopaste<cr>
-:map <silent> <leader>v :setlocal virtualedit=all<cr>
-:map <silent> <leader>V :setlocal virtualedit=block<cr>
-:map <silent> <leader>e :setlocal expandtab<cr>
-:map <silent> <leader>E :setlocal noexpandtab<cr>
-:map <silent> <leader>w :setlocal nowrap<cr>
-:map <silent> <leader>W :setlocal wrap<cr>
-:map <silent> <leader>d :set filetype=markdown<cr>
-:map <silent> <leader>D :doautocmd FileType<cr>
-:map <silent> <leader>r :set relativenumber<cr>
-:map <silent> <leader>R :set norelativenumber<cr>
-:map <silent> <leader>s :set scrollbind<cr>
-:map <silent> <leader>S :set noscrollbind<cr>
-:map <leader>tf :TableModeRealign<cr>:TableEvalFormulaLine<cr>
-:map <leader>tb :TagbarToggle<cr>
-:map <leader>2 :setlocal sw=2 ts=2<cr>
-:map <leader>4 :setlocal sw=4 ts=4<cr>
-:map <leader>8 :setlocal sw=8 ts=8<cr>
-:map <silent> <c-n> :tabnext<cr>
-:map <silent> <c-p> :tabprevious<cr>
-:map <silent> <leader>, :tabmove -1<cr>
-:map <silent> <leader>. :tabmove +1<cr>
-:map <leader>x :close<cr>
 :if has('terminal') tmap <esc><esc> <c-\><c-N> | map <leader><leader> :vertical below terminal<cr> | map <leader>\| :tab terminal<cr> | endif
-:map <silent> <leader>h1 :call matchadd("DiffText", expand("<cword>"))<cr>
-:map <silent> <leader>h2 :call matchadd("DiffDelete", expand("<cword>"))<cr>
-:map <silent> <leader>h3 :call matchadd("DiffAdd", expand("<cword>"))<cr>
-:map <silent> <leader>h4 :call matchadd("DiffChange", expand("<cword>"))<cr>
-:map <silent> <leader>h5 :call matchadd("Error", expand("<cword>"))<cr>
-:map <silent> <leader>h6 :call matchadd("Todo", expand("<cword>"))<cr>
-:map <silent> <leader>h7 :call matchadd("Folded", expand("<cword>"))<cr>
-:map <silent> <leader>h8 :call matchadd("PMenu", expand("<cword>"))<cr>
-:map <silent> <leader>h9 :call matchadd("PMenuSel", expand("<cword>"))<cr>
-:map <silent> <leader>h0 :call clearmatches()<cr>
+:nmap <leader>c :lchdir <c-r>=expand('%:p:h')<cr><cr>
+:nmap <leader>C :chdir <c-r>=expand('%:p:h')<cr><cr>
+:nmap <silent> <leader>l :setlocal list<cr>
+:nmap <silent> <leader>L :setlocal nolist<cr>
+:nmap <silent> <leader>p :setlocal paste<cr>
+:nmap <silent> <leader>P :setlocal nopaste<cr>
+:nmap <silent> <leader>v :setlocal virtualedit=all<cr>
+:nmap <silent> <leader>V :setlocal virtualedit=block<cr>
+:nmap <silent> <leader>e :setlocal expandtab<cr>
+:nmap <silent> <leader>E :setlocal noexpandtab<cr>
+:nmap <silent> <leader>w :setlocal nowrap<cr>
+:nmap <silent> <leader>W :setlocal wrap<cr>
+:nmap <silent> <leader>d :set filetype=markdown<cr>
+:nmap <silent> <leader>D :doautocmd FileType<cr>
+:nmap <silent> <leader>m :set mouse=a<cr>
+:nmap <silent> <leader>M :set mouse=<cr>
+:nmap <silent> <leader>r :set relativenumber<cr>
+:nmap <silent> <leader>R :set norelativenumber<cr>
+:nmap <silent> <leader>s :set scrollbind<cr>
+:nmap <silent> <leader>S :set noscrollbind<cr>
+:nmap <leader>tf :TableModeRealign<cr>:TableEvalFormulaLine<cr>
+:nmap <leader>tb :TagbarToggle<cr>
+:nmap <leader>2 :setlocal sw=2 ts=2<cr>
+:nmap <leader>4 :setlocal sw=4 ts=4<cr>
+:nmap <leader>8 :setlocal sw=8 ts=8<cr>
+:nmap <leader>dt O# <C-R>=strftime("%Y-%m-%d")<cr><esc><cr>
+:nmap <silent> <c-n> :tabnext<cr>
+:nmap <silent> <c-p> :tabprevious<cr>
+:nmap <silent> <leader>, :tabmove -1<cr>
+:nmap <silent> <leader>. :tabmove +1<cr>
+:nmap <leader>x :close<cr>
+:nmap <silent> <leader>[ :bprevious<cr>
+:nmap <silent> <leader>] :bnext<cr>
+:nmap <silent> <leader>h1 :call matchadd("DiffText", expand("<cword>"))<cr>
+:nmap <silent> <leader>h2 :call matchadd("DiffDelete", expand("<cword>"))<cr>
+:nmap <silent> <leader>h3 :call matchadd("DiffAdd", expand("<cword>"))<cr>
+:nmap <silent> <leader>h4 :call matchadd("DiffChange", expand("<cword>"))<cr>
+:nmap <silent> <leader>h5 :call matchadd("Error", expand("<cword>"))<cr>
+:nmap <silent> <leader>h6 :call matchadd("Todo", expand("<cword>"))<cr>
+:nmap <silent> <leader>h7 :call matchadd("Folded", expand("<cword>"))<cr>
+:nmap <silent> <leader>h8 :call matchadd("PMenu", expand("<cword>"))<cr>
+:nmap <silent> <leader>h9 :call matchadd("PMenuSel", expand("<cword>"))<cr>
+:nmap <silent> <leader>h0 :call clearmatches()<cr>
 :nmap <silent> <leader>/ :nohlsearch<cr>
 :nmap <space> za
+:nmap <s-space> zA
 :nmap + zA
 :let base16colorspace=256
+:set background=dark
 :syn on
 :set statusline=%n%m%h%r\ %f\ [%{strlen(&fenc)?&fenc:'none'},%{&ff}]\ %{&list?'LIST\ ':''}%{&linebreak?'TEXTMODE\ ':''}%{&scrollbind?'SCROLLBIND\ ':''}%{&scrollbind?'SCROLLBIND\ ':''}%{&expandtab?'EXPANDTAB\ ':''}%{&wrap?'':'NOWRAP\ '}%{&paste?'PASTE\ ':''}%{&virtualedit=='all'?'VIRTUALEDIT\ ':''}%{strlen(&mouse)?'MOUSE\ ':''}%y%=C:%c%V\ L:%l/%L\ %p%%
 :autocmd BufReadPost * exe "normal! g`\""
@@ -63,27 +72,12 @@
 :let g:markdown_folding=1
 :autocmd FileType markdown setlocal foldlevel=99
 :autocmd FileType markdown syn match Todo "\<XXX\>"
-:autocmd FileType markdown syn match markdownH1 "^# \zs"
-:autocmd FileType markdown syn match markdownH2 "^## \zs"
-:autocmd FileType markdown syn match markdownH3 "^### \zs"
-:autocmd FileType markdown syn match markdownH4 "^#### \zs"
-:autocmd FileType markdown syn match markdownH5 "^##### \zs"
-:autocmd FileType markdown syn match markdownH6 "^###### \zs"
 :autocmd FileType netrw nmap <buffer> <space> mf
-:highlight markdownH1 ctermbg=243 guibg=#666666 ctermfg=15 guifg=#ffffff
-:highlight markdownH2 ctermbg=238 guibg=#333333 ctermfg=7 guifg=#AAAAAA
-:highlight markdownH3 ctermfg=71 guifg=#5faf5f
-:highlight markdownH4 ctermfg=63 guifg=#605df6
-:highlight markdownH5 ctermfg=24 guifg=#255e87
-:highlight markdownH6 ctermfg=23 guifg=#295f5e
 :let g:copilot_enabled = v:false
-:map <leader>g :Copilot enable<cr>
-:map <leader>G :Copilot disable<cr>
-:map <leader><c-g> :Copilot status<cr>
-:let g:ollama_enabled = 0
-:let g:ollama_model = 'qwen2.5-coder:7b'
-:let g:ollama_chat_model = g:ollama_model
-:map <leader>o :Ollama enable<cr>
-:map <leader>O :Ollama disable<cr>
-:map <leader><c-o> :Ollama toggle<cr>
+:nmap <leader>g :Copilot enable<cr>
+:nmap <leader>G :Copilot disable<cr>
+:nmap <leader><c-g> :Copilot status<cr>
+:let g:vim_ai_roles_config_file = '~/.vim/ai-models.ini'"
+:map <leader>a :AIC<cr>
+:nmap <leader>A :AIStopChat<cr>
 :echo "vim ok"

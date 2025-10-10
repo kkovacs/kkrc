@@ -63,118 +63,109 @@ filetype plugin indent on
 let g:netrw_preview=1
 
 " Open a new tab with netrw explorer
-map <silent> _ :Texplore<cr>
+nmap <silent> _ :Texplore<cr>
 
 " Open a netrw window, OR reuse the previous (so cursor is in the right place).
-map <silent> - :execute exists("w:netrw_rexlocal")?":Rexplore":":Explore"<cr>
+nmap <silent> - :execute exists("w:netrw_rexlocal")?":Rexplore":":Explore"<cr>
 
 " I like to scroll the screen and advance the cursor at the same time
 map <c-j> j<c-e>
 map <c-k> k<c-y>
 
 " GUI tab navigation
-map <silent> <c-tab> :tabnext<cr>
-map <silent> <s-c-tab> :tabprevious<cr>
+nmap <silent> <c-tab> :tabnext<cr>
+nmap <silent> <s-c-tab> :tabprevious<cr>
 
 " My little calculator
 map <leader>= viW"zyA = <esc>"=<c-r>z<cr>p
 
 " cd into current file's directory for this buffer only (!)
-map <leader>c :lchdir <c-r>=expand('%:p:h')<cr><cr>
+nmap <leader>c :lchdir <c-r>=expand('%:p:h')<cr><cr>
 " cd into current file's directory globally
-map <leader>C :chdir <c-r>=expand('%:p:h')<cr><cr>
+nmap <leader>C :chdir <c-r>=expand('%:p:h')<cr><cr>
 
 " Turn on "list" display
-map <silent> <leader>l :setlocal list<cr>
+nmap <silent> <leader>l :setlocal list<cr>
 " Turn off list display
-map <silent> <leader>L :setlocal nolist<cr>
+nmap <silent> <leader>L :setlocal nolist<cr>
 
 " Turn on paste
-map <silent> <leader>p :setlocal paste<cr>
+nmap <silent> <leader>p :setlocal paste<cr>
 " Turn off paste
-map <silent> <leader>P :setlocal nopaste<cr>
+nmap <silent> <leader>P :setlocal nopaste<cr>
 
 " Turn on free cursor movement
-map <silent> <leader>v :setlocal virtualedit=all<cr>
+nmap <silent> <leader>v :setlocal virtualedit=all<cr>
 " Turn off free cursor movement
-map <silent> <leader>V :setlocal virtualedit=block<cr>
+nmap <silent> <leader>V :setlocal virtualedit=block<cr>
 
 " Turn on expandtab
-map <silent> <leader>e :setlocal expandtab<cr>
+nmap <silent> <leader>e :setlocal expandtab<cr>
 " Turn off expandtab
-map <silent> <leader>E :setlocal noexpandtab<cr>
+nmap <silent> <leader>E :setlocal noexpandtab<cr>
 
 " Turn on nowrap
-map <silent> <leader>w :setlocal nowrap<cr>
+nmap <silent> <leader>w :setlocal nowrap<cr>
 " Turn off expandtab
-map <silent> <leader>W :setlocal wrap<cr>
+nmap <silent> <leader>W :setlocal wrap<cr>
 
 " Force filetype to markdown
-map <silent> <leader>d :set filetype=markdown<cr>
+nmap <silent> <leader>d :set filetype=markdown<cr>
 " Re-run filetype autodetection (not reliable...)
-map <silent> <leader>D :doautocmd FileType<cr>
+nmap <silent> <leader>D :doautocmd FileType<cr>
 
 " Turn on mouse
-map <silent> <leader>m :set mouse=a<cr>
+nmap <silent> <leader>m :set mouse=a<cr>
 " Turn off mouse
-map <silent> <leader>M :set mouse=<cr>
+nmap <silent> <leader>M :set mouse=<cr>
 
 " Turn on relativenumber
-map <silent> <leader>r :set relativenumber<cr>
+nmap <silent> <leader>r :set relativenumber<cr>
 " Turn off relativenumber
-map <silent> <leader>R :set norelativenumber<cr>
+nmap <silent> <leader>R :set norelativenumber<cr>
 
 " Turn on scrollbind
-map <silent> <leader>s :set scrollbind<cr>
+nmap <silent> <leader>s :set scrollbind<cr>
 " Turn off scrollbind
-map <silent> <leader>S :set noscrollbind<cr>
+nmap <silent> <leader>S :set noscrollbind<cr>
 
 " Manual TableModeRealign, for when I want to use TableMode without using it's special mode
-map <leader>tf :TableModeRealign<cr>:TableEvalFormulaLine<cr>
+nmap <leader>tf :TableModeRealign<cr>:TableEvalFormulaLine<cr>
 
 " Toggle Tagbar
-map <leader>tb :TagbarToggle<cr>
+nmap <leader>tb :TagbarToggle<cr>
 
 " switch to N char tabs (useful when browsing inelegant code)
-map <leader>2 :setlocal sw=2 ts=2<cr>
-map <leader>4 :setlocal sw=4 ts=4<cr>
-map <leader>8 :setlocal sw=8 ts=8<cr>
+nmap <leader>2 :setlocal sw=2 ts=2<cr>
+nmap <leader>4 :setlocal sw=4 ts=4<cr>
+nmap <leader>8 :setlocal sw=8 ts=8<cr>
 
 " Insert a line with the date (used in project notes)
-map <leader>dt O# <C-R>=strftime("%Y-%m-%d")<cr><esc><cr>
+nmap <leader>dt O# <C-R>=strftime("%Y-%m-%d")<cr><esc><cr>
 
 " Better next/prev tab
-map <silent> <c-n> :tabnext<cr>
-map <silent> <c-p> :tabprevious<cr>
-map <silent> <leader>, :tabmove -1<cr>
-map <silent> <leader>. :tabmove +1<cr>
-map <leader>x :close<cr>
+nmap <silent> <c-n> :tabnext<cr>
+nmap <silent> <c-p> :tabprevious<cr>
+nmap <silent> <leader>, :tabmove -1<cr>
+nmap <silent> <leader>. :tabmove +1<cr>
+nmap <leader>x :close<cr>
 
-if has("gui_macvim")
-	map <d-1> 1gt
-	map <d-2> 2gt
-	map <d-3> 3gt
-	map <d-4> 4gt
-	map <d-5> 5gt
-	map <d-6> 6gt
-	map <d-7> 7gt
-	map <d-8> 8gt
-	map <d-9> 9gt
-	map <silent> <d-0> :tablast<cr>
-endif
+" Buffer navigation
+nmap <silent> <leader>[ :bprevious<cr>
+nmap <silent> <leader>] :bnext<cr>
 
 " Highlight the word under the color with 4 different colors.
-map <silent> <leader>h1 :call matchadd("Highlight1", expand("<cword>"))<cr>
-map <silent> <leader>h2 :call matchadd("Highlight2", expand("<cword>"))<cr>
-map <silent> <leader>h3 :call matchadd("Highlight3", expand("<cword>"))<cr>
-map <silent> <leader>h4 :call matchadd("Highlight4", expand("<cword>"))<cr>
-map <silent> <leader>h5 :call matchadd("Highlight5", expand("<cword>"))<cr>
-map <silent> <leader>h6 :call matchadd("Highlight6", expand("<cword>"))<cr>
-map <silent> <leader>h7 :call matchadd("Highlight7", expand("<cword>"))<cr>
-map <silent> <leader>h8 :call matchadd("Highlight8", expand("<cword>"))<cr>
-map <silent> <leader>h9 :call matchadd("Highlight9", expand("<cword>"))<cr>
+nmap <silent> <leader>h1 :call matchadd("Highlight1", expand("<cword>"))<cr>
+nmap <silent> <leader>h2 :call matchadd("Highlight2", expand("<cword>"))<cr>
+nmap <silent> <leader>h3 :call matchadd("Highlight3", expand("<cword>"))<cr>
+nmap <silent> <leader>h4 :call matchadd("Highlight4", expand("<cword>"))<cr>
+nmap <silent> <leader>h5 :call matchadd("Highlight5", expand("<cword>"))<cr>
+nmap <silent> <leader>h6 :call matchadd("Highlight6", expand("<cword>"))<cr>
+nmap <silent> <leader>h7 :call matchadd("Highlight7", expand("<cword>"))<cr>
+nmap <silent> <leader>h8 :call matchadd("Highlight8", expand("<cword>"))<cr>
+nmap <silent> <leader>h9 :call matchadd("Highlight9", expand("<cword>"))<cr>
 " Clear all highlights
-map <silent> <leader>h0 :call clearmatches()<cr>
+nmap <silent> <leader>h0 :call clearmatches()<cr>
 
 " Clear all highlights
 nmap <silent> <leader>/ :nohlsearch<cr>
@@ -215,8 +206,8 @@ endif
 " But it needs a better get-back-to-command-mode key, let's use double-ESC
 if has('terminal')
 	tmap <esc><esc> <c-\><c-N>
-	map <leader><leader> :vertical below terminal<cr>
-	map <leader>\| :tab terminal<cr>
+	nmap <leader><leader> :vertical below terminal<cr>
+	nmap <leader>\| :tab terminal<cr>
 endif
 
 " Statusline with a few useful items, but still lightweight (no plugins!)
@@ -277,11 +268,11 @@ highlight markdownH6 ctermfg=23 guifg=#295f5e
 " Disable by default, because I don't want my everything uploaded. Enable with: ":Copilot enable"
 let g:copilot_enabled = v:false
 " Enable
-map <leader>g :Copilot enable<cr>
+nmap <leader>g :Copilot enable<cr>
 " Disable
-map <leader>G :Copilot disable<cr>
+nmap <leader>G :Copilot disable<cr>
 " Status
-map <leader><c-g> :Copilot status<cr>
+nmap <leader><c-g> :Copilot status<cr>
 
 " *** AI: vim-ollama ***
 " https://github.com/gergap/vim-ollama
@@ -289,11 +280,11 @@ map <leader><c-g> :Copilot status<cr>
 " Disable by default
 let g:ollama_enabled = 0
 " Enable
-map <leader>o :Ollama enable<cr>
+nmap <leader>o :Ollama enable<cr>
 " Disable
-map <leader>O :Ollama disable<cr>
+nmap <leader>O :Ollama disable<cr>
 " Status
-map <leader><c-o> :Ollama config<cr>
+nmap <leader><c-o> :Ollama config<cr>
 
 " *** AI: vim-ai ***
 " https://github.com/gergap/vim-ollama
@@ -301,8 +292,8 @@ map <leader><c-o> :Ollama config<cr>
 "  git clone https://github.com/madox2/vim-ai.git ~/.vim/pack/kkrc/start/vim-ai
 "
 " Config file
-let g:vim_ai_roles_config_file = '~/.kkrc/.vim/ai-models.ini'"
+let g:vim_ai_roles_config_file = '~/.vim/ai-models.ini'"
 " Chat with default model
 map <leader>a :AIC<cr>
 " Force stop chat (used to be ctrl-c, but was changed for some reason)
-map <leader>A :AIStopChat<cr>
+nmap <leader>A :AIStopChat<cr>
