@@ -2,30 +2,31 @@
 alias:
   # few free that actually works
   - "r:openrouter/x-ai/grok-4-fast:free"
-  #- "free:openrouter/deepseek/deepseek-chat:free"
-  # Google Gemini
+  # Via Openrouter.ai
+  - "q0:openrouter/qwen/qwen3-coder-30b-a3b-instruct" # USD 0.25
+  - "q1:openrouter/qwen/qwen3-coder" # USD 0.95
+  - "d0:openrouter/deepseek/deepseek-v3.2-exp" # USD 0.4
+  - "d1:openrouter/deepseek/deepseek-r1-0528" # USD 1.75
+  - "o0:openrouter/openai/o4-mini-high" # USD 4.4
+  - "o1:openrouter/openai/o3" # USD 8
+  - "gpt0:openrouter/openai/gpt-5-mini" # USD 2
+  - "gpt1:openrouter/openai/gpt-5" # USD 10
+  - "rg0:openrouter/google/gemini-2.5-flash" # USD 2.5
+  - "rg1:openrouter/google/gemini-2.5-pro-preview" # USD 10-15
+  - "grok0:openrouter/x-ai/grok-code-fast-1" # USD 1.5
+  - "grok1:openrouter/x-ai/grok-4" # USD 15
+  - "c0:openrouter/anthropic/claude-3.5-haiku" # USD 4
+  - "c1:openrouter/anthropic/claude-sonnet-4.5" # USD 15
+  # Google
   - "g:gemini/gemma-3-27b-it" # free
-  - "gfl:gemini/gemini-2.5-flash-lite" # USD 0.4
-  - "gf:gemini/gemini-2.5-flash" # USD 2.5
-  - "gp:gemini/gemini-2.5-pro" # USD 10-15
-  # Openrouter
-  - "rg:openrouter/google/gemma-3-27b-it" # USD 0.2
-  - "qwen:openrouter/qwen/qwen3-coder" # USD 0.3
-  - "llama:openrouter/meta-llama/llama-4-maverick" # USD 0.6
-  - "deepseek:openrouter/deepseek/deepseek-chat-v3.1" # USD 1.5
-  - "grok:openrouter/x-ai/grok-code-fast-1" # USD 1.5
-  - "devstral:openrouter/mistralai/devstral-medium" # USD 2.0
-  - "rgf:openrouter/google/gemini-2.5-flash" # USD 2.5
-  - "c3:openrouter/anthropic/claude-3.5-haiku" # USD 4
-  - "o3m:openrouter/openai/o3-mini-high" # USD 4.40
-  - "o4m:openrouter/openai/o4-mini-high" # USD 4.40
-  - "gpt5:openrouter/openai/gpt-5" # USD 5
-  - "rgp:openrouter/google/gemini-2.5-pro" # USD 10-15
-  - "rgpp:openrouter/google/gemini-2.5-pro-preview" # USD 10-15
-  - "c4:openrouter/anthropic/claude-sonnet-4" # USD 15
+  - "g0:gemini/gemini-2.5-flash" # USD 2.5
+  - "g1:gemini/gemini-2.5-pro" # USD 10-15
+  # Google Copilot with OpenAI compatibility
+  - "gh0:openai/gpt-5-mini"
+  - "gh1:openai/gpt-5"
 
 # Default model (possibly alias):
-model: free
+model: r
 
 # Other global life quality settings:
 vim: true
