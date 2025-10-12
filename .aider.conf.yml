@@ -7,10 +7,8 @@ alias:
   - "q1:openrouter/qwen/qwen3-coder" # USD 0.95
   - "d0:openrouter/deepseek/deepseek-v3.2-exp" # USD 0.4
   - "d1:openrouter/deepseek/deepseek-r1-0528" # USD 1.75
-  - "o0:openrouter/openai/o4-mini-high" # USD 4.4
-  - "o1:openrouter/openai/o3" # USD 8
-  - "gpt0:openrouter/openai/gpt-5-mini" # USD 2
-  - "gpt1:openrouter/openai/gpt-5" # USD 10
+  - "a0:openrouter/openai/gpt-5-mini" # USD 2
+  - "a1:openrouter/openai/gpt-5" # USD 10
   - "g0:openrouter/google/gemini-2.5-flash" # USD 2.5
   - "g1:openrouter/google/gemini-2.5-pro-preview" # USD 10-15
   - "grok0:openrouter/x-ai/grok-code-fast-1" # USD 1.5
