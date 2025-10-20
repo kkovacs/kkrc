@@ -17,8 +17,8 @@ alias:
   - "c1:openrouter/anthropic/claude-sonnet-4.5" # USD 15
   # Google
   - "gg:gemini/gemma-3-27b-it" # free
-  - "gg0:gemini/gemini-flash-latest" # USD 2.5
-  - "gg1:gemini/gemini-pro-latest" # USD 10-15
+  - "gg0:gemini/gemini-2.5-flash" # USD 2.5
+  - "gg1:gemini/gemini-2.5-pro" # USD 10-15
   # Google Copilot with OpenAI compatibility
   - "gh0:openai/gpt-5-mini" # free for paid plans
   - "gh1:openai/gpt-5" # 1x "premium request"
