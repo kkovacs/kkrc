@@ -132,8 +132,10 @@ alias gf="git fetch --all -v"
 alias gp="git pull --ff-only -v"
 alias gclean="git reset --hard && git clean -f -d -x"
 
-# Load age-encrypted environment variables in shell
-function E { set -a ; eval $(age -i ~/.ssh/age.key -d ${2:-~/.env.age} | grep -i "$1.*=") ; set +a ; }
+# Load age-encrypted environment variables in shell. Uses trap to restore stty echo if password prompting is ctrl-c-ed.
+function E { trap 'stty sane; set +a; echo; return 1' INT; set -a; eval "$(age -i ~/.ssh/age.key -d "${2:-$HOME/.env.age}" | grep -i -- "$1.*=")"; set +a; trap - INT; }
+# Helper function to list the variables without exposing the value.
+#function EL { trap 'stty sane; set +a; echo; return 1' INT; age -i ~/.ssh/age.key -d "${2:-$HOME/.env.age}" | grep -i "$1.*=" | sed 's/=.*//'; trap - INT; }
 
 # Recursive git
 function G { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
