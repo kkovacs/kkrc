@@ -132,11 +132,6 @@ alias gf="git fetch --all -v"
 alias gp="git pull --ff-only -v"
 alias gclean="git reset --hard && git clean -f -d -x"
 
-# Load age-encrypted environment variables in shell. Uses trap to restore stty echo if password prompting is ctrl-c-ed.
-function E { trap 'stty sane; set +a; echo; return 1' INT; set -a; eval "$(age -i ~/.ssh/age.key -d "${2:-$HOME/.env.age}" | grep -i -- "$1.*=")"; set +a; trap - INT; }
-# Helper function to list the variables without exposing the value.
-#function EL { trap 'stty sane; set +a; echo; return 1' INT; age -i ~/.ssh/age.key -d "${2:-$HOME/.env.age}" | grep -i "$1.*=" | sed 's/=.*//'; trap - INT; }
-
 # Recursive git
 function G { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
 # Recursive git status. This is to quickly find uncommitted changes, not a detailed view
@@ -352,6 +347,11 @@ alias kbd-reset="setxkbmap -layout us"
 alias kbd-pc="kbd-reset;xmodmap -e 'keysym Super_L = Mode_switch' ~/.Xmodmap"
 # B) For MAC-style hardware (Order: Alt, Win, Space)
 alias kbd-mac="kbd-reset;xmodmap -e 'keysym Alt_L = Mode_switch' -e 'keysym Super_L = Alt_L' ~/.Xmodmap"
+
+# Load age-encrypted environment variables in shell. Uses trap to restore stty echo if password prompting is ctrl-c-ed.
+function E { trap 'stty sane; set +a; echo; return 1' INT; set -a; eval "$(age -i ~/.ssh/age.key -d "${2:-$HOME/.env.age}" | grep -i -- "$1.*=")"; set +a; trap - INT; }
+# Helper function to list the variables without exposing the value.
+function EL { trap 'stty sane; set +a; echo; return 1' INT; age -i ~/.ssh/age.key -d "${2:-$HOME/.env.age}" | grep -i "$1.*=" | sed 's/=.*//'; trap - INT; }
 
 # Quickly create/list/delete VMs on DigitalOcean.
 # NOTE: You can set "export DIGITALOCEAN_ACCESS_TOKEN=..." in ~/.bashrc.local , or use `doctl auth` to log in
