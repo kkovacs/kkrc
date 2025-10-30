@@ -8,6 +8,10 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 # NOTE: Use this if you can't add `IdentityAgent ~/.gnupg/S.gpg-agent.ssh` to your `.ssh/config`
 #export SSH_AUTH_SOCK="/Users/$USER/.gnupg/S.gpg-agent.ssh"
 
+# Apple containers, see: https://github.com/apple/container
+function cl() { container list ; }
+function c() { container system start && container run --rm -it --ssh -v ~/wrk:/wrk -m "${2:-1G}" "${1:-ubuntu}" ; }
+
 # This is my preferred way of working with Ubuntu multipass on OS X.
 function vm()
 {
