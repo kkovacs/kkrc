@@ -350,6 +350,8 @@ alias kbd-mac="kbd-reset;xmodmap -e 'keysym Alt_L = Mode_switch' -e 'keysym Supe
 
 # Load age-encrypted environment variables in shell. Uses trap to restore stty echo if password prompting is ctrl-c-ed.
 function E { trap 'stty sane; set +a; echo; return 1' INT; set -a; eval "$(age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i -- "$1.*=")"; set +a; trap - INT; }
+# Make it usable in scripts ran from this bash
+export -f E
 # Helper function to list the variables without exposing the value.
 function EL { trap 'stty sane; set +a; echo; return 1' INT; age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i "$1.*=" | sed 's/=.*//'; trap - INT; }
 
