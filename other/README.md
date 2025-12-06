@@ -32,6 +32,10 @@ For VIM mode to work properly, you will also need to (see https://github.com/VSC
 
 	defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
 
+Or disable key repeat globally (also works for neovim-qt):
+
+	defaults write -g ApplePressAndHoldEnabled -bool false
+
 On Linux:
 	~/.config/Code/User/keybindings.json
 
