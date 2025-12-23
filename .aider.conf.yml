@@ -1,7 +1,7 @@
 # Models based on https://aider.chat/docs/leaderboards/ at 2025-04-15
 alias:
   # few free that actually works
-  - "r:openrouter/microsoft/mai-ds-r1:free"
+  - "r:openrouter/mistralai/devstral-2512:free"
   # Via Openrouter.ai
   - "q0:openrouter/qwen/qwen3-coder-30b-a3b-instruct" # USD 0.25
   - "q1:openrouter/qwen/qwen3-coder" # USD 0.95
