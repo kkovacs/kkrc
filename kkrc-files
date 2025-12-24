@@ -17,7 +17,6 @@ mysoftlink .psqlrc ~/.psqlrc
 mysoftlink .inputrc ~/.inputrc
 mysoftlink .i3 ~/.i3
 mysoftlink .ansible.cfg ~/.ansible.cfg
-mysoftlink .aider.conf.yml ~/.aider.conf.yml
 
 # Damn you Microsoft for not being able to keep everything in one place
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
