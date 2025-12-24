@@ -208,6 +208,8 @@ alias lb="lsblk -Mf"
 alias lvl="pvs; echo; vgs; echo; lvs -o lv_name,pool_lv,size,data_percent,metadata_percent,origin"
 # ZFS "du"
 alias zl="zfs list -t all -o space,compressratio"
+# aider-chat
+alias aider="uvx --from aider-chat aider --vim --watch-files --dark-mode --analytics-disable"
 # Replicate zsh's "vared" command (with autocompletion)
 function vared { read -r -e -p "$1=" -i "${!1}" "$1" ; }
 complete -v vared
