@@ -342,8 +342,6 @@ alias ssh-with-rsa-enabled="ssh -o PubkeyAcceptedAlgorithms=+ssh-rsa -o HostkeyA
 
 # Locally we don't need these (but leave them in the inject part)
 unalias tig
-# Locally we don't need ux to run aider
-alias aider="aider --vim --watch-files --dark-mode --analytics-disable"
 #unset VIMINIT
 
 # Linux hardware keyboard setup options.
