@@ -131,9 +131,8 @@ alias gs="git status -sb"
 alias gf="git fetch --all -v"
 alias gp="git pull --ff-only -v"
 alias gclean="git reset --hard && git clean -f -d -x"
-# xxd alternatives
-alias xxo="od -v -A x -t x1z"
-alias xxh="hexdump -v -e '\"%08.8_ax:\"' -e '16/1 \" %02x\"' -e '\" \" 16/1 \"%_p\" \"\n\"'"
+# xxd alternative. Interestingly, "hexdump" is more widespread than "od"
+alias xxh="hexdump -v -e '\"%08.8_ax:\"' -e '16/1 \" %02x\"' -e '\"  \" 16/1 \"%_p\" \"\n\"'"
 
 # Recursive git
 function G { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
