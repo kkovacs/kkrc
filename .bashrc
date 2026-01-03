@@ -153,7 +153,6 @@ function gg { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*
 
 # GNU screen with SSH_AUTH_SOCK filename transfer, to be used with `CTRL+A` `:paste s`, tmux-bound to <c-q><c-r>a
 # You can append a PID if there are multiple screen-s.
-unalias s 2>/dev/null # XXX Tempotarily, while I have running sessions having the alias
 # We WANT this to expand when defined, so:
 # shellcheck disable=SC2139
 function s() { screen ${1:+-S} $1 -X register s " export SSH_AUTH_SOCK=\"$SSH_AUTH_SOCK\"" ; screen -xR "$1" ; }
@@ -350,6 +349,10 @@ alias kbd-pc="kbd-reset;xmodmap -e 'keysym Super_L = Mode_switch' ~/.Xmodmap"
 # B) For MAC-style hardware (Order: Alt, Win, Space)
 alias kbd-mac="kbd-reset;xmodmap -e 'keysym Alt_L = Mode_switch' -e 'keysym Super_L = Alt_L' ~/.Xmodmap"
 
+# Turn CAPS LOCK into CTRL on Linux.
+#setxkbmap -option ctrl:nocaps
+# Or. on Ubuntu, put this into /etc/default/keyboard: XKBOPTIONS="ctrl:nocaps"
+
 # Load age-encrypted environment variables in shell. Uses trap to restore stty echo if password prompting is ctrl-c-ed.
 function E { trap 'stty sane; set +a; echo; return 1' INT; set -a; eval "$(age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i -- "$1.*=")"; set +a; trap - INT; }
 # Make it usable in scripts ran from this bash
@@ -358,7 +361,7 @@ export -f E
 function EL { trap 'stty sane; set +a; echo; return 1' INT; age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i "$1.*=" | sed 's/=.*//'; trap - INT; }
 
 # Quickly create/list/delete VMs on DigitalOcean.
-# NOTE: You can set "export DIGITALOCEAN_ACCESS_TOKEN=..." in ~/.bashrc.local , or use `doctl auth` to log in
+# NOTE: You can set "export DIGITALOCEAN_ACCESS_TOKEN=..."
 do-mk() { doctl compute droplet create "${1:-tmp1}" --region ams3 --ssh-keys "$(doctl compute ssh-key list --format=ID --no-header | paste -sd "," -)" --image "${2:-ubuntu-24-04-x64}" --size "${3:-s-2vcpu-2gb}" --wait -v ; }
 do-ssh() { ( HN="${1:-tmp1}"; shift; ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "root@$(doctl compute droplet list --format=PublicIPv4 --no-header "${HN}")" "$@" ) ; }
 do-ls() { doctl compute droplet list --format Name,ID,PublicIPv4,Memory,VCPUs,Disk,Region,Status; doctl account get --format Email,DropletLimit,Status ; }
@@ -410,10 +413,6 @@ fi
 if [ ! -n "$STY" ]; then
 	screen -ls | grep -v "Socket"
 fi
-
-# Turn CAPS LOCK into CTRL on Linux.
-#setxkbmap -option ctrl:nocaps
-# Or. on Ubuntu, put this into /etc/default/keyboard: XKBOPTIONS="ctrl:nocaps"
 
 # Local commands
 # shellcheck disable=SC1090
