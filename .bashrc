@@ -141,8 +141,8 @@ function GS { find . -name .git -type d | while read -r a; do a="${a%.git}"; tpu
 
 # Show .gitignore-d files, all of them
 alias gii="git ls-files --exclude-standard --ignored --others"
-# Show .gitignore-d files except vendor and node_modules, because that's TMI
-alias gi="gii | egrep -v '^vendor/|^node_modules/'"
+# Show .gitignore-d files except vendor node_modules and .venv, because that's TMI
+alias gi="gii | egrep -v '^vendor/|^node_modules/|^.venv/'"
 # Quick grep, with case and ignore case.
 # NOTE: GR_EXCLUDE is an array!
 export GR_EXCLUDE=(-I --exclude-dir=.git --exclude=*.min.* --exclude=*.sql --exclude=*.log --exclude=tags --exclude-dir=cache --exclude-dir=vendor --exclude-dir=.venv --exclude-dir=venv --exclude-dir=node_modules --exclude-dir=storage)
@@ -335,8 +335,6 @@ sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 alias tmux="tmux -2"
 # When I don't want to pollute my known_hosts file (temporary VMs, etc)
 alias sssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
-# When I want to remote-forward port 11434 (Ollama)
-alias assh="ssh -R 11434:127.0.0.1:11434"
 # SSH reverse-compatible with RSA (routers with dropbear, etc)
 alias ssh-with-rsa-enabled="ssh -o PubkeyAcceptedAlgorithms=+ssh-rsa -o HostkeyAlgorithms=+ssh-rsa"
 
