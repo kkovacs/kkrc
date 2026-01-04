@@ -11,7 +11,7 @@ variations between various operating systems, distributions, etc.)
 
 To install:
 
-git clone https://github.com/kkovacs/kkrc/ ~/.kkrc; ~/.kkrc/install.sh
+git clone --depth 1 https://github.com/kkovacs/kkrc/ ~/.kkrc; ~/.kkrc/install.sh
 
 After that, you can always update with:
 
