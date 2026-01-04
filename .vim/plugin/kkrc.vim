@@ -289,7 +289,7 @@ nmap <leader><c-o> :Ollama config<cr>
 " *** AI: vim-ai ***
 " https://github.com/gergap/vim-ollama
 "
-"  git clone https://github.com/madox2/vim-ai.git ~/.vim/pack/kkrc/start/vim-ai
+"  git clone --depth 1 https://github.com/madox2/vim-ai.git ~/.vim/pack/kkrc/start/vim-ai
 "
 " Config file
 let g:vim_ai_roles_config_file = '~/.vim/ai-models.ini'"
