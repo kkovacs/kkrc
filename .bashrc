@@ -166,6 +166,8 @@ D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none\|^overlay\|^shm' ; }
 F() { free -h ; }
 # Process list overview (for Linux)
 alias P="ps axfwwo pid,user,start,rss,stat,cmd | less -SXRn"
+# Two purposes: 1. lxl shound work with incus too. 2. avoid Ubuntu agressively installing lxd snap BECAUSE OF CALLING AN UNINSTALLED CLIENT... Very unelegant, Ubuntu!
+lxc() { if [[ -x /usr/bin/incus ]]; then command incus "$@" ; elif [[ -x /snap/bin/lxc ]]; then command lxc "$@" ; else echo "No LXD or Incus" ; fi }
 # lxd/lxc list conatiners
 alias lxl='lxc list -c ns46tSbNm,image.release'
 # lxd/lxc show port forwards XXX not pretty if no forwards
