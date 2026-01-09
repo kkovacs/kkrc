@@ -114,6 +114,9 @@ unalias ll 2>/dev/null # Many systems has an ll alias, THIS IS NOT TEMPORARY
 # No, we WANT to use ls, so:
 # shellcheck disable=2012
 function ll() { ls -lrtA --color "$@" | less -FXRn +G ; }
+# Display progress
+alias dd="dd status=progress"
+alias rsync="rsync --info=progress2"
 #alias lr="ls -AR1 -I .git|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d files\n%s \t\",p-2,\$0);p=0}{p++}END{print p \" files\"}'|less -FXn" # Cut -FX in ash
 #alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
 alias h="history"

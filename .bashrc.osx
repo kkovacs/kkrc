@@ -4,6 +4,9 @@
 # It's recommended to load from .bashrc.local :
 # . ~/.kkrc/.bashrc.osx
 
+# OS X rsync does not take "--info=progress2"
+alias rsync="rsync --progress"
+
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 # NOTE: Use this if you can't add `IdentityAgent ~/.gnupg/S.gpg-agent.ssh` to your `.ssh/config`
 #export SSH_AUTH_SOCK="/Users/$USER/.gnupg/S.gpg-agent.ssh"
