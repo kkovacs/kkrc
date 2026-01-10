@@ -113,7 +113,7 @@ alias la="ls -lrtA -I*" # For Linux. Hidden files ONLY.
 unalias ll 2>/dev/null # Many systems has an ll alias, THIS IS NOT TEMPORARY
 # No, we WANT to use ls, so:
 # shellcheck disable=2012
-function ll() { ls -lrtA --color "$@" | less -FXRn +G ; }
+ll() { ls -lrtA --color "$@" | less -FXRn +G ; }
 # Display progress
 alias dd="dd status=progress"
 alias rsync="rsync --info=progress2"
@@ -121,9 +121,9 @@ alias rsync="rsync --info=progress2"
 #alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
 alias h="history"
 # PostgreSQL with readline
-function psql { INPUTRC=/dev/fd/9 command psql 9<<<'set editing-mode vi' "$@" ; }
+psql() { INPUTRC=/dev/fd/9 command psql 9<<<'set editing-mode vi' "$@" ; }
 # PostgreSQL as above, but as postgres user
-function ppsql { sudo -u postgres -- bash -c "$(declare -f psql); psql \"\$@\"" bash "$@" ; }
+ppsql() { sudo -u postgres -- bash -c "$(declare -f psql); psql \"\$@\"" bash "$@" ; }
 # MySQL with readline
 alias mysql="INPUTRC=/dev/fd/9 mysql 9<<<'set editing-mode vi'"
 # This is getting even uglier, but must have on remote machines
@@ -141,9 +141,9 @@ alias xxh="hexdump -v -e '\"%08.8_ax:\"' -e '16/1 \" %02x\"' -e '\"  \" 16/1 \"%
 hl() { local GR="grep --line-buffered --color=always -E"; GREP_COLORS="mt=01;31" $GR "$1|$" | GREP_COLORS="mt=01;32" $GR "$2|$" | GREP_COLORS="mt=01;33" $GR "$3|$" | GREP_COLORS="mt=01;34" $GR "$4|$" | GREP_COLORS="mt=01;35" $GR "$5|$" ; }
 
 # Recursive git
-function G { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
+G() { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
 # Recursive git status. This is to quickly find uncommitted changes, not a detailed view
-function GS { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "$a"; tput rmso; if ! command git -C "$a" diff-index --quiet --ignore-submodules HEAD --; then if [ "$#" -lt 3 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; fi ; done ; }
+GS() { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "$a"; tput rmso; if ! command git -C "$a" diff-index --quiet --ignore-submodules HEAD --; then if [ "$#" -lt 3 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; fi ; done ; }
 
 # Show .gitignore-d files, all of them
 alias gii="git ls-files --exclude-standard --ignored --others"
@@ -152,19 +152,19 @@ alias gi="gii | egrep -v '^vendor/|^node_modules/|^.venv/'"
 # Quick grep, with case and ignore case.
 # NOTE: GR_EXCLUDE is an array!
 export GR_EXCLUDE=(-I --exclude-dir=.git --exclude=*.min.* --exclude=*.sql --exclude=*.log --exclude=tags --exclude-dir=cache --exclude-dir=vendor --exclude-dir=.venv --exclude-dir=venv --exclude-dir=node_modules --exclude-dir=storage)
-function gr { command grep --color=auto -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null ; }
-function ggr { command grep --color=force -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXnr ; }
+gr() { command grep --color=auto -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null ; }
+ggr() { command grep --color=force -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXnr ; }
 # Better git grep
-function gg { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
+gg() { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
 
 # GNU screen with SSH_AUTH_SOCK filename transfer, to be used with `CTRL+A` `:paste s`, tmux-bound to <c-q><c-r>a
 # You can append a PID if there are multiple screen-s.
 # We WANT this to expand when defined, so:
 # shellcheck disable=SC2139
-function s() { screen ${1:+-S} $1 -X register s " export SSH_AUTH_SOCK=\"$SSH_AUTH_SOCK\"" ; screen -xR "$1" ; }
+s() { screen ${1:+-S} $1 -X register s " export SSH_AUTH_SOCK=\"$SSH_AUTH_SOCK\"" ; screen -xR "$1" ; }
 
 # Watch out for using git as a different user than the repository. Avoid mandatory reconfiguration of git with user/email for hotfixes.
-function git { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " config grep log blame diff show status init clone " == *" $1 "* ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
+git() { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " config grep log blame diff show status init clone " == *" $1 "* ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
 M() { mount "$@" | grep '^\/dev\/' ; }
 D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none\|^overlay\|^shm' ; }
@@ -177,15 +177,15 @@ lxc() { if [[ -x /usr/bin/incus ]]; then command incus "$@" ; elif [[ -x /snap/b
 # lxd/lxc list conatiners
 alias lxl='lxc list -c ns46tSbNm,image.release'
 # lxd/lxc show port forwards XXX not pretty if no forwards
-function lxp { for ip in $(lxc network forward list lxdbr0 -f csv | awk -F, -e '{ print $1 }'); do lxc network forward show lxdbr0 "$ip"; done ; }
+lxp() { for ip in $(lxc network forward list lxdbr0 -f csv | awk -F, -e '{ print $1 }'); do lxc network forward show lxdbr0 "$ip"; done ; }
 # With MAC addresses:
 #alias lxl='lxc list -c ns46tSbNm,image.release,volatile.lxdbr0.hwaddr:lxdbr0,volatile.eth0.hwaddr:eth0'
 # If can't use docker as current user, try sudo
 # We define a shell command, but we don't mind that sudo will not use it, so:
 # shellcheck disable=SC2033,SC2032
-function docker { if [[ -r /var/run/docker.sock ]] ; then command docker "$@" ; else sudo docker "$@" ; fi ; }
+docker() { if [[ -r /var/run/docker.sock ]] ; then command docker "$@" ; else sudo docker "$@" ; fi ; }
 # shellcheck disable=SC2033,SC2032
-function docker-compose { if [[ -r /var/run/docker.sock ]] ; then command docker-compose "$@" ; else sudo docker-compose "$@" ; fi ; }
+docker-compose() { if [[ -r /var/run/docker.sock ]] ; then command docker-compose "$@" ; else sudo docker-compose "$@" ; fi ; }
 # Docker containers overview
 alias C="docker ps -as"
 # Docker-compose
@@ -220,7 +220,7 @@ alias zl="zfs list -t all -o space,compressratio"
 # aider-chat
 alias aider="uvx --from aider-chat aider --vim --dark-mode --analytics-disable --no-gitignore --watch-files"
 # Replicate zsh's "vared" command (with autocompletion)
-function vared { read -r -e -p "$1=" -i "${!1}" "$1" ; }
+vared() { read -r -e -p "$1=" -i "${!1}" "$1" ; }
 complete -v vared
 
 # Only if not on busybox
@@ -362,11 +362,11 @@ alias kbd-mac="kbd-reset;xmodmap -e 'keysym Alt_L = Mode_switch' -e 'keysym Supe
 # Or. on Ubuntu, put this into /etc/default/keyboard: XKBOPTIONS="ctrl:nocaps"
 
 # Load age-encrypted environment variables in shell. Uses trap to restore stty echo if password prompting is ctrl-c-ed.
-function E { trap 'stty sane; set +a; echo; return 1' INT; set -a; eval "$(age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i -- "$1.*=")"; set +a; trap - INT; }
+E { trap 'stty sane; set +a; echo; return 1' INT; set -a; eval "$(age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i -- "$1.*=")"; set +a; trap - INT ; }
 # Make it usable in scripts ran from this bash
 export -f E
 # Helper function to list the variables without exposing the value.
-function EL { trap 'stty sane; set +a; echo; return 1' INT; age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i "$1.*=" | sed 's/=.*//'; trap - INT; }
+EL() { trap 'stty sane; set +a; echo; return 1' INT; age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i "$1.*=" | sed 's/=.*//'; trap - INT ; }
 
 # Quickly create/list/delete VMs on DigitalOcean.
 # NOTE: You can set "export DIGITALOCEAN_ACCESS_TOKEN=..."
