@@ -112,7 +112,7 @@ alias la="ls -lrtA -I*" # For Linux. Hidden files ONLY.
 # NOTE: use this in the "function ..." form, because if there is an ll alias, that causes an error (even if we unalias in the previos lik
 unalias ll 2>/dev/null # Many systems has an ll alias, THIS IS NOT TEMPORARY
 # No, we WANT to use ls, so:
-# XXX Mysteriously, this ONE has to start with "function", or else inject gets an error.
+# XXX Mysteriously, this ONE has to start with "function", or else inject gets an error. Also, psql ones SOMETIMES cause an error???
 # shellcheck disable=2012
 function ll() { ls -lrtA --color "$@" | less -FXRn +G ; }
 # Display progress
@@ -122,9 +122,9 @@ alias rsync="rsync --info=progress2"
 #alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
 alias h="history"
 # PostgreSQL with readline
-psql() { INPUTRC=/dev/fd/9 command psql 9<<<'set editing-mode vi' "$@" ; }
+function psql() { INPUTRC=/dev/fd/9 command psql 9<<<'set editing-mode vi' "$@" ; }
 # PostgreSQL as above, but as postgres user
-ppsql() { sudo -u postgres -- bash -c "$(declare -f psql); psql \"\$@\"" bash "$@" ; }
+function ppsql() { sudo -u postgres -- bash -c "$(declare -f psql); psql \"\$@\"" bash "$@" ; }
 # MySQL with readline
 alias mysql="INPUTRC=/dev/fd/9 mysql 9<<<'set editing-mode vi'"
 # This is getting even uglier, but must have on remote machines
@@ -140,6 +140,7 @@ alias xxh="hexdump -v -e '\"%08.8_ax:\"' -e '16/1 \" %02x\"' -e '\"  \" 16/1 \"%
 
 # Highlight function, max 5 params. Use "." to skip parameters.
 hl() { local GR="grep --line-buffered --color=always -E"; GREP_COLORS="mt=01;31" $GR "$1|$" | GREP_COLORS="mt=01;32" $GR "$2|$" | GREP_COLORS="mt=01;33" $GR "$3|$" | GREP_COLORS="mt=01;34" $GR "$4|$" | GREP_COLORS="mt=01;35" $GR "$5|$" ; }
+export -f hl
 
 # Recursive git
 G() { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
@@ -375,11 +376,6 @@ do-mk() { doctl compute droplet create "${1:-tmp1}" --region ams3 --ssh-keys "$(
 do-ssh() { ( HN="${1:-tmp1}"; shift; ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "root@$(doctl compute droplet list --format=PublicIPv4 --no-header "${HN}")" "$@" ) ; }
 do-ls() { doctl compute droplet list --format Name,ID,PublicIPv4,Memory,VCPUs,Disk,Region,Status; doctl account get --format Email,DropletLimit,Status ; }
 do-rm() { doctl compute droplet delete "$(doctl compute droplet list --format=ID --no-header "${1:-tmp1}")" ; }
-
-# hl - highlight command
-# shellcheck disable=SC1090
-source ~/.kkrc/hl
-export -f hl
 
 # Automatically set TMUX window title on SSH
 ssh() {
