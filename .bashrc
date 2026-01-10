@@ -112,8 +112,9 @@ alias la="ls -lrtA -I*" # For Linux. Hidden files ONLY.
 # NOTE: use this in the "function ..." form, because if there is an ll alias, that causes an error (even if we unalias in the previos lik
 unalias ll 2>/dev/null # Many systems has an ll alias, THIS IS NOT TEMPORARY
 # No, we WANT to use ls, so:
+# XXX Mysteriously, this ONE has to start with "function", or else inject gets an error.
 # shellcheck disable=2012
-ll() { ls -lrtA --color "$@" | less -FXRn +G ; }
+function ll() { ls -lrtA --color "$@" | less -FXRn +G ; }
 # Display progress
 alias dd="dd status=progress"
 alias rsync="rsync --info=progress2"
@@ -173,7 +174,7 @@ F() { free -h ; }
 # Process list overview (for Linux)
 alias P="ps axfwwo pid,user,start,rss,stat,cmd | less -SXRn"
 # Two purposes: 1. lxl shound work with incus too. 2. avoid Ubuntu agressively installing lxd snap BECAUSE OF CALLING AN UNINSTALLED CLIENT... Very unelegant, Ubuntu!
-lxc() { if [[ -x /usr/bin/incus ]]; then command incus "$@" ; elif [[ -x /snap/bin/lxc ]]; then command lxc "$@" ; else echo "No LXD or Incus" ; fi }
+lxc() { if [[ -x /usr/bin/incus ]]; then command incus "$@" ; elif [[ -x /snap/bin/lxc ]]; then command lxc "$@" ; else echo "No LXD or Incus" ; fi ; }
 # lxd/lxc list conatiners
 alias lxl='lxc list -c ns46tSbNm,image.release'
 # lxd/lxc show port forwards XXX not pretty if no forwards
@@ -362,7 +363,7 @@ alias kbd-mac="kbd-reset;xmodmap -e 'keysym Alt_L = Mode_switch' -e 'keysym Supe
 # Or. on Ubuntu, put this into /etc/default/keyboard: XKBOPTIONS="ctrl:nocaps"
 
 # Load age-encrypted environment variables in shell. Uses trap to restore stty echo if password prompting is ctrl-c-ed.
-E { trap 'stty sane; set +a; echo; return 1' INT; set -a; eval "$(age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i -- "$1.*=")"; set +a; trap - INT ; }
+E() { trap 'stty sane; set +a; echo; return 1' INT; set -a; eval "$(age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i -- "$1.*=")"; set +a; trap - INT ; }
 # Make it usable in scripts ran from this bash
 export -f E
 # Helper function to list the variables without exposing the value.
