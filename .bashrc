@@ -139,13 +139,13 @@ alias gclean="git reset --hard && git clean -f -d -x"
 alias xxh="hexdump -v -e '\"%08.8_ax:\"' -e '16/1 \" %02x\"' -e '\"  \" 16/1 \"%_p\" \"\n\"'"
 
 # Highlight function, max 5 params. Use "." to skip parameters.
-hl() { local GR="grep --line-buffered --color=always -E"; GREP_COLORS="mt=01;31" $GR "$1|$" | GREP_COLORS="mt=01;32" $GR "$2|$" | GREP_COLORS="mt=01;33" $GR "$3|$" | GREP_COLORS="mt=01;34" $GR "$4|$" | GREP_COLORS="mt=01;35" $GR "$5|$" ; }
+function hl() { local GR="grep --line-buffered --color=always -E"; GREP_COLORS="mt=01;31" $GR "$1|$" | GREP_COLORS="mt=01;32" $GR "$2|$" | GREP_COLORS="mt=01;33" $GR "$3|$" | GREP_COLORS="mt=01;34" $GR "$4|$" | GREP_COLORS="mt=01;35" $GR "$5|$" ; }
 export -f hl
 
 # Recursive git
-G() { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
+function G() { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
 # Recursive git status. This is to quickly find uncommitted changes, not a detailed view
-GS() { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "$a"; tput rmso; if ! command git -C "$a" diff-index --quiet --ignore-submodules HEAD --; then if [ "$#" -lt 3 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; fi ; done ; }
+function GS() { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "$a"; tput rmso; if ! command git -C "$a" diff-index --quiet --ignore-submodules HEAD --; then if [ "$#" -lt 3 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; fi ; done ; }
 
 # Show .gitignore-d files, all of them
 alias gii="git ls-files --exclude-standard --ignored --others"
@@ -154,40 +154,40 @@ alias gi="gii | egrep -v '^vendor/|^node_modules/|^.venv/'"
 # Quick grep, with case and ignore case.
 # NOTE: GR_EXCLUDE is an array!
 export GR_EXCLUDE=(-I --exclude-dir=.git --exclude=*.min.* --exclude=*.sql --exclude=*.log --exclude=tags --exclude-dir=cache --exclude-dir=vendor --exclude-dir=.venv --exclude-dir=venv --exclude-dir=node_modules --exclude-dir=storage)
-gr() { command grep --color=auto -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null ; }
-ggr() { command grep --color=force -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXnr ; }
+function gr() { command grep --color=auto -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null ; }
+function ggr() { command grep --color=force -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXnr ; }
 # Better git grep
-gg() { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
+function gg() { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
 
 # GNU screen with SSH_AUTH_SOCK filename transfer, to be used with `CTRL+A` `:paste s`, tmux-bound to <c-q><c-r>a
 # You can append a PID if there are multiple screen-s.
 # We WANT this to expand when defined, so:
 # shellcheck disable=SC2139
-s() { screen ${1:+-S} $1 -X register s " export SSH_AUTH_SOCK=\"$SSH_AUTH_SOCK\"" ; screen -xR "$1" ; }
+function s() { screen ${1:+-S} $1 -X register s " export SSH_AUTH_SOCK=\"$SSH_AUTH_SOCK\"" ; screen -xR "$1" ; }
 
 # Watch out for using git as a different user than the repository. Avoid mandatory reconfiguration of git with user/email for hotfixes.
-git() { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " config grep log blame diff show status init clone " == *" $1 "* ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
+function git() { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " config grep log blame diff show status init clone " == *" $1 "* ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
-M() { mount "$@" | grep '^\/dev\/' ; }
-D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none\|^overlay\|^shm' ; }
+function M() { mount "$@" | grep '^\/dev\/' ; }
+function D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none\|^overlay\|^shm' ; }
 # Free memory
-F() { free -h ; }
+function F() { free -h ; }
 # Process list overview (for Linux)
 alias P="ps axfwwo pid,user,start,rss,stat,cmd | less -SXRn"
 # Two purposes: 1. lxl shound work with incus too. 2. avoid Ubuntu agressively installing lxd snap BECAUSE OF CALLING AN UNINSTALLED CLIENT... Very unelegant, Ubuntu!
-lxc() { if [[ -x /usr/bin/incus ]]; then command incus "$@" ; elif [[ -x /snap/bin/lxc ]]; then command lxc "$@" ; else echo "No LXD or Incus" ; fi ; }
+function lxc() { if [[ -x /usr/bin/incus ]]; then command incus "$@" ; elif [[ -x /snap/bin/lxc ]]; then command lxc "$@" ; else echo "No LXD or Incus" ; fi ; }
 # lxd/lxc list conatiners
 alias lxl='lxc list -c ns4tSbNm,image.release --format=compact | hl STOPPED RUNNING'
 # lxd/lxc show port forwards XXX not pretty if no forwards
-lxp() { for ip in $(lxc network forward list lxdbr0 -f csv | awk -F, -e '{ print $1 }'); do lxc network forward show lxdbr0 "$ip"; done ; }
+function lxp() { for ip in $(lxc network forward list lxdbr0 -f csv | awk -F, -e '{ print $1 }'); do lxc network forward show lxdbr0 "$ip"; done ; }
 # With MAC addresses:
 #alias lxl='lxc list -c ns46tSbNm,image.release,volatile.lxdbr0.hwaddr:lxdbr0,volatile.eth0.hwaddr:eth0'
 # If can't use docker as current user, try sudo
 # We define a shell command, but we don't mind that sudo will not use it, so:
 # shellcheck disable=SC2033,SC2032
-docker() { if [[ -r /var/run/docker.sock ]] ; then command docker "$@" ; else sudo docker "$@" ; fi ; }
+function docker() { if [[ -r /var/run/docker.sock ]] ; then command docker "$@" ; else sudo docker "$@" ; fi ; }
 # shellcheck disable=SC2033,SC2032
-docker-compose() { if [[ -r /var/run/docker.sock ]] ; then command docker-compose "$@" ; else sudo docker-compose "$@" ; fi ; }
+function docker-compose() { if [[ -r /var/run/docker.sock ]] ; then command docker-compose "$@" ; else sudo docker-compose "$@" ; fi ; }
 # Docker containers overview
 alias C="docker ps -as"
 # Docker-compose
@@ -222,7 +222,7 @@ alias zl="zfs list -t all -o space,compressratio"
 # aider-chat
 alias aider="uvx --from aider-chat aider --vim --dark-mode --analytics-disable --no-gitignore --watch-files"
 # Replicate zsh's "vared" command (with autocompletion)
-vared() { read -r -e -p "$1=" -i "${!1}" "$1" ; }
+function vared() { read -r -e -p "$1=" -i "${!1}" "$1" ; }
 complete -v vared
 
 # Only if not on busybox
@@ -280,42 +280,42 @@ compopt -o bashdefault cd
 # - Functions start, reload and restart show the status of how it went, and also tails the log/journal afterwards. Exit tail with CTRL-c.
 
 # Generic helper functions to set up bash-autocomplete for our aliases
-_scx() { COMP_WORDS=("systemctl" "$1" "${COMP_WORDS[@]:1}") ; ((COMP_CWORD++)) ; _systemctl ; }
-_jcx() { COMP_WORDS=("journalctl" "$1" "${COMP_WORDS[@]:1}") ; ((COMP_CWORD++)) ; _journalctl ; }
+function _scx() { COMP_WORDS=("systemctl" "$1" "${COMP_WORDS[@]:1}") ; ((COMP_CWORD++)) ; _systemctl ; }
+function _jcx() { COMP_WORDS=("journalctl" "$1" "${COMP_WORDS[@]:1}") ; ((COMP_CWORD++)) ; _journalctl ; }
 
 # "SystemCtl", generic alias, because who has time to type THAT much?
-sc() { SC="${*: -1}" ; systemctl "$@" ; }
+function sc() { SC="${*: -1}" ; systemctl "$@" ; }
 complete -F _systemctl sc
 # "User-level SystemCtl" alias, becuase, there's NOT even a short-option or something...
-usc() { SC="${*: -1}" ; systemctl --user "$@" ; }
-_usc() { _scx --user ; }
+function usc() { SC="${*: -1}" ; systemctl --user "$@" ; }
+function _usc() { _scx --user ; }
 complete -F _usc usc
 # "SystemCtl List" services, because it should be simple
-scl() { systemctl list-units --type service --all ; }
+function scl() { systemctl list-units --type service --all ; }
 # Systemctl Daemon-Reload", because systemd can't do it on its own... Do user or system depending on UID
-sdr() { if [ $UID -eq 0 ]; then systemctl daemon-reload; else systemctl --user daemon-reload; fi ; }
+function sdr() { if [ $UID -eq 0 ]; then systemctl daemon-reload; else systemctl --user daemon-reload; fi ; }
 
 # JournalCtl for Unit
-jc() { SC="${1:-${SC}}" ; journalctl -xu "$SC" ; }
-_jc() { _jcx "--unit" ; }
+function jc() { SC="${1:-${SC}}" ; journalctl -xu "$SC" ; }
+function _jc() { _jcx "--unit" ; }
 complete -F _jc jc
 # ...with "tail -f"
-jcf() { SC="${1:-${SC}}" ; journalctl -xefu "$SC" ; }
+function jcf() { SC="${1:-${SC}}" ; journalctl -xefu "$SC" ; }
 complete -F _jc jcf
 # User-level JournalCtrl for Unit
-ujc() { SC="${1:-${SC}}" ; journalctl -x --user-unit "$SC" ; }
-_ujc() { _jcx "--user-unit" ; }
+function ujc() { SC="${1:-${SC}}" ; journalctl -x --user-unit "$SC" ; }
+function _ujc() { _jcx "--user-unit" ; }
 complete -F _ujc ujc
 
 # Reusable command to show status afterwards, and tail the log during reload. Exit with CTRL-c
 # - We use daemon-reload automatically, because very often the thing you modified for a restart is the unit file.
 # - We use reset-failed, because for some incomprehensible reason, the restart-count limit imposed by StartLimitInterval[Sec] also affects manual restarts.
-stail() { SC="${2:-${SC}}" ; sdr ; systemctl reset-failed "$SC" ; journalctl -n 0 -xfu "$SC" & systemctl "$1" "$SC" ; scs ; fg %journalctl ; }
+function stail() { SC="${2:-${SC}}" ; sdr ; systemctl reset-failed "$SC" ; journalctl -n 0 -xfu "$SC" & systemctl "$1" "$SC" ; scs ; fg %journalctl ; }
 # Param #1: desired function name
 # Param #2: command to call
 # Param #3: command action to call
 # Param #4+: any further options to pass to action
-_mksc() {
+function _mksc() {
 	eval "$1() { SC=\"\${1:-\${SC}}\" ; $2 $3 ${*:4} \"\$SC\" ; }"
 	eval "_$1() { _scx \"$3\" ; }"
 	eval "complete -F _$1 $1"
@@ -327,7 +327,7 @@ _mksc sc1 stail start
 _mksc scr stail reload-or-restart
 _mksc scR stail restart
 # Override sc0 to add an additional `scs` to show status afterwards
-sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
+function sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 
 # Now fix bash competion for our systemd aliases.
 # Even without bash-completion, most linux package managers put these there from the systemd packages - take advantage.
@@ -364,21 +364,21 @@ alias kbd-mac="kbd-reset;xmodmap -e 'keysym Alt_L = Mode_switch' -e 'keysym Supe
 # Or. on Ubuntu, put this into /etc/default/keyboard: XKBOPTIONS="ctrl:nocaps"
 
 # Load age-encrypted environment variables in shell. Uses trap to restore stty echo if password prompting is ctrl-c-ed.
-E() { trap 'stty sane; set +a; echo; return 1' INT; set -a; eval "$(age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i -- "$1.*=")"; set +a; trap - INT ; }
+function E() { trap 'stty sane; set +a; echo; return 1' INT; set -a; eval "$(age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i -- "$1.*=")"; set +a; trap - INT ; }
 # Make it usable in scripts ran from this bash
 export -f E
 # Helper function to list the variables without exposing the value.
-EL() { trap 'stty sane; set +a; echo; return 1' INT; age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i "$1.*=" | sed 's/=.*//'; trap - INT ; }
+function EL() { trap 'stty sane; set +a; echo; return 1' INT; age -i ~/.ssh/age.key -d "${2:-$HOME/.ssh/env.age}" | grep -i "$1.*=" | sed 's/=.*//'; trap - INT ; }
 
 # Quickly create/list/delete VMs on DigitalOcean.
 # NOTE: You can set "export DIGITALOCEAN_ACCESS_TOKEN=..."
-do-mk() { doctl compute droplet create "${1:-tmp1}" --region ams3 --ssh-keys "$(doctl compute ssh-key list --format=ID --no-header | paste -sd "," -)" --image "${2:-ubuntu-24-04-x64}" --size "${3:-s-2vcpu-2gb}" --wait -v ; }
-do-ssh() { ( HN="${1:-tmp1}"; shift; ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "root@$(doctl compute droplet list --format=PublicIPv4 --no-header "${HN}")" "$@" ) ; }
-do-ls() { doctl compute droplet list --format Name,ID,PublicIPv4,Memory,VCPUs,Disk,Region,Status; doctl account get --format Email,DropletLimit,Status ; }
-do-rm() { doctl compute droplet delete "$(doctl compute droplet list --format=ID --no-header "${1:-tmp1}")" ; }
+function do-mk() { doctl compute droplet create "${1:-tmp1}" --region ams3 --ssh-keys "$(doctl compute ssh-key list --format=ID --no-header | paste -sd "," -)" --image "${2:-ubuntu-24-04-x64}" --size "${3:-s-2vcpu-2gb}" --wait -v ; }
+function do-ssh() { ( HN="${1:-tmp1}"; shift; ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "root@$(doctl compute droplet list --format=PublicIPv4 --no-header "${HN}")" "$@" ) ; }
+function do-ls() { doctl compute droplet list --format Name,ID,PublicIPv4,Memory,VCPUs,Disk,Region,Status; doctl account get --format Email,DropletLimit,Status ; }
+function do-rm() { doctl compute droplet delete "$(doctl compute droplet list --format=ID --no-header "${1:-tmp1}")" ; }
 
 # Automatically set TMUX window title on SSH
-ssh() {
+function ssh() {
 	# Only if running under TMUX
 	if [ -n "$TMUX" ]; then
 		# Store current window name
