@@ -104,9 +104,8 @@ alias vim='vim -n -i NONE "+set nobackup noswapfile encoding=utf8 mouse=a" +"pac
 . /usr/share/bash-completion/bash_completion 2>/dev/null
 
 # Set up some handy aliases
-#alias l="ls -lrt" # Shows only non-hidden files.
-alias l="ls -lrtA" # Always shows hidden files too.
-alias la="ls -lrtA -I*" # For Linux. Hidden files ONLY.
+alias l="ls -lrtAp" # Always shows hidden files too.
+alias la="ls -lrtAp -I*" # For Linux. Hidden files ONLY.
 #alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
 # A version of ls that is still quick to type, BUT uses "less" automatically BUT exits it immediately if text is not long enough.
 # NOTE: use this in the "function ..." form, because if there is an ll alias, that causes an error (even if we unalias in the previos lik
@@ -114,7 +113,7 @@ unalias ll 2>/dev/null # Many systems has an ll alias, THIS IS NOT TEMPORARY
 # No, we WANT to use ls, so:
 # XXX Mysteriously, this ONE has to start with "function", or else inject gets an error. Also, psql ones SOMETIMES cause an error???
 # shellcheck disable=2012
-function ll() { ls -lrtA --color "$@" | less -FXRn +G ; }
+function ll() { ls -lrtAp --color "$@" | less -FXRn +G ; }
 # Display progress
 alias dd="dd status=progress"
 alias rsync="rsync --info=progress2"
