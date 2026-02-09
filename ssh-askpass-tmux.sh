@@ -24,4 +24,4 @@ elif [[ "$1" == "popup" ]]; then
 fi
 
 # Called as SSH_AGENT ...
-tmux display-popup -y P -h 7 -e MSG="$1" -EE "$HOME/.kkrc/ssh-askpass-tmux.sh popup"
+tmux display-popup -y P -h 7 -e MSG="$1" -E "$HOME/.kkrc/ssh-askpass-tmux.sh popup"
