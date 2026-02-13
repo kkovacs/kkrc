@@ -1,0 +1,15 @@
+# If you put this example file at ~/.tmux.local, then you can start it with `<c-q><c-r>0`
+
+# Rename default session
+rename-session main
+
+# Split to three
+split-window -d -t 0 -h
+split-window -d -t 1 -v
+resize-pane -x 62 -t 0
+resize-pane -y 12 -t 1
+
+# Auto-start stuff in various panes
+#send-keys -t 0 'prettyping 1.1.1.1' enter
+#send-keys -t 1 "vim ~/todo.md"
+#send-keys -t 2 "sudo tcpdump -vvln -i en0 port 53 | grep -Eo '[A-Z]+\\? .*?\\. '" enter
