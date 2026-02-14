@@ -1,4 +1,4 @@
-# Ensure .config directory for nvim
+# Ensure .config directory
 mkdir -p ~/.config
 
 # Softlink all the files
@@ -17,20 +17,13 @@ mysoftlink .psqlrc ~/.psqlrc
 mysoftlink .inputrc ~/.inputrc
 mysoftlink .i3 ~/.i3
 mysoftlink .ansible.cfg ~/.ansible.cfg
+mysoftlink .config/opencode ~/.config/opencode
+mysoftlink .config/Code ~/.config/Code
 
 # Damn you Microsoft for not being able to keep everything in one place
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+if [[ "$OSTYPE" == "darwin"* ]]; then
 	# For system-level install
-	mkdir -p "$HOME/.config/Code/User/"
-	mysoftlink other/settings.json $HOME/.config/Code/User/settings.json
-	mysoftlink other/keybindings.json $HOME/.config/Code/User/keybindings.json
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-	# For system-level install
-	mkdir -p "$HOME/Library/Application Support/Code/User/"
-	mysoftlink other/settings.json "$HOME/Library/Application Support/Code/User/settings.json"
-	mysoftlink other/keybindings.json "$HOME/Library/Application Support/Code/User/keybindings.json"
+	mysoftlink .config/Code "$HOME/Library/Application Support/Code"
 	# For portable (which I prefer)
-	mkdir -p "$HOME/Applications/code-portable-data/User/"
-	mysoftlink other/settings.json "$HOME/Applications/code-portable-data/User/settings.json"
-	mysoftlink other/keybindings.json "$HOME/Applications/code-portable-data/User/keybindings.json"
+	mysoftlink .config/Code "$HOME/Applications/code-portable-data"
 fi
