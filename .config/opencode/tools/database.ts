@@ -10,7 +10,9 @@ export default tool({
     let result = "";
 
     try {
-      result = await Bun.$`duckdb -c "${args.sql}" opencode-test.ddb`.text()
+      const result = await Bun.$`duckdb opencode-test.ddb`
+        .in$(args.sql)
+        .text();
     } catch (err) {
       // For now, opencode didn't see the ShellError exception, so let's handle this for it.
       // XXX Check https://opencode.ai/docs/custom-tools/ to see if they added error handling.
