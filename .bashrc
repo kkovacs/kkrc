@@ -220,10 +220,10 @@ alias lb="lsblk -Mf"
 alias lvl="pvs; echo; vgs; echo; lvs -o lv_name,pool_lv,size,data_percent,metadata_percent,origin"
 # ZFS "du"
 alias zl="zfs list -t all -o space,compressratio"
-# aider-chat
-alias aider="uvx --from aider-chat aider --vim --dark-mode --analytics-disable --no-show-release-notes --no-gitignore --watch-files"
-# opencode run, but with fixed model, and --continue
-function O() { opencode -m opencode/kimi-k2.5-free run -c "$@" ; }
+# AI helper function for easy, bash-based interaction. First arg is system prompt, second is optional model, stdin is user message.
+# NOTE: If you edit this, you should edit inject-ai.txt too.
+function AI() { python3 -c "import sys,json,urllib.request;u='https://openrouter.ai/api/v1/chat/completions';h={'Authorization':'Bearer '+__import__('os').environ.get('OPENROUTER_API_KEY',''),'Content-Type':'application/json'};d=json.dumps({'model':'${2:-google/gemini-3-flash-preview}','messages':[{'role':'system','content':'$1'},{'role':'user','content':sys.stdin.read()}]}).encode();print(json.loads(urllib.request.urlopen(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])" "$@"; }
+export -f AI
 # Replicate zsh's "vared" command (with autocompletion)
 function vared() { read -r -e -p "$1=" -i "${!1}" "$1" ; }
 complete -v vared
