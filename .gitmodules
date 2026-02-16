@@ -7,6 +7,3 @@
 [submodule ".vim/bundle/editorconfig-vim"]
 	path = .vim/pack/kkrc/start/editorconfig-vim
 	url = https://github.com/editorconfig/editorconfig-vim.git
-[submodule ".vim/pack/kkrc/start/vim-ai"]
-	path = .vim/pack/kkrc/start/vim-ai
-	url = https://github.com/madox2/vim-ai.git
