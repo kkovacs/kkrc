@@ -222,7 +222,7 @@ alias lvl="pvs; echo; vgs; echo; lvs -o lv_name,pool_lv,size,data_percent,metada
 alias zl="zfs list -t all -o space,compressratio"
 # AI helper function for easy, bash-based interaction. First arg is system prompt, second is optional model, stdin is user message.
 # NOTE: If you edit this, you should edit inject-ai.txt too.
-function AI() { AI_SYSTEM="$1" python3 -c "import sys,json,urllib.request,os;u='https://openrouter.ai/api/v1/chat/completions';h={'Authorization':'Bearer '+os.environ.get('OPENROUTER_API_KEY',''),'Content-Type':'application/json'};d=json.dumps({'model':'${2:-google/gemini-3-flash-preview}','messages':[{'role':'system','content':os.environ.get('AI_SYSTEM','')},{'role':'user','content':sys.stdin.read()}]}).encode();o=urllib.request.build_opener(urllib.request.ProxyHandler());print(json.loads(o.open(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])"; }
+function AI() { AI_SYSTEM="$1" python3 -c "import sys,json,urllib.request,os;u='https://openrouter.ai/api/v1/chat/completions';h={'Authorization':'Bearer '+os.environ.get('OPENROUTER_API_KEY',''),'Content-Type':'application/json'};d=json.dumps({'model':'${2:-x-ai/grok-code-fast-1}','messages':[{'role':'system','content':os.environ.get('AI_SYSTEM','')},{'role':'user','content':sys.stdin.read()}]}).encode();o=urllib.request.build_opener(urllib.request.ProxyHandler());print(json.loads(o.open(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])"; }
 export -f AI
 # Replicate zsh's "vared" command (with autocompletion)
 function vared() { read -r -e -p "$1=" -i "${!1}" "$1" ; }
