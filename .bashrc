@@ -133,7 +133,10 @@ alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s 
 alias gs="git status -sb"
 alias gf="git fetch --all -v"
 alias gp="git pull --ff-only -v"
+# gap: "git pull + add + push": sync, to be used with a notes directory
 function gap() { gs ; gp ; git add . ; git commit -m sync ; git push ; } ; export -f gap
+# gat: "git at": diff a file with itself at a given ref
+function gat() { vimdiff "$1" <(git show "${2:-HEAD^}":"$1" ) ; }
 alias gclean="git reset --hard && git clean -f -d -x"
 # xxd alternative. Interestingly, "hexdump" is more widespread than "od"
 alias xxh="hexdump -v -e '\"%08.8_ax:\"' -e '16/1 \" %02x\"' -e '\"  \" 16/1 \"%_p\" \"\n\"'"
