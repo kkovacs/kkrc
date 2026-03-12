@@ -5,7 +5,8 @@
 
 # Called without params means we're installing.
 if [[ "$#" -eq 0 ]]; then
-    if [[ -z $SSH_AUTH_SOCK ]]; then
+    # NOTE: OS X has its own ssh-agent, but if we are here, then we want to replace it with our own solution.
+    if [[ -z $SSH_AUTH_SOCK || $SSH_AUTH_SOCK == *"com.apple.launchd"* ]]; then
         # Start ssh-agent in background, using the right variables
         eval `DISPLAY=dummy SSH_ASKPASS="$HOME/.kkrc/ssh-askpass-tmux.sh" ssh-agent`
     fi
