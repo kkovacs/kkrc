@@ -140,6 +140,8 @@ function gat() { vimdiff "$1" <(git show "${2:-HEAD^}":"$1" ) ; }
 alias gclean="git reset --hard && git clean -f -d -x"
 # xxd alternative. Interestingly, "hexdump" is more widespread than "od"
 alias xxh="hexdump -v -e '\"%08.8_ax:\"' -e '16/1 \" %02x\"' -e '\"  \" 16/1 \"%_p\" \"\n\"'"
+# JSON
+alias J="python3 -mjson.tool"
 
 # Highlight function, max 5 params. Use "." to skip parameters.
 function hl() { local GR="grep --line-buffered --color=always -E"; GREP_COLORS="mt=01;31" $GR "$1|$" | GREP_COLORS="mt=01;32" $GR "$2|$" | GREP_COLORS="mt=01;33" $GR "$3|$" | GREP_COLORS="mt=01;34" $GR "$4|$" | GREP_COLORS="mt=01;35" $GR "$5|$" ; }
