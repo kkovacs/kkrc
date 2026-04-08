@@ -19,6 +19,7 @@ mysoftlink .i3 ~/.i3
 mysoftlink .ansible.cfg ~/.ansible.cfg
 mysoftlink .config/opencode ~/.config/opencode
 mysoftlink .config/Code ~/.config/Code
+mysoftlink .config/ghostty ~/.config/ghostty
 
 # Damn you Microsoft for not being able to keep everything in one place
 if [[ "$OSTYPE" == "darwin"* ]]; then
