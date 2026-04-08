@@ -1,1 +1,4 @@
+# OS X fullscreen mode that is compatible with Workspaces.
 fullscreen = non-native-visible-menu
+# I'm old school, don't touch my `!=`
+font-feature = -calt
