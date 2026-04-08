@@ -405,7 +405,7 @@ function ssh() {
 		tmux rename-window "${NAME}" >/dev/null 2>&1
 	fi
 	# Do it
-	command ssh "$@"
+	command ssh -q "$@"
 	# To Restore window name automatically:
 	#tmux rename-window "$SAVED" >/dev/null 2>/dev/null
 	# To switch back to auto-renaming after disconnection:
