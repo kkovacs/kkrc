@@ -2,3 +2,5 @@
 fullscreen = non-native-visible-menu
 # I'm old school, don't touch my `!=`
 font-feature = -calt
+# <cmd+`> to toggle quake terminal
+#keybind = global:cmd+backquote=toggle_quick_terminal
