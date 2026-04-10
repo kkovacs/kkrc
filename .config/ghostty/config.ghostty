@@ -4,3 +4,8 @@ fullscreen = non-native-visible-menu
 font-feature = -calt
 # <cmd+`> to toggle quake terminal
 #keybind = global:cmd+backquote=toggle_quick_terminal
+
+# Needed to use ctrl-tab and ctrl-shift-tab with tmux.
+# Thanks, https://github.com/ghostty-org/ghostty/discussions/9381
+keybind = ctrl+tab=esc:[27;5;9~
+keybind = ctrl+shift+tab=esc:[27;6;9~
