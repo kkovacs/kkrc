@@ -1,5 +1,5 @@
 
-## You have DuckDB
+## You have DuckDB:
 
 You have `duckdb` installed, you can use it for all kinds of database operations and for working with JSON, CSV, .parquet files and to access PostgreSQL, MySQL, SQLite databases via `ATTACH`. DuckDB uses a PostgreSQL-compatible SQL dialect, but with its own extensions.
 
