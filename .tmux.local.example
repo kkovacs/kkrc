@@ -4,5 +4,6 @@ bind "c-l" send-keys -K c-q ^ c-l
 # Local menu
 bind -T menus "c-l" display-menu -T " Local... " \
 "Git clone our project .............." "c" "send-keys ' git config --global user.name \"ME\" && git config --global user.email \"me@example.com\" && git clone ...' enter" \
+"llama.cpp (g)emma-4-e2b ............" "g" "send-keys ' llama-server --webui-mcp-proxy -hf unsloth/gemma-4-E2B-it-GGUF:UD-Q4_K_XL' enter" \
 "" \
 "Reload tmux.local .................." "0" "source-file ~/.tmux.local"
