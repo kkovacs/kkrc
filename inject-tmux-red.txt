@@ -1,0 +1,1 @@
+tmux set -g status-left "#[bold,fg=white,bg=red] PROD #[default] " \; set -g status-right-style bold,fg=white,bg=red \; set -g window-status-current-style bold,fg=white,bg=red
