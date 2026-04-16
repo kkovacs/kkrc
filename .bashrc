@@ -165,11 +165,10 @@ function ggr() { command grep --color=force -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/
 # Better git grep
 function gg() { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
 
-# GNU screen with SSH_AUTH_SOCK filename transfer, to be used with `CTRL+A` `:paste s`, tmux-bound to <c-q><c-r>a
-# You can append a PID if there are multiple screen-s.
-# We WANT this to expand when defined, so:
+# tmux-first (uses set-environment -g, auto-inherited), falls back to GNU screen (register + paste with CTRL+A ]).
+# Usage: s [sessionname]. Bound in tmux to <c-q><c-r>a.
 # shellcheck disable=SC2139
-function s() { screen ${1:+-S} $1 -X register s " export SSH_AUTH_SOCK=\"$SSH_AUTH_SOCK\"" ; screen -xR "$1" ; }
+function s() { command -v tmux >/dev/null 2>&1 && { tmux set-environment SSH_AUTH_SOCK "$SSH_AUTH_SOCK"; tmux attach-session ${1:+-t} "$1" || tmux new-session ${1:+-s} "$1"; } || { screen ${1:+-S} $1 -X register s " export SSH_AUTH_SOCK=\"$SSH_AUTH_SOCK\""; screen -xR "$1"; }; }
 
 # Watch out for using git as a different user than the repository. Avoid mandatory reconfiguration of git with user/email for hotfixes.
 function git() { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " config grep log blame diff show status init clone " == *" $1 "* ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
