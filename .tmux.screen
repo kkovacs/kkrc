@@ -76,17 +76,15 @@ bind r send-keys -R \; clear-history \; refresh-client \; send-keys ^L
 # Kill pane/window
 bind x confirm-before -p "kill-pane #P? (y/n)" kill-pane
 
-#
 # GNU-screen status simulator
-#
 set -g status on
 set -g status-position bottom
-set -g status-style bg=colour235,fg=colour250
+set -g status-style bg=gray,fg=black
 
-# Window list format (non-current): dimmed
+# Window list format (non-current)
 setw -g window-status-format " #I:#W "
 
-# Current window: bold white-on-blue, with flags
+# Current window
 setw -g window-status-current-format "#[bold,fg=white,bg=blue] #I:#F:#W #[default]"
 
 # Activity style
@@ -95,9 +93,9 @@ set -g window-status-activity-style fg=yellow
 # No left side content
 set -g status-left ""
 
-# Right side: hostname in blue-on-blue (inverted/highlighted)
+# Right side: hostname in white-on-blue
 set -g status-right "#[bold,fg=white,bg=blue] #H #[default]"
 
-# Leave these last so they don't stop config; incompatible with tmux on Ubuntu 24.04 and before :(
-set -s extended-keys on
-set -s extended-keys-format csi-u
+# Leave these last so they don't stop config loading - incompatible with tmux on Ubuntu 24.04 and before :(
+set -gs extended-keys on
+set -gs -q extended-keys-format csi-u
