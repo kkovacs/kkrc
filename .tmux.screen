@@ -1,16 +1,13 @@
-# Converted from .screenrc
-
-# Keep GNU Screen's usual prefix
+unbind C-b
 set -g prefix c-a
-unbind ^B
 bind a send-prefix
 bind c-a last-window
 
 # Switch windows
 bind BSpace previous-window
 bind Space next-window
-bind-key -n C-Space next-window
-bind-key -n C-BSpace previous-window
+bind -n C-Space next-window
+bind -n C-BSpace previous-window
 
 # Reload tmux config
 bind R source-file ~/.kkrc/.tmux.screen\; display ".tmux.screen reloaded!"
@@ -100,9 +97,6 @@ set -g status-left ""
 
 # Right side: hostname in blue-on-blue (inverted/highlighted)
 set -g status-right "#[bold,fg=white,bg=blue] #H #[default]"
-
-set -g status-interval 60
-set -g status-justify left
 
 # Leave these last so they don't stop config; incompatible with tmux on Ubuntu 24.04 and before :(
 set -s extended-keys on
