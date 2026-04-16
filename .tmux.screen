@@ -80,6 +80,7 @@ bind x confirm-before -p "kill-pane #P? (y/n)" kill-pane
 set -g status on
 set -g status-position bottom
 set -g status-style bg=gray,fg=black
+set -g message-style bg=gray,fg=black
 
 # Window list format (non-current)
 set -g window-status-format " #I:#W "
