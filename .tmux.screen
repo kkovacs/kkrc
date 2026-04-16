@@ -1,0 +1,109 @@
+# Converted from .screenrc
+
+# Keep GNU Screen's usual prefix
+set -g prefix c-a
+unbind ^B
+bind a send-prefix
+bind c-a last-window
+
+# Switch windows
+bind BSpace previous-window
+bind Space next-window
+bind-key -n C-Space next-window
+bind-key -n C-BSpace previous-window
+
+# Reload tmux config
+bind R source-file ~/.kkrc/.tmux.screen\; display ".tmux.screen reloaded!"
+
+# Copy mode
+bind Escape copy-mode
+
+# Paste immediately
+bind ] paste-buffer
+bind c-p paste-buffer
+bind p paste-buffer
+
+# Keys INSIDE copy-mode
+bind -T copy-mode-vi Escape send -X cancel
+bind -T copy-mode-vi Space send -X clear-selection
+bind -T copy-mode-vi v send -X begin-selection
+bind -T copy-mode-vi V send -X select-line
+bind -T copy-mode-vi C-v send -X rectangle-toggle
+bind -T copy-mode-vi Enter send -X copy-selection-and-cancel
+bind -T copy-mode-vi y send -X copy-selection-and-cancel
+
+# Various comfort settings stolen from all over the net
+set -g status-keys vi
+set -g renumber-windows on
+set -g history-limit 100000
+set -g mode-keys vi
+set -g mouse off
+set -g automatic-rename on
+set -g set-titles on
+set -sg escape-time 0
+set -g display-time 1500
+set -g detach-on-destroy off
+
+# Split vertically
+bind v split-window -h
+bind | split-window -h
+# Split horizontally
+bind s split-window -v
+# Window chooser
+bind "\"" choose-window -Z
+bind "\'" choose-session -Z
+
+# Rename window
+bind A command-prompt -I "#W" "rename-window '%%'"
+
+# Move window left and right
+bind , swap-window -d -t -1
+bind . swap-window -d -t +1
+
+# Vim style pane selection
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+bind c-h select-pane -L
+bind c-j select-pane -D
+bind c-k select-pane -U
+bind c-l select-pane -R
+bind [ select-pane -t :.-
+bind ] select-pane -t :.+
+bind Tab select-pane -t :.+
+
+# Clear pane
+bind r send-keys -R \; clear-history \; refresh-client \; send-keys ^L
+
+# Kill pane/window
+bind x confirm-before -p "kill-pane #P? (y/n)" kill-pane
+
+#
+# GNU-screen status simulator
+#
+set -g status on
+set -g status-position bottom
+set -g status-style bg=colour235,fg=colour250
+
+# Window list format (non-current): dimmed
+setw -g window-status-format " #I:#W "
+
+# Current window: bold white-on-blue, with flags
+setw -g window-status-current-format "#[bold,fg=white,bg=blue] #I:#F:#W #[default]"
+
+# Activity style
+set -g window-status-activity-style fg=yellow
+
+# No left side content
+set -g status-left ""
+
+# Right side: hostname in blue-on-blue (inverted/highlighted)
+set -g status-right "#[bold,fg=white,bg=blue] #H #[default]"
+
+set -g status-interval 60
+set -g status-justify left
+
+# Leave these last so they don't stop config; incompatible with tmux on Ubuntu 24.04 and before :(
+set -s extended-keys on
+set -s extended-keys-format csi-u
