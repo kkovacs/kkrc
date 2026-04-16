@@ -84,18 +84,22 @@ set -g message-style bg=gray,fg=black
 
 # Window list format (non-current)
 set -g window-status-format " #I:#W "
+set -g window-status-style bg=gray,fg=black
 
 # Current window
-set -g window-status-current-format "#[bold,fg=white,bg=blue] #I:#F:#W #[default]"
+set -g window-status-current-format " #I:#F:#W "
+set -g window-status-current-style bold,fg=white,bg=blue
 
 # Activity style
 set -g window-status-activity-style fg=yellow
 
 # No left side content
 set -g status-left ""
+set -g status-left-style bold,fg=white,bg=blue
 
 # Right side: hostname in white-on-blue
-set -g status-right "#[bold,fg=white,bg=blue] #H #[default]"
+set -g status-right " #H "
+set -g status-right-style bold,fg=white,bg=blue
 
 # Leave these last so they don't stop config loading - incompatible with tmux on Ubuntu 24.04 and before :(
 set -gs extended-keys on
