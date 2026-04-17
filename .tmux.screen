@@ -7,48 +7,51 @@ bind c-a last-window
 bind BSpace previous-window
 bind Space next-window
 bind -n C-Space next-window
-bind -n C-BSpace previous-window
 
 # Reload tmux config
-bind R source-file ~/.kkrc/.tmux.screen\; display ".tmux.screen reloaded!"
+bind R source-file ~/.kkrc/.tmux.screen
+
+# Toggle tmux "mouse" functionality
+bind m set mouse
+bind M set mouse on
 
 # Copy mode
 bind Escape copy-mode
 
 # Paste immediately
-bind ] paste-buffer
 bind c-p paste-buffer
-bind p paste-buffer
+bind p choose-buffer -Z
+bind P choose-buffer
 
 # Keys INSIDE copy-mode
 bind -T copy-mode-vi Escape send -X cancel
-bind -T copy-mode-vi Space send -X clear-selection
 bind -T copy-mode-vi v send -X begin-selection
 bind -T copy-mode-vi V send -X select-line
 bind -T copy-mode-vi C-v send -X rectangle-toggle
 bind -T copy-mode-vi Enter send -X copy-selection-and-cancel
 bind -T copy-mode-vi y send -X copy-selection-and-cancel
+bind -T copy-mode-vi Y send -X append-selection-and-cancel
 
 # Various comfort settings stolen from all over the net
 set -g status-keys vi
 set -g renumber-windows on
 set -g history-limit 100000
 set -g mode-keys vi
-set -g mouse off
+set -g mouse on
 set -g automatic-rename on
 set -g set-titles on
 set -sg escape-time 0
 set -g display-time 1500
 set -g detach-on-destroy off
 
-# Split vertically
+# Split
 bind v split-window -h
-bind | split-window -h
-# Split horizontally
+bind "|" split-window -h
 bind s split-window -v
+
 # Window chooser
 bind "\"" choose-window -Z
-bind "\'" choose-session -Z
+bind "'" choose-session -Z
 
 # Rename window
 bind A command-prompt -I "#W" "rename-window '%%'"
