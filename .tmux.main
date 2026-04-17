@@ -7,9 +7,9 @@ set -g prefix c-q
 #sepa='▌'	# Design #1
 #sepa='▌▌'	# Design #2
 #sepa='▚'	# Design #3
-#sepa='▄'	# Design #4
+sepa='▚▚'	# Design #4
 #sepa='▏▎▍▌▋▊▉'	# Design #5
-sepa='▎▌▊'	# Design #6
+#sepa='▎▌▊'	# Design #6
 
 # Status command on the right, between the clock and the screen size.
 mystat="%Y-%m-%d %a"			# Date with DOW, OS independent
