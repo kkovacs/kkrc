@@ -66,7 +66,7 @@ set -g mode-style "bg=#{@themecolour},fg=colour231"
 
 # Modifications compared to the original theme
 set -g status-left-length 100
-set -g status-left "#[fg=#{@gray1},bg=#{@themecolour},bold] #{?client_prefix,Q,-}#{?pane_pipe,P,-} #{?alternate_on,A,-}#{?window_zoomed_flag,Z,-} #{?monitor-activity,a,-}#{?monitor-silence,s,-} #{?mouse,-,M}#{?synchronize-panes, [BCAST],}#{?session_many_attached, [MANY],} #[fg=#{@gray4},bg=#{@themecolour},nobold]$sepa#[fg=#{@gray1},bg=#{@gray3}] #S:#I.#P #[fg=#{@gray2},bg=#{@gray3}]$sepa#[fg=#{@gray5},bg=#{@gray2}] #{pane_pid} #[fg=#{@gray1},bg=#{@gray2},nobold]$sepa"
+set -g status-left "#[fg=#{@gray1},bg=#{@themecolour},bold] #{?client_prefix,Q,-}#{?pane_pipe,P,-} #{?alternate_on,A,-}#{?window_zoomed_flag,Z,-} #{?monitor-activity,a,-}#{?monitor-silence,s,-} #{?mouse,-,M}#{?synchronize-panes, [BCAST],}#{?session_many_attached, [MANY],} #[fg=#{@gray4},bg=#{@themecolour},nobold]$sepa#[fg=#{@gray1},bg=#{@gray3}] #{pane_pid} #[fg=#{@gray2},bg=#{@gray3}]$sepa#[fg=#{@gray5},bg=#{@gray2}] #S:#I.#P #[fg=#{@gray1},bg=#{@gray2},nobold]$sepa"
 set -g status-right "#[fg=#{@gray2},bg=#{@gray1}]$sepa#[fg=#{@gray5},bg=#{@gray2}] #{pane_width}x#{pane_height} #[fg=#{@gray3},bg=#{@gray2}]$sepa#[fg=#{@gray1},bg=#{@gray3}] $mystat #[fg=#{@themecolour},bg=#{@gray3}]$sepa#[fg=#{@gray1},bg=#{@themecolour},bold] %H:%M %Z "
 
 # Force the status line to ON
