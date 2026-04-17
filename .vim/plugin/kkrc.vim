@@ -181,7 +181,7 @@ nmap + zA
 " Needed for Base16
 let base16colorspace=256
 set background=dark
-colorscheme kk-base16-colors
+"colorscheme kk-base16-colors
 syn on
 if has("gui_running")
 	"colorscheme kk-rdark

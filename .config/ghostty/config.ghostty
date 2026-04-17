@@ -9,3 +9,14 @@ font-feature = -calt
 # Thanks, https://github.com/ghostty-org/ghostty/discussions/9381
 keybind = ctrl+tab=esc:[27;5;9~
 keybind = ctrl+shift+tab=esc:[27;6;9~
+
+# Experiment: ghostty +list-themes
+# Best:
+theme = Synthwave
+#theme = Vercel
+#theme = Kitty Default
+# Good:
+#theme = Dracula+
+#theme = Github Dark
+#theme = Gruber Darker
+#theme = Terminal Basic Dark
