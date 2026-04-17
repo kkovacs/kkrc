@@ -347,6 +347,8 @@ function sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 
 # Commands which are not required in remote inject
 alias tmux="tmux -2"
+# Start tmux in "main" mode (on my local notebook)
+function T() { tmux attach-session || tmux -f ~/.kkrc/.tmux.main new-session ; }
 # When I don't want to pollute my known_hosts file (temporary VMs, etc)
 alias sssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 # SSH reverse-compatible with RSA (routers with dropbear, etc)
