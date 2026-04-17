@@ -214,8 +214,6 @@ alias KA="kubectl get all --output=wide --all-namespaces"
 alias KN="kubectl get nodes --output=wide"
 # nftables show all
 alias N="sudo nft list ruleset"
-# The missing pip upgrade
-alias pipupgrade="pip install --upgrade \$(pip freeze | awk -F'[==]' '{print \$1}')"
 # Firefox private window
 alias ff="firefox --new-instance --private-window &"
 # lsblk tree
