@@ -15,7 +15,7 @@ if [[ "$#" -eq 0 ]]; then
     return
 elif [[ "$1" == "popup" ]]; then
     # Colors!
-    printf "\033[1;36m%s\n\n" "$MSG"
+    printf "%s\n\n" "$MSG"
     printf "\033[1;33m" "$MSG"
     read -p "To confirm type 'ok' " -s -n 2
     printf "\033[0m\n"
