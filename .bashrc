@@ -433,6 +433,7 @@ fi
 # source ~/.kkrc/.bashrc.osx # Mac OS X specific bash config
 # source ~/.kkrc/ssh-askpass-tmux.sh # ssh-agent confirm in tmux
 # PS1='${debian_chroot:+($debian_chroot)}\[\033[00;'$([[ `id -u` -eq 0 ]]&&echo -n 31||echo -n 34)'m\]\u\[\033[00m\]@\[\033[38;5;39m\]\h \[\033[00;33m\]\w \[\033[00;36m\][\j]\[\033[00m\]\$ '; # Custom color for local
+# eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"
 # ---8<---
 # shellcheck disable=SC1090
 if [ -e ~/.bashrc.local ]; then . ~/.bashrc.local; fi
