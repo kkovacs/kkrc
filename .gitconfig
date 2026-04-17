@@ -24,10 +24,7 @@
 	wdiff = difftool -t wdiff
 
 [push]
-	default = matching
 	followTags = true
-[init]
-	defaultBranch = main
 
 [gpg]
 	format = ssh
