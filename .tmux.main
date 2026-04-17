@@ -327,8 +327,6 @@ set -s command-alias[114] setup_golang="send-keys ' type -p go || (cd /tmp; FNAM
 set -s command-alias[115] setup_postgres="send-keys ' sudo NEEDRESTART_MODE=a \$EAT apt-get install -y postgresql; export PGUSER=root PGPASSWORD=tiger PGHOST=127.0.0.1; printf \"\$PGPASSWORD\\n\$PGPASSWORD\" | sudo su - postgres -c \"createuser --superuser --pwprompt \\\"\$PGUSER\\\"\"' enter"
 # Inject an .editorconfig
 set -s command-alias[116] setup_editorconfig="send-keys ' cat >.editorconfig <<\"EOF\"' enter ; load-buffer -b staticsendbuf ~/.kkrc/.editorconfig ; paste-buffer -d -b staticsendbuf ; send-keys 'EOF' enter"
-# Set up remote ~/.screenrc
-set -s command-alias[117] setup_screenrc="send-keys ' cat >~/.screenrc <<\"EOF\"' enter ; load-buffer -b staticsendbuf ~/.kkrc/.screenrc ; paste-buffer -d -b staticsendbuf ; send-keys 'EOF' enter"
 # Set up vim-go
 set -s command-alias[118] setup_vim_go="send-keys ' git clone --depth 1 https://github.com/fatih/vim-go.git ~/.vim/pack/plugins/start/vim-go; vim -e -c GoInstallBinaries -c q' enter"
 # Set up vim IDE
@@ -400,7 +398,8 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "Agressive apt (u)pgrade ............" "u" "send-keys 'sudo \$EAT apt update && sudo \$EAT NEEDRESTART_MODE=a apt upgrade -y'" \
 "" \
 "Modify (A)uthorized_keys ..........." "A" setup_ssh_key \
-"Drop .(s)creenrc ..................." "s" setup_screenrc \
+"Drop .tmux.conf ...................." "s" "send-keys ' cat >~/.tmux.conf <<\"EOF\"' enter ; load-buffer -b staticsendbuf ~/.kkrc/.tmux.conf ; paste-buffer -d -b staticsendbuf ; send-keys 'EOF' enter" \
+"Drop .screenrc ....................." "x" "send-keys ' cat >~/.screenrc <<\"EOF\"' enter ; load-buffer -b staticsendbuf ~/.kkrc/.screenrc ; paste-buffer -d -b staticsendbuf ; send-keys 'EOF' enter" \
 "Drop .(e)ditorconfig ..............." "e" setup_editorconfig \
 "Modify .(b)ashrc ..................." "b" setup_bashrc \
 "Install shell(c)heck ..............." "c" setup_shellcheck \
