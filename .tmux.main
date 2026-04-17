@@ -286,14 +286,14 @@ bind c-e pipe-pane -I 'cat ~/.kkrc/inject-ash.txt'
 # Add ssh public key to authorized_keys. Create dir if necessary, take care of permissions
 set -s command-alias[101] setup_ssh_key="send-keys \" (umask 077; mkdir ~/.ssh 2>/dev/null; echo >>~/.ssh/authorized_keys '\" \; load-buffer -b staticsendbuf ~/.ssh/id_ed25519.pub \; paste-buffer -d -s '' -b staticsendbuf \; send-keys \"')\" enter"
 # Install must-have packages on the remote system (Debian & derivatives)
-BASIC="man less psmisc screen htop curl wget bash-completion dnsutils git tig socat rsync jq gron unzip vim-nox unattended-upgrades"
+BASIC="bash-completion curl dnsutils git gron htop jq less man psmisc rsync screen socat tig unattended-upgrades unzip vim-nox wget"
 set -s command-alias[104] setup_basics_eatmydata="send-keys ' until sudo apt-get update; do sleep 1; done; [ -f /usr/bin/eatmydata ] || until sudo NEEDRESTART_MODE=a apt-get install -y eatmydata; do sleep 1; done; export EAT=eatmydata; until sudo NEEDRESTART_MODE=a eatmydata apt-get install -y less $BASIC; do sleep 1; done;' #enter"
 # Install .kkrc
 set -s command-alias[105] setup_kkrc="send-keys \" git clone --depth 1 https://github.com/kkovacs/kkrc/ ~/.kkrc; ~/.kkrc/install.sh; . ~/.bashrc\" enter"
 # Poor server's Ansible. :)
 set -s command-alias[106] setup_bashrc="load-buffer -b staticsendbuf ~/.kkrc/inject-func-lineinfile.txt \; paste-buffer -d -b staticsendbuf \; load-buffer -b staticsendbuf ~/.kkrc/inject-setup-bashrc.txt \; paste-buffer -d -b staticsendbuf"
 # Install must-have packages on the remote system (RedHat & derivatives)
-set -s command-alias[108] setup_centos="send-keys ' sudo yum install -y epel-release && sudo yum install -y less psmisc tar screen htop curl wget bash-completion bind-utils util-linux git tig socat rsync vim jq unzip' #enter"
+set -s command-alias[108] setup_centos="send-keys ' sudo yum install -y epel-release && sudo yum install -y bash-completion bind-utils curl git htop jq less psmisc rsync screen socat tar tig unzip util-linux vim wget' #enter"
 # Install docker & docker-compose
 # DO NOT USE THIS FOR PRODUCTION, we're cheating: to avoid having to long in-out to obtain the "docker" group, we pre-create the docker group with the current user's GID.
 set -s command-alias[109] setup_docker="send-keys ' [[ \${GROUPS[0]} -gt 0 ]] && sudo groupadd -og \${GROUPS[0]} docker || true && until sudo NEEDRESTART_MODE=a \$EAT apt-get install -y docker.io docker-compose-v2; do sleep 1; done' enter"
@@ -379,7 +379,7 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "Setup kkrc ........................." "" setup_kkrc \
 "apt basics + setup kkrc............." "r" "send-keys ' time cat <<\"EOF\" | bash' enter '[ ! -f /usr/bin/tig ] && {' ; setup_basics_eatmydata ; send-keys ' } ; [ ! -d ~/.kkrc ] && {' ; setup_kkrc ; send-keys '}' enter 'EOF' enter '. ~/.bashrc' enter" \
 "yum basics ........................." "y" setup_centos \
-"apk add basics ....................." "K" "send-keys ' apk add bash sudo shadow less psmisc screen htop curl wget bash-completion git tig socat rsync zip unzip vim && chsh --shell /bin/bash && exec bash' enter" \
+"apk add basics ....................." "K" "send-keys ' apk add bash bash-completion curl git htop less psmisc rsync screen shadow socat sudo tig unzip vim wget zip && chsh --shell /bin/bash && exec bash' enter" \
 "" \
 "Downgrade run(C) [TEMPORARY] ......." "C" "send-keys '( source /etc/os-release; [[ \$VERSION_ID == \"24.04\" ]] && sudo apt install -y --allow-downgrades runc=1.1.12-0ubuntu3 && sudo apt-mark hold runc )' enter" \
 "Agressive apt (u)pgrade ............" "u" "send-keys 'sudo \$EAT apt update && sudo \$EAT NEEDRESTART_MODE=a apt upgrade -y'" \

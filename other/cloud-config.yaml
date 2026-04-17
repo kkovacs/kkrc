@@ -7,21 +7,22 @@ users:
   sudo: "ALL=(ALL) NOPASSWD:ALL"
 package_update: true
 packages:
-- less
-- psmisc
-- screen
-- htop
-- curl
-- wget
 - bash-completion
+- curl
 - dnsutils
 - git
-- tig
-- socat
+- gron
+- htop
+- jq
+- less
+- psmisc
 - rsync
-- vim-nox
-- zip
-- unzip
+- socat
+- tig
 - unattended-upgrades
+- unzip
+- vim-nox
+- wget
+- zip
 # - docker.io
 # - docker-compose

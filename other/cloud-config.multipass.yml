@@ -8,17 +8,18 @@ users:
   sudo: "ALL=(ALL) NOPASSWD:ALL"
 package_update: true
 packages:
-- less
-- psmisc
-- screen
-- htop
-- curl
-- wget
 - bash-completion
+- curl
 - dnsutils
 - git
-- tig
-- socat
-- rsync
+- gron
+- htop
+- jq
+- less
 - openvpn
+- psmisc
+- rsync
+- socat
+- tig
+- wget
 - wireguard

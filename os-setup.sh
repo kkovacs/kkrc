@@ -12,7 +12,7 @@ if [[ ! -f /etc/os-release && "$(uname -s)" == "Darwin" ]]; then
 	# Install brew if needed
 	type -p brew || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 	brew update
-	brew install bash bash-completion coreutils ctags curl git gnu-sed htop lftp pinentry-mac pwgen socat telnet tig tmux vim watch wget
+	brew install bash bash-completion coreutils ctags curl git gnu-sed htop neovim pwgen socat telnet tig tmux vim watch wget
 	exit 0 # Don't execute the Linux parts
 fi
 
@@ -24,13 +24,13 @@ if [[ $ID_LIKE == "debian" ]]; then
 	# Update packages (wait if needed)
 	until sudo apt-get update; do sleep 1; done
 	# Install packages (wait if needed)
-	until sudo NEEDRESTART_MODE=a apt-get install -y less man less psmisc screen htop curl wget bash-completion dnsutils git tig socat rsync zip unzip vim-nox unattended-upgrades; do sleep 1; done;
+	until sudo NEEDRESTART_MODE=a apt-get install -y bash-completion curl dnsutils git htop less less man psmisc rsync screen socat tig unattended-upgrades unzip vim-nox wget zip; do sleep 1; done;
 elif [[ $ID_LIKE == *"fedora"* ]]; then # Covers Fedora, RedHat, CentOS, Alma Linux, Oracle Linux
-	sudo yum install -y epel-release && sudo yum install -y less psmisc screen htop curl wget bash-completion bind-utils util-linux git tig socat rsync vim zip unzip
+	sudo yum install -y epel-release && sudo yum install -y bash-completion bind-utils curl git htop less psmisc rsync screen socat tig unzip util-linux vim wget zip
 elif [[ $ID_LIKE == *"suse"* ]]; then
-	sudo zypper install -y less psmisc screen htop curl wget bash-completion bind-utils util-linux git tig socat rsync vim zip unzip
+	sudo zypper install -y bash-completion bind-utils curl git htop less psmisc rsync screen socat tig unzip util-linux vim wget zip
 elif [[ $ID == "alpine" ]]; then
-	sudo apk add less psmisc screen htop curl wget bash-completion bind-tools git tig socat rsync zip unzip vim
+	sudo apk add bash-completion bind-tools curl git htop less psmisc rsync screen socat tig unzip vim wget zip
 else
 	echo "Unknown OS - can't setup!"
 	exit 1
