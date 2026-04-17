@@ -1,0 +1,555 @@
+# CTRL-Q is much natural than CTRL-B, and doesn't clash with screen's CTRL-A.
+# (CTRL-Q = XOFF anyway, which you most likely don't use in the 21st century)
+set -g prefix c-q
+
+# Design. Use only plain unicode, still look somewhat special. No powerline special font needed
+#sepa=''	# Design #0
+#sepa='▌'	# Design #1
+#sepa='▌▌'	# Design #2
+#sepa='▚'	# Design #3
+#sepa='▄'	# Design #4
+#sepa='▏▎▍▌▋▊▉'	# Design #5
+sepa='▎▌▊'	# Design #6
+
+# Status command on the right, between the clock and the screen size.
+mystat="%Y-%m-%d %a"			# Date with DOW, OS independent
+#mystat="#(ipconfig getifaddr en0 || echo No WiFi)"	# WiFi IP on OS X
+
+# To make SHIFT+ENTER et al to work. Tested in iTerm2 and Ghostty.
+# Thanks, https://blog.fsck.com/releases/2026/02/26/terminal-keyboard-protocol/
+# Forward extended key sequences to applications
+set -gs extended-keys on
+# Use CSI u encoding format
+set -gs -q extended-keys-format csi-u
+# Tell tmux your outer terminal supports extended keys
+# Adjust the glob to match your terminal's $TERM value
+set -as terminal-features 'xterm*:extkeys'
+
+# Theme originally from https://github.com/jimeh/tmux-themepack/blob/master/powerline/block/magenta.tmuxtheme
+# and slightly modified (see below). You can find other color schemes there too!
+set -g @themecolour colour125 # magenta
+#set -g @themecolour colour26 # blue
+#set -g @themecolour colour39 # cyan
+#set -g @themecolour colour245 # gray
+#set -g @themecolour colour41 # green
+#set -g @themecolour colour127 # purple
+#set -g @themecolour colour130 # brown
+
+# I switched colour90 => colour125
+set -g status-style "fg=colour240,bg=colour233"
+set -g status-left-style "bg=colour233,fg=colour243"
+set -g status-right-style "bg=colour233,fg=colour243"
+set -g status-right-length "150"
+set -g window-status-format " #I:#W#F "
+set -g window-status-current-format " #I:#W#F "
+set -g window-status-current-style "bg=#{@themecolour},fg=colour232"
+set -g window-status-activity-style "bg=colour233,fg=colour141"
+set -g window-status-separator ""
+set -g status-justify centre
+set -g pane-border-style "bg=default,fg=colour238"
+set -g pane-active-border-style "bg=default,fg=#{@themecolour}"
+set -g display-panes-colour "colour233"
+set -g display-panes-active-colour "colour245"
+set -gF clock-mode-colour "#{@themecolour}"
+set -g clock-mode-style "24"
+set -g message-style "bg=#{@themecolour},fg=black"
+set -g message-command-style "bg=colour233,fg=black"
+set -g mode-style "bg=#{@themecolour},fg=colour231"
+
+# Modifications compared to the original theme
+set -g status-left-length 100
+set -g status-left "#[fg=colour232,bg=#{@themecolour},bold] #S:#I.#P#{?client_last_session, S, -}#{?mouse,, [NOMOUSE]}#{?session_many_attached, [MANY],""}#{?synchronize-panes, [BROADCASTING],""}#{?window_zoomed_flag, [ZOOM],""}#{?pane_pipe, [PIPE],""} #[fg=colour240,bg=#{@themecolour},nobold]$sepa#[fg=colour233,bg=colour240] #{?client_prefix,Q,-}#{?#{==:#{client_key_table},inject},R,-} #{?alternate_on,A,-} #{?monitor-activity,a,-}#{?monitor-silence,s,-} #[fg=colour235,bg=colour240]$sepa#[fg=colour240,bg=colour235] #{pane_pid} #[fg=colour233,bg=colour235,nobold]$sepa"
+set -g status-right "#[fg=colour235,bg=colour233]$sepa#[fg=colour240,bg=colour235] %H:%M %Z #[fg=colour240,bg=colour235]$sepa#[fg=colour233,bg=colour240] $mystat #[fg=colour245,bg=colour240]$sepa#[fg=colour232,bg=colour245,bold] #{pane_width}x#{pane_height} "
+
+# Force the status line to ON
+set -g status on
+
+# Always use ~ as the dir for new panes, not wherever tmux was started from
+#attach-session -t . -c ~
+
+# Allow to send CTRL-Q
+bind q send-prefix
+
+# CTRL-Q CTRL-Q goes back to last window, like in screen
+bind c-q last-window
+#set -g base-index 1
+
+# To make screen easier to use if accidentally hit CTRL-Q instead of CTRL-A or CTRL-W
+bind c-a send-keys c-a
+bind a send-keys c-a
+bind w send-keys c-w
+
+# Toggle broadcasting input to all panes.
+bind b set synchronize-panes
+
+# Toggle tmux "mouse" functionality
+bind m set mouse
+bind M set mouse on
+
+# Copy mode
+bind Escape copy-mode
+# Paste immediately
+bind c-p paste-buffer
+# Select what buffer to paste
+bind p choose-buffer -Z
+bind P choose-buffer
+
+# Keys INSIDE copy-mode
+bind -T copy-mode-vi Escape send -X cancel
+bind -T copy-mode-vi v send -X begin-selection
+bind -T copy-mode-vi V send -X select-line
+bind -T copy-mode-vi C-v send -X rectangle-toggle
+bind -T copy-mode-vi Enter send -X copy-selection-and-cancel
+bind -T copy-mode-vi y send -X copy-selection-and-cancel
+bind -T copy-mode-vi Y send -X append-selection-and-cancel
+bind -T copy-mode-vi c-y send -X copy-pipe-and-cancel 'cat >>~/Desktop/tmux-copy.#S.#I.#P.#W.txt'
+
+# Set word separators for word selection
+set -g word-separators " `'\"{}()[],;<>"
+# Write to system clipboard, but don't read it
+set -s set-clipboard external
+
+# Pane management
+bind Enter select-pane -m
+bind S join-pane
+bind V join-pane -h
+bind o break-pane
+bind O break-pane -d
+
+# Various comfort settings stolen from all over the net
+set -g default-terminal screen-256color
+set -g status-keys vi
+set -g renumber-windows on
+set -g history-limit 100000
+set -g mode-keys vi
+set -g mouse on
+# Automatically set window title
+set -g automatic-rename on
+set -g set-titles on
+# No delay for escape key press
+set -sg escape-time 0
+# Leave messages on longer (or until keypress)
+set -g display-time 1500
+# Switch to a remaining session if one session is exited
+set -g detach-on-destroy off
+
+# Split vertically
+bind v split-window -h
+# Split horizontally
+bind s split-window -v
+# Window chooser
+bind "\"" choose-window -Z
+bind "\'" choose-session -Z
+# New session
+bind C command-prompt "new-session -s '%%'"
+# Rename window
+bind A command-prompt -I "#W" "rename-window '%%'"
+# Move pane to window
+#bind m choose-window -Z "move-pane -h -t '%%'"
+# Move window to session and switch to there
+#bind M choose-session -Z "move-window -t \"%1\"; switch-client -t \"%1\""
+# Move window left and right
+bind , swap-window -d -t -1
+bind . swap-window -d -t +1
+
+# Switch windows with C-Tab and C-S-Tab.
+bind-key -n C-Tab next-window
+bind-key -n C-S-Tab previous-window
+bind-key -n C-BTab previous-window
+# Instead, what works (plus, need to add this to iTerm):
+set -s user-keys[0] "\e[1;5I"
+set -s user-keys[1] "\e[1;6I"
+bind-key -n User0 next-window
+bind-key -n User1 previous-window
+
+# Pane layouts
+bind > next-layout
+bind < previous-layout
+# Spread out panes equally
+bind = select-layout -E
+
+# Move panes around
+# XXX Same as default
+#bind { swap-pane -U
+#bind } swap-pane -D
+
+# Pane resize options
+bind J resize-pane -D 5
+bind K resize-pane -U 5
+bind H resize-pane -L 5
+bind L resize-pane -R 5
+
+# Vim style pane selection
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+bind c-h select-pane -L
+bind c-j select-pane -D
+bind c-k select-pane -U
+bind c-l select-pane -R
+bind [ select-pane -t :.-
+bind ] select-pane -t :.+
+bind Tab select-pane -t :.+
+bind i display-panes
+
+# Use Alt-arrow keys without prefix key to switch panes
+bind -n M-Left select-pane -L
+bind -n M-Right select-pane -R
+bind -n M-Up select-pane -U
+bind -n M-Down select-pane -D
+
+# To interate through windows with space and backspace
+bind BSpace previous-window
+bind Space next-window
+bind n next-window
+bind N previous-window
+# Jump to window with bell
+bind c-x next-window -a
+bind X previous-window -a
+
+# Scroll wheel the right way (with recent tmux)
+# If scrolled Pane is NOT in alternate, AND it's not in (copy)mode, then start copy mode
+bind -n WheelUpPane if -Ft= '#{pane_in_mode}' 'send-keys -M' 'if -Ft= "#{alternate_on}" "send-keys -M" "copy-mode -e -t="'
+bind -n WheelDownPane select-pane -t= \; send-keys -M
+
+# Don't send mouse clicks to apps
+bind -n MouseDown1Pane select-pane -t=
+bind -n MouseUp1Pane send-keys "" # NOP
+
+# Dont try to drag-scroll
+bind -n MouseDragEnd1Pane send-keys "" # NOP
+
+# Do not auto-copy on mouse drag end
+unbind -T copy-mode-vi MouseDragEnd1Pane
+
+# Double-clicking starts selection of word (both normal end copy-mode-vi)
+bind -n DoubleClick1Pane copy-mode -t= \; send-keys -X select-word
+bind -T copy-mode-vi DoubleClick1Pane send-keys -X select-word
+# Drag start in normal mode also starts selection of word
+bind -n MouseDrag1Pane copy-mode -t= \; send-keys -X select-word
+
+# Toggle monitoring activity and/or silence. Have the same keys as `screen`
+bind "#" set -w monitor-activity
+bind _ if -F '#{monitor-silence}' 'set -w monitor-silence 0' 'set -w monitor-silence 30'
+# Global default
+set -g monitor-activity off
+
+# Clear pane
+bind r send-keys -R \; clear-history \; refresh-client \; send-keys ^L
+
+# Kill pane/window
+bind x confirm-before -p "kill-pane #P? (y/n)" kill-pane
+
+# Log pane output to file (toggle)
+bind | pipe-pane -o 'cat >>~/Desktop/tmux-output.#S.#I.#P.#W.txt'
+
+# Hardcopy pane visible
+bind y command-prompt -1 -p "Hardcopy VISIBLE pane in (a)scii or (c)olor?" "if-shell -F '#{==:%%,a}' 'capture-pane -J -b hardcopy' 'capture-pane -e -b hardcopy' ; save-buffer -b hardcopy '$HOME/Desktop/tmux-visible.#S.#I.#P.#W.#{client_activity}.txt' ; delete-buffer -b hardcopy ; display Saved"
+# Hardcopy pane history
+bind Y command-prompt -1 -p "Hardcopy HISTORY of pane in (a)scii or (c)olor?" "if-shell -F '#{==:%%,a}' 'capture-pane -S - -J -b hardcopy' 'capture-pane -S - -e -J -b hardcopy' ; save-buffer -b hardcopy '$HOME/Desktop/tmux-history.#S.#I.#P.#W.#{client_activity}.txt' ; delete-buffer -b hardcopy ; display Saved"
+
+# Reload tmux config
+bind R 'source-file ~/.kkrc/.tmux.main ; display ".tmux.main reloaded!"'
+
+# Inject bash config. Easiest key, used all the time
+bind c-w pipe-pane -I 'cat ~/.kkrc/inject-bash.txt'
+
+# Inject bash config as if BROADCAST to all panes of current window.
+bind W load-buffer -b staticsendbuf ~/.kkrc/inject-bash.txt \; run-shell -b 'for a in $(tmux list-panes -F \#\D); do tmux paste-buffer -t "$a" -b staticsendbuf; done; tmux delete-buffer staticsendbuf; exit 0'
+# Inject minimalist ash config. Second easiest key, used a lot
+bind c-e pipe-pane -I 'cat ~/.kkrc/inject-ash.txt'
+
+# For further use:
+#bind "^" usable
+#bind "\\" usable
+#bind "@" usable
+#bind "\$" usable
+#bind "%" usable (default: split)
+#bind "!" usable (default: break-pane)
+#bind "&" usable (default: kill-pane, but we have "X" instead)
+#bind "/" usable
+#bind "-" usable (default: delete-buffer)
+#bind "+" usable
+#bind "*" usable
+#bind "d" usable (default: detach)
+#bind "e" usable
+#bind "g" usable
+#bind "B" usable
+#bind "F" usable
+#bind "G" usable
+#bind "I" usable
+#bind "Q" usable
+#bind "T" usable
+#bind "T" usable
+#bind "Z" usable
+#bind "c-c" usable
+#bind "c-d" usable
+#bind "c-f" usable
+#bind "c-g" usable
+#bind "c-n" usable
+#bind "c-s" usable
+#bind "c-t" usable
+#bind "c-u" usable
+#bind "c-v" usable
+#bind "c-y" usable
+
+# COMMAND ALIASES
+
+# Add ssh public key to authorized_keys. Create dir if necessary, take care of permissions
+set -s command-alias[101] setup_ssh_key="send-keys \" (umask 077; mkdir ~/.ssh 2>/dev/null; echo >>~/.ssh/authorized_keys '\" \; load-buffer -b staticsendbuf ~/.ssh/id_ed25519.pub \; paste-buffer -d -s '' -b staticsendbuf \; send-keys \"')\" enter"
+# Install must-have packages on the remote system (Debian & derivatives)
+BASIC="man less psmisc screen htop curl wget bash-completion dnsutils git tig socat rsync jq gron unzip vim-nox unattended-upgrades"
+set -s command-alias[104] setup_basics_eatmydata="send-keys ' until sudo apt-get update; do sleep 1; done; [ -f /usr/bin/eatmydata ] || until sudo NEEDRESTART_MODE=a apt-get install -y eatmydata; do sleep 1; done; export EAT=eatmydata; until sudo NEEDRESTART_MODE=a eatmydata apt-get install -y less $BASIC; do sleep 1; done;' #enter"
+# Install .kkrc
+set -s command-alias[105] setup_kkrc="send-keys \" git clone --depth 1 https://github.com/kkovacs/kkrc/ ~/.kkrc; ~/.kkrc/install.sh; . ~/.bashrc\" enter"
+# Poor server's Ansible. :)
+set -s command-alias[106] setup_bashrc="load-buffer -b staticsendbuf ~/.kkrc/inject-func-lineinfile.txt \; paste-buffer -d -b staticsendbuf \; load-buffer -b staticsendbuf ~/.kkrc/inject-setup-bashrc.txt \; paste-buffer -d -b staticsendbuf"
+# Install must-have packages on the remote system (RedHat & derivatives)
+set -s command-alias[108] setup_centos="send-keys ' sudo yum install -y epel-release && sudo yum install -y less psmisc tar screen htop curl wget bash-completion bind-utils util-linux git tig socat rsync vim jq unzip' #enter"
+# Install docker & docker-compose
+# DO NOT USE THIS FOR PRODUCTION, we're cheating: to avoid having to long in-out to obtain the "docker" group, we pre-create the docker group with the current user's GID.
+set -s command-alias[109] setup_docker="send-keys ' [[ \${GROUPS[0]} -gt 0 ]] && sudo groupadd -og \${GROUPS[0]} docker || true && until sudo NEEDRESTART_MODE=a \$EAT apt-get install -y docker.io docker-compose-v2; do sleep 1; done' enter"
+# nodejs install
+set -s command-alias[102] setup_node_snap="send-keys ' sudo snap install node --classic --channel=24' enter"
+set -s command-alias[110] setup_node="send-keys ' sudo mkdir /usr/local/node ; curl -L https://nodejs.org/dist/v24.13.1/node-v24.13.1-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\").tar.xz | sudo tar Jxv --strip-components=1 --no-same-owner -C /usr/local/node && sudo find /usr/local/node/bin/ -mindepth 1 -executable -exec ln -s \"{}\" /usr/local/bin/ \\;' enter"
+set -s command-alias[103] setup_bun="send-keys ' curl -Lo /tmp/bun.zip https://github.com/oven-sh/bun/releases/latest/download/bun-linux-\$(uname -m | sed \"s/x86_64/x64/\").zip && sudo unzip -j -o /tmp/bun.zip -d /usr/local/bin/ && sudo ln -s bun /usr/local/bin/node' enter"
+set -s command-alias[107] setup_pnpm="send-keys ' sudo curl -Lo /usr/local/bin/pnpm https://github.com/pnpm/pnpm/releases/latest/download/pnpm-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\") && sudo chmod 755 /usr/local/bin/pnpm' enter"
+# Install PHP & composer
+set -s command-alias[111] setup_php="send-keys ' sudo NEEDRESTART_MODE=a \$EAT apt-get install -y $BASIC php-cli php-gd php-mbstring php-dom php-xml php-zip php-curl php-intl php-mysql php-pgsql php-sqlite3 php-xdebug && (curl -sS https://getcomposer.org/installer | sudo NEEDRESTART_MODE=a php -- --install-dir=/usr/local/bin --filename=composer)' enter"
+# Minikube but running on local docker (for setting up playground/dev VMs)
+set -s command-alias[112] setup_minikube="load-buffer -b staticsendbuf ~/.kkrc/inject-setup-minikube.txt \; paste-buffer -d -b staticsendbuf"
+# Mysql, without any real password protection (default oracle password as cultural nod)
+set -s command-alias[113] setup_mysql="send-keys ' sudo debconf-set-selections <<< \"mysql-server mysql-server/root_password password tiger\"; sudo debconf-set-selections <<< \"mysql-server mysql-server/root_password_again password tiger\"; sudo NEEDRESTART_MODE=a \$EAT apt-get install -y mysql-server' enter"
+# Golang latest
+set -s command-alias[114] setup_golang="send-keys ' type -p go || (cd /tmp; FNAME=\$(curl -s https://go.dev/dl/ | grep -om 1 \"go[[:digit:].]\\+linux-\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\")\\.tar\\.gz\"|head -1); curl -LO \"https://go.dev/dl/\$FNAME\"; cd /usr/local/; sudo tar zxf \"/tmp/\$FNAME\"; sudo find /usr/local/go/bin/ -type f -executable -exec ln -s \"{}\" /usr/local/bin/ \\; );' enter"
+# PostgreSQL
+set -s command-alias[115] setup_postgres="send-keys ' sudo NEEDRESTART_MODE=a \$EAT apt-get install -y postgresql; export PGUSER=root PGPASSWORD=tiger PGHOST=127.0.0.1; printf \"\$PGPASSWORD\\n\$PGPASSWORD\" | sudo su - postgres -c \"createuser --superuser --pwprompt \\\"\$PGUSER\\\"\"' enter"
+# Inject an .editorconfig
+set -s command-alias[116] setup_editorconfig="send-keys ' cat >.editorconfig <<\"EOF\"' enter ; load-buffer -b staticsendbuf ~/.kkrc/.editorconfig ; paste-buffer -d -b staticsendbuf ; send-keys 'EOF' enter"
+# Set up remote ~/.screenrc
+set -s command-alias[117] setup_screenrc="send-keys ' cat >~/.screenrc <<\"EOF\"' enter ; load-buffer -b staticsendbuf ~/.kkrc/.screenrc ; paste-buffer -d -b staticsendbuf ; send-keys 'EOF' enter"
+# Set up vim-go
+set -s command-alias[118] setup_vim_go="send-keys ' git clone --depth 1 https://github.com/fatih/vim-go.git ~/.vim/pack/plugins/start/vim-go; vim -e -c GoInstallBinaries -c q' enter"
+# Set up vim IDE
+set -s command-alias[119] setup_vim_tagbar="send-keys ' git clone --depth 1 https://github.com/preservim/tagbar.git ~/.vim/pack/kkrc/start/tagbar; sudo NEEDRESTART_MODE=a apt install -y universal-ctags' enter"
+# Gosec
+set -s command-alias[120] setup_gosec="send-keys ' go install github.com/securego/gosec/v2/cmd/gosec@latest' enter '~/go/bin/gosec -r'"
+# PHPCS
+set -s command-alias[121] setup_phpcs="send-keys ' composer global require --dev squizlabs/php_codesniffer' enter '~/.config/composer/vendor/bin/phpcs'"
+# Larastan
+set -s command-alias[122] setup_phpstan="send-keys ' composer global require --dev phpstan/phpstan' enter '~/.config/composer/vendor/bin/phpstan analyse'"
+# Shellcheck
+set -s command-alias[123] setup_shellcheck="send-keys ' curl -L \"https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.\$(uname -m).tar.xz\" | tar -xJv --strip 1 shellcheck-stable/shellcheck' enter './shellcheck '"
+# XXX If apt actually installs, it "eats" the pre-typed command.
+set -s command-alias[125] get_adminer="send-keys ' curl -Lo adminer.php https://www.adminer.org/latest-en.php' enter"
+set -s command-alias[126] setup_duckdb="send-keys ' curl -Lo /tmp/duckdb.zip https://github.com/duckdb/duckdb/releases/latest/download/duckdb_cli-linux-\$(uname -m | sed s/x86_64/amd64/).zip && sudo unzip -o /tmp/duckdb.zip -d /usr/local/bin/' enter"
+set -s command-alias[127] setup_python_venv="send-keys ' sudo apt-get install -y python3-venv && python3 -m venv .venv; . .venv/bin/activate' enter"
+set -s command-alias[128] setup_frankenphp="send-keys ' sudo curl -Lo /usr/local/bin/frankenphp https://github.com/dunglas/frankenphp/releases/latest/download/frankenphp-linux-\$(uname -m) && sudo chmod 755 /usr/local/bin/frankenphp' enter"
+set -s command-alias[129] setup_composer="send-keys ' sudo curl -Lo /usr/local/bin/composer https://github.com/composer/composer/releases/latest/download/composer.phar && sudo chmod 755 /usr/local/bin/composer' enter"
+set -s command-alias[130] setup_static_php_cli="send-keys ' curl -L https://dl.static-php.dev/static-php-cli/bulk/php-8.4.18-cli-linux-\$(uname -m).tar.gz | sudo tar xz --no-same-owner -C /usr/local/bin/' enter"
+set -s command-alias[131] get_pgweb="send-keys ' curl -Lo /tmp/pgweb.zip https://github.com/sosedoff/pgweb/releases/download/v0.17.0/pgweb_linux_\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").zip && sudo unzip -o /tmp/pgweb.zip -d /usr/local/bin/' enter"
+set -s command-alias[132] setup_jupyterlab="send-keys 'uv pip install jupyterlab jupysql itables psycopg2-binary jupyterlab-git plotly ipywidgets duckdb duckdb-engine magic-duckdb && while true; do jupyter lab --ip=0.0.0.0 --port=80; sleep 1; done' enter"
+set -s command-alias[134] setup_python_uv="send-keys ' curl -L https://github.com/astral-sh/uv/releases/latest/download/uv-\$(uname -m)-unknown-linux-gnu.tar.gz | sudo tar zxv -C /usr/local/bin/ --strip-components=1' enter"
+set -s command-alias[124] setup_brew="send-keys ' NONINTERACTIVE=1 /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"' enter" \
+
+# PLEASE DONT USE: "j", "k", "q" IN ANY MENU!
+
+# I'm hiding the submenus behind the "ctrl-q shift-6 ..." combo, because no sane person would ever use it :)
+bind "^" switch-client -T menus
+
+# Show inject menu. Trigger with: CTRL-Q CTRL-R
+bind "c-r" display-menu -T " Inject... " \
+"Submenu (c-r)emote-changing ......" "c-r" "send-keys -K c-q ^ c-r" \
+"Inject vim config .................." "v" "pipe-pane -I 'cat ~/.kkrc/inject-vim.txt'" \
+"Run tmux config ...................." "s" "pipe-pane -I 'cat ~/.kkrc/inject-tmux.txt'" \
+"Run tmux PROD warning .............." "S" "pipe-pane -I 'cat ~/.kkrc/inject-tmux-red.txt'" \
+"Reload .tmux.main .................." "R" "source-file ~/.kkrc/.tmux.main ; display '.tmux.conf reloaded!'" \
+"Reload .tmux.local ................." "0" "source-file ~/.tmux.local ; display '.tmux.local reloaded!'" \
+"Reload .tmux.init .................." "-" "source-file ~/.tmux.init" \
+"Reload .tmux.conf (screen-like) ...." "" "source-file ~/.tmux.conf" \
+"Inject e(x)-screen config .........." "x" "pipe-pane -I 'cat ~/.kkrc/inject-screen.txt'" \
+"Inject e(X)-screen PROD warning ...." "X" "pipe-pane -I 'cat ~/.kkrc/inject-screen-red.txt'" \
+"cat os-release ....................." "o" "send-keys \" cat /etc/os-release; systemd-detect-virt\" enter" \
+"Inject fancy 'set -x' .............." "" "send-keys \"export PS4=\$'+\\\\tLine \\\$LINENO at \$(date -Iseconds): '\" enter" \
+"unset (Q)UOTING_STYLE .............." "Q" "send-keys \" unset QUOTING_STYLE\" enter" \
+"" \
+"Submenu (c-d)atabases ............" "c-d" "send-keys -K c-q ^ d" \
+"Submenu (c-e)nvironment .........." "c-e" "send-keys -K c-q ^ e" \
+"Submenu (c-a)I ..................." "c-a" "send-keys -K c-q ^ a" \
+"Submenu (c-g)o ..................." "c-g" "send-keys -K c-q ^ g" \
+"Submenu (c-p)hp .................." "c-p" "send-keys -K c-q ^ p" \
+"Submenu p(c-y)thon ..............." "c-y" "send-keys -K c-q ^ y" \
+"Submenu (n)odejs ................." "c-n" "send-keys -K c-q ^ n" \
+"Submenu (c-t)ools/platforms ......" "c-t" "send-keys -K c-q ^ t" \
+"Submenu (c-v)im .................." "c-v" "send-keys -K c-q ^ v" \
+"Submenu (c-z)modem-like .........." "c-z" "send-keys -K c-q ^ z"
+
+# Commands that do CHANGE the remote system.
+# The main purpose of these shortcuts is to quickly set up ephemeral dev-VMs.
+# Thus we use eatmydata to speed things up (especially on btrfs and xfs) and don't care about safety.
+
+# Submenu: kkrc
+bind -T menus "c-r" display-menu -T " Modify... " \
+"Setup kkrc ........................." "" setup_kkrc \
+"apt basics + setup kkrc............." "r" "send-keys ' time cat <<\"EOF\" | bash' enter '[ ! -f /usr/bin/tig ] && {' ; setup_basics_eatmydata ; send-keys ' } ; [ ! -d ~/.kkrc ] && {' ; setup_kkrc ; send-keys '}' enter 'EOF' enter '. ~/.bashrc' enter" \
+"yum basics ........................." "y" setup_centos \
+"apk add basics ....................." "K" "send-keys ' apk add bash sudo shadow less psmisc screen htop curl wget bash-completion git tig socat rsync zip unzip vim && chsh --shell /bin/bash && exec bash' enter" \
+"" \
+"Downgrade run(C) [TEMPORARY] ......." "C" "send-keys '( source /etc/os-release; [[ \$VERSION_ID == \"24.04\" ]] && sudo apt install -y --allow-downgrades runc=1.1.12-0ubuntu3 && sudo apt-mark hold runc )' enter" \
+"Agressive apt (u)pgrade ............" "u" "send-keys 'sudo \$EAT apt update && sudo \$EAT NEEDRESTART_MODE=a apt upgrade -y'" \
+"" \
+"Modify (A)uthorized_keys ..........." "A" setup_ssh_key \
+"Drop .(s)creenrc ..................." "s" setup_screenrc \
+"Drop .(e)ditorconfig ..............." "e" setup_editorconfig \
+"Modify .(b)ashrc ..................." "b" setup_bashrc \
+"Install shell(c)heck ..............." "c" setup_shellcheck \
+"Download (p)rettyping .............." "p" "send-keys ' curl -Lo ./prettyping https://raw.githubusercontent.com/denilsonsa/prettyping/master/prettyping && chmod 755 prettyping' enter './prettyping 1.1.1.1' enter" \
+"" \
+"Setup PROD (w)arn .................." "w" "send-keys ' printf \"\\033[00;31mPRODUCTION SERVER\\033[00m\" | sudo tee /etc/debian_chroot ; . ~/.bashrc' enter" \
+"Remove PROD (W)arn ................." "W" "send-keys ' sudo rm /etc/debian_chroot; unset debian_chroot' enter"
+
+# Submenu: databases
+bind -T menus "d" display-menu -T " DB... " \
+"Download duckdb ...................." "d" setup_duckdb \
+"Download pgweb ....................." "w" get_pgweb \
+"" \
+"apt install postgresql-client ......" "c" "send-keys 'sudo apt install -y postgresql-client' enter" \
+"Install postgres ..................." "P" setup_postgres \
+"Install mysql ......................" "M" setup_mysql \
+"Install sqlite3 ...................." "L" "send-keys ' sudo apt-get install -y sqlite3' enter" \
+"" \
+"Inject (p)sql config ..............." "p" "pipe-pane -I 'cat ~/.kkrc/.psqlrc'" \
+"" \
+"CSV: startrek.csv (30 rows) ........" "1" "send-keys 'https://blobs.duckdb.org/data/Star_Trek-Season_1.csv'" \
+"CSV: penguins.csv (344 rows) ......." "2" "send-keys 'https://blobs.duckdb.org/data/penguins.csv'" \
+"stations.parquet (578 rows) ........" "3" "send-keys 'https://blobs.duckdb.org/stations.parquet'" \
+"shakespeare.parquet (87K rows) ....." "4" "send-keys 'https://blobs.duckdb.org/data/shakespeare.parquet'" \
+"tariffs.parquet (158K rows) ........" "5" "send-keys 'https://blobs.duckdb.org/tariffs.parquet'" \
+"ontime.parquet (4M rows) ..........." "6" "send-keys 'https://blobs.duckdb.org/data/ontime.parquet'" \
+"CSV: fin_fraud.csv (5M rows) ......." "8" "send-keys 'https://blobs.duckdb.org/data/financial_fraud_detection_dataset.csv'" \
+"taxi.parquet (7M rows) ............." "7" "send-keys 'https://blobs.duckdb.org/data/taxi_2019_04.parquet'" \
+"services_2023.parquet (21M rows) ..." "9" "send-keys 'https://blobs.duckdb.org/nl-railway/services-2023.parquet'"
+
+# Submenu: GO
+bind -T menus "g" display-menu -T " GO... " \
+"Install go ........................." "g" setup_golang \
+"Install vim-go ....................." "v" setup_vim_go \
+"Install air ........................" "a" "send-keys ' go install github.com/air-verse/air@latest' enter" \
+"Install goose ......................" "o" "send-keys ' go install github.com/pressly/goose/v3/cmd/goose@latest' enter" \
+"Install gosec ......................" "s" setup_gosec \
+"" \
+"go+vim ............................." "1" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_golang ; setup_vim_tagbar ; setup_vim_go ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"go+vim+psql ........................" "2" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_golang ; setup_postgres ; setup_vim_tagbar ; setup_vim_go ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"go+vim+psql+node ..................." "3" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_golang ; setup_node ; setup_postgres ; setup_vim_tagbar ; setup_vim_go ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"go+vim+docker ......................" "9" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_golang ; setup_docker ; setup_vim_tagbar ; setup_vim_go ; send-keys 'EOF' enter '. ~/.bashrc' enter"
+
+# Submenu: PHP
+bind -T menus "p" display-menu -T " PHP... " \
+"Download static-php-cli ............" "p" setup_static_php_cli \
+"Download frankenphp ................" "f" setup_frankenphp \
+"Download php composer .............." "c" setup_composer \
+"Install php (apt) .................." "P" setup_php \
+"" \
+"Download adminer ..................." "a" get_adminer \
+"Install phpcs ......................" "" setup_phpcs \
+"Install phpstan ...................." "" setup_phpstan \
+"" \
+"php+node+mysql ....................." "1" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_php ; setup_node ; setup_mysql ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"php+node+psql ......................" "2" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_php ; setup_node ; setup_postgres ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"php+docker ........................." "3" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_php ; setup_node ; setup_docker ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"franken+staticphp+node ............." "8" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_frankenphp ; setup_static_php_cli ; setup_composer ; setup_node ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"franken+staticphp+bun .............." "9" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_frankenphp ; setup_static_php_cli ; setup_composer ; setup_bun; send-keys 'EOF' enter '. ~/.bashrc' enter"
+
+# Submenu: python
+bind -T menus "y" display-menu -T " Python... " \
+". ./.venv/bin/activate ............." "y" "send-keys '. .venv/bin/activate' enter" \
+"" \
+"Setup (u)v ........................." "u" setup_python_uv \
+"Setup classic .venv ................" "V" setup_python_venv \
+"Setup jupyterlab ..................." "J" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_python_uv ; send-keys 'uv venv ; . .venv/bin/activate ;' ; setup_jupyterlab ; send-keys 'EOF' enter '" \
+"Setup (s)treamlit .................." "s" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_python_uv ; send-keys 'uv venv ; . .venv/bin/activate ; uv pip install streamlit[charts] ; streamlit hello ' ; send-keys enter 'EOF' enter '"
+
+# Submenu: node
+bind -T menus "n" display-menu -T " NodeJS... " \
+"Install nodejs (direct download) ..." "n" setup_node \
+"Install bun ........................" "b" setup_bun \
+"Install nodejs (snap) .............." "s" setup_node_snap \
+"Install pnpm ......................." "p" setup_pnpm \
+"Docker run (N)ode..................." "N" "send-keys 'docker run -it --rm -v `pwd`:/app -w /app --network=host -u `id -u`:`id -g` node:alpine npm run build'"
+
+# Submenu: tools
+bind -T menus "t" display-menu -T " Tools / platforms... " \
+"sudo touch /snapsho(t)me ..........." "t" "send-keys ' sudo touch /snapshotme; echo -n Commencing in ~\$(( 60 - \$( date +%S | sed 's/^0*//' ) )) secs; while [[ -f /snapshotme ]]; do echo -n .; sleep 1; done; echo' enter" \
+"" \
+"git repo (i)nit ...................." "i" "send-keys ' git init && touch README.md && git add README.md && git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" commit -m init' enter" \
+"Params for (c)hrome devtools ......." "c" "send-keys ' --remote-debugging-port=9222 --user-data-dir=/tmp/cdp/ --no-first-run --no-default-browser-check --disable-signin-promo --disable-sync --disable-infobars \"chrome://inspect/#remote-debugging\" ; rm -rf /tmp/cdp' enter" \
+"" \
+"Install (b)rew ....................." "b" setup_brew \
+"Install (d)ocker ..................." "d" setup_docker \
+"Install (m)inikube.................." "m" setup_minikube \
+"Install (h)url ....................." "h" "send-keys ' curl -L https://github.com/Orange-OpenSource/hurl/releases/download/7.1.0/hurl-7.1.0-\$(uname -m)-unknown-linux-gnu.tar.gz | sudo tar zxv -C /usr/local/bin/ --strip-components=2 --wildcards \"hurl-*/bin/hurl*\"' enter" \
+"Install ~/(z)ig ...................." "z" "send-keys ' mkdir -p ~/zig && curl -L https://ziglang.org/builds/zig-\$(uname -m)-linux-0.16.0-dev.2565+684032671.tar.xz | tar Jxv --strip-components=1 -C ~/zig' enter"
+
+# Submenu: AI
+opencode_config="\~/.config/opencode/opencode.json"
+bind -T menus "a" display-menu -T " AI... " \
+"Inject (a)i shell+python snippet...." "a" "pipe-pane -I 'cat ~/.kkrc/inject-ai-oneliner.txt'" \
+"Inject plan mode snippet ..........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-planmode.md'" \
+"Inject code review snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
+"Inject duckdb snippet .............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
+"Inject go doc snippet .............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
+"Inject work-style snippet .........." "w" "pipe-pane -I 'cat ~/.kkrc/inject-ai-kk.md'" \
+"Inject caveman snippet ............." "c" "pipe-pane -I 'cat ~/.kkrc/inject-ai-caveman.md'" \
+"(g)it commit with AI message ......." "g" "send-keys 'git diff --cached | AI \"Please craft a git commit message from this. Just the text, no markdown code markers.\" | git commit -F -' enter" \
+"" \
+"Download (o)pencode................." "o" "send-keys ' curl -L https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | sudo tar zxv -C /usr/local/bin/ opencode' enter" \
+"config reset ......................." "r" "send-keys ' echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\" }\" >#{opencode_config}' enter" \
+"config MCP Chrome CDP..............." "9" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
+"config LLM on :8080 ................" "0" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:8080/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
+"Clean up opencode ................" "c-o" "send-keys ' rm -rf ~/{.config,.local/state,.local/share,.cache}/opencode ~/.bun ; sudo rm -rf /usr/local/bin/opencode ' enter" \
+"" \
+"Download (p)i ......................" "p" "send-keys ' curl -L https://github.com/badlogic/pi-mono/releases/latest/download/pi-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~' enter" \
+"Clean up pi ......................" "c-p" "send-keys ' rm -rf ~/pi ~/.pi' enter" \
+"" \
+"Download (k)ilo cli ................" "K" "send-keys ' curl -L https://github.com/Kilo-Org/kilocode/releases/latest/download/kilo-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | sudo tar zxv -C /usr/local/bin/ kilo' enter"
+
+# Submenu: environment
+# Load age-encrypted environment variables in tmux session, so they can be injected.
+# -h means hidden: variables don't get automatically added to new windows' environments and not shown by :show-environment
+bind -T menus "e" display-menu -T " inject from tmux session environment... " \
+"Load (e)nv.age to tmux .................." "e" "display-popup -T \"Load env.age to tmux\" -EE bash -c \"age -i ~/.ssh/age.key -d ~/.ssh/env.age | awk '!/^\s*(\\\$|#)/ { sub(/=/, \\\" \\\"); print \\\"set-environment -h\\\", \$0 }' | tmux source-file -\"" \
+"Inject \$GEMINI_API_KEY .................." "g" "send-keys ' stty -echo' enter ' export GEMINI_API_KEY=#{GEMINI_API_KEY} GOOGLE_GENERATIVE_AI_API_KEY=#{GEMINI_API_KEY}; stty echo' enter" \
+"Inject \$GITHUB_TOKEN ...................." "G" "send-keys ' stty -echo' enter ' export GITHUB_TOKEN=#{GITHUB_TOKEN}; stty echo' enter" \
+"Inject \$MISTRAL_API_KEY ................." "m" "send-keys ' stty -echo' enter ' export MISTRAL_API_KEY=#{MISTRAL_API_KEY}; stty echo' enter" \
+"Inject \$OPENCODE_API_KEY ................" "O" "send-keys ' stty -echo' enter ' export OPENCODE_API_KEY=#{OPENCODE_API_KEY}; stty echo' enter" \
+"Inject \$OPENROUTER_API_KEY .............." "o" "send-keys ' stty -echo' enter ' export OPENROUTER_API_KEY=#{OPENROUTER_API_KEY}; stty echo' enter" \
+"Inject \$OPENROUTER_API_KEY for Claude ..." "C" "send-keys ' stty -echo' enter ' export ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" ANTHROPIC_AUTH_TOKEN=\"#{OPENROUTER_API_KEY}\" ANTHROPIC_API_KEY=\"\"; stty echo' enter" \
+"Inject \$XAI_API_KEY ....................." "x" "send-keys ' stty -echo' enter ' export XAI_API_KEY=#{XAI_API_KEY}; stty echo' enter" \
+"" \
+"Unset proxies ..........................." "-" 'send-keys " unset {http,https,all}_proxy {HTTP,HTTPS,ALL}_PROXY WSL_PAC_URL" enter' \
+"Inject proxy socks5h:(1)080 (ssh -D 1080)" "1" 'send-keys " export all_proxy=socks5h://127.0.0.1:1080" enter' \
+"Inject proxy http:888(8)................." "8" 'send-keys " export {http,https}_proxy=http://127.0.0.1:8888 {HTTP,HTTPS}_PROXY=http://127.0.0.1:8888" enter' \
+"Inject proxy http:808(0)................." "0" 'send-keys " export {http,https}_proxy=http://127.0.0.1:8080 {HTTP,HTTPS}_PROXY=http://127.0.0.1:8080" enter' \
+"" \
+"Inject \$SSH_AUTH_SOCK ..................." "a" 'send-keys " export SSH_AUTH_SOCK=$(tmux show-environment SSH_AUTH_SOCK | cut -d= -f2)" enter'
+
+# Submenu: vim
+bind -T menus "v" display-menu -T " vim... " \
+"Inject (v)im config ................" "v" "pipe-pane -I 'cat ~/.kkrc/inject-vim.txt'" \
+"Inject modeline: preserve (t)abs ..." "t" "send-keys '# vim: set noexpandtab :'" \
+"Inject modeline: tabs to (s)paces .." "s" "send-keys '# vim: set expandtab ts=4 sw=4 :'" \
+"" \
+"Install vim-tagbar ................." "t" setup_vim_tagbar \
+"Install copilot.vim ................" "c" "send-keys ' sudo snap install node --classic --channel=22 && mkdir -p ~/.config/github-copilot && git clone --depth 1 https://github.com/github/copilot.vim.git ~/.vim/pack/kkrc/start/copilot && cat >~/.config/github-copilot/apps.json <<EOF' enter \; load-buffer -b staticsendbuf ~/.config/github-copilot/apps.json \; paste-buffer -d -b staticsendbuf \; send-keys 'EOF' enter"
+
+# Submenu: zmodem-like (= binary-to-ascii and back)
+bind -T menus "z" display-menu -T " Zmodem... " \
+"Poor man's \"xxd\" with hexdump ...." "h" "send-keys \"hexdump -v -e '\\\"%08.8_ax:\\\"' -e '16/1 \\\" %02x\\\"' -e '\\\"  \\\" 16/1 \\\"%_p\\\" \\\"\\\\n\\\"' " \
+"Poor man's \"xxd\" with od ........." "o" 'send-keys "od -v -A x -t x1z "' \
+"" \
+"Bytestream with hexdump .........." "b" "send-keys \"hexdump -v -e '32/1 \\\" %02x\\\" \\\"\\\\n\\\"' \"" \
+"Bytestream reverse ..............." "r" "send-keys 'while read -r -d \" \" x; do [ -n \"\$x\" ] && printf \"\\x\${x}\"; done'"
+
+# Local commands:
+#source-file -q ~/.tmux.local
