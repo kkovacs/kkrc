@@ -165,10 +165,8 @@ function ggr() { command grep --color=force -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/
 # Better git grep
 function gg() { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
 
-# tmux-first (uses set-environment -g, auto-inherited), falls back to GNU screen (register + paste with CTRL+A ]).
-# Usage: s [sessionname]. Bound in tmux to <c-q><c-r>a.
-# shellcheck disable=SC2139
-function s() { tmux attach-session || tmux -f ~/.kkrc/.tmux.screen new-session \; set prefix c-a \; set-environment SSH_AUTH_SOCK "$SSH_AUTH_SOCK" ; }
+# tmux-first (NOTE: tmux show-environment is set automatically, no need for hack)
+function s() { tmux attach-session || tmux -f ~/.kkrc/.tmux.screen new-session \; set prefix2 c-a ; }
 
 # Watch out for using git as a different user than the repository. Avoid mandatory reconfiguration of git with user/email for hotfixes.
 function git() { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " config grep log blame diff show status init clone " == *" $1 "* ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
