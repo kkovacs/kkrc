@@ -168,8 +168,8 @@ function gg() { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :
 # tmux-first (NOTE: tmux show-environment is set automatically, no need for hack)
 function s() { tmux attach-session || tmux new-session \; set prefix2 c-a ; }
 
-# Watch out for using git as a different user than the repository. Avoid mandatory reconfiguration of git with user/email for hotfixes.
-function git() { if [[ -O "$(command git rev-parse --show-toplevel 2>/dev/null)/.git" || " config grep log blame diff show status init clone " == *" $1 "* ]]; then command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@"; else echo "Please use the unix user that owns .git"; return 1; fi }
+# Avoid mandatory reconfiguration of git with user/email for hotfixes. File permission matching git does by itself since 2022 (was here earlier)
+function git() { command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@" ; } ; export -f git
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
 function M() { mount "$@" | grep '^\/dev\/' ; }
 function D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none\|^overlay\|^shm' ; }

@@ -5,17 +5,14 @@ mkdir -p ~/.config
 mysoftlink .vimrc ~/.vimrc
 mysoftlink .vim ~/.vim
 mysoftlink .vim ~/.config/nvim
-mysoftlink .zshrc ~/.zshrc
 mysoftlink .screenrc ~/.screenrc
 mysoftlink .bashrc ~/.bashrc
-mysoftlink .hgrc ~/.hgrc
 mysoftlink .tmux.conf ~/.tmux.conf
 mysoftlink .gitconfig ~/.gitconfig
 mysoftlink .Xmodmap ~/.Xmodmap
 mysoftlink .tigrc ~/.tigrc
 mysoftlink .psqlrc ~/.psqlrc
 mysoftlink .inputrc ~/.inputrc
-mysoftlink .i3 ~/.i3
 mysoftlink .ansible.cfg ~/.ansible.cfg
 mysoftlink .config/opencode ~/.config/opencode
 mysoftlink .config/Code ~/.config/Code

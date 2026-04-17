@@ -128,10 +128,5 @@ tags
 #*.test
 #*.prof
 
-# Aider-related
-.aider.chat.history.md
-.aider.input.history
-.aider.tags.cache.*/
-
 # Differs on each machine
 .config/opencode/opencode.json
