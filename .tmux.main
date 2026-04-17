@@ -117,7 +117,7 @@ bind o break-pane
 bind O break-pane -d
 
 # Various comfort settings stolen from all over the net
-set -g default-terminal screen-256color
+set -g default-terminal tmux-256color
 set -g status-keys vi
 set -g renumber-windows on
 set -g history-limit 100000
