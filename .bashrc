@@ -419,9 +419,8 @@ if [ -n "$VIM_TERMINAL" ]; then
 	export -f vim
 fi
 
-# Display screens if any, and we're not already running under GNU screen / tmux.
-if [[ ! -n "$STY" && ! -n "$TMUX" ]]; then
-	screen -ls | grep -v "Socket"
+# Display tmux sessions if any, and we're not already running under tmux.
+if [[ ! -n "$TMUX" ]]; then
 	tmux list-sessions
 	echo
 fi
