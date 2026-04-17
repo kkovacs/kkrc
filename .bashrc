@@ -98,6 +98,7 @@ export NEEDRESTART_MODE=a
 # No swapfile, no viminfo and a few other things
 # Fortunately packadd does not give an error on pre-9.1 versions (before editorconfig was added to vim by default)
 alias vim='vim -n -i NONE "+set nobackup noswapfile encoding=utf8 mouse=a" +"packadd editorconfig"'
+alias nvim='nvim -n -i NONE "+set nobackup noswapfile mouse=a"'
 
 # Use bash-completion (but show no errors if not found).
 # shellcheck disable=SC1091
