@@ -76,6 +76,9 @@ map <c-k> k<c-y>
 nmap <silent> <c-tab> :tabnext<cr>
 nmap <silent> <s-c-tab> :tabprevious<cr>
 
+" Next pane
+map <c-w><tab> <c-w>w
+
 " My little calculator
 map <leader>= viW"zyA = <esc>"=<c-r>z<cr>p
 

@@ -12,6 +12,7 @@
 :map <c-k> k<c-y>
 :nmap <silent> <c-tab> :tabnext<cr>
 :nmap <silent> <s-c-tab> :tabprevious<cr>
+:map <c-w><tab> <c-w>w
 :map <leader>= viW"zyA = <esc>"=<c-r>z<cr>p
 :if has('terminal') tmap <esc><esc> <c-\><c-N> | map <leader><leader> :vertical below terminal<cr> | map <leader>\| :tab terminal<cr> | endif
 :nmap <leader>c :lchdir <c-r>=expand('%:p:h')<cr><cr>
