@@ -208,21 +208,8 @@ bind N previous-window
 bind c-x next-window -a
 bind X previous-window -a
 
-# Scroll wheel the right way (with recent tmux)
-# If scrolled Pane is NOT in alternate, AND it's not in (copy)mode, then start copy mode
-bind -n WheelUpPane if -Ft= '#{pane_in_mode}' 'send-keys -M' 'if -Ft= "#{alternate_on}" "send-keys -M" "copy-mode -e -t="'
-bind -n WheelDownPane select-pane -t= \; send-keys -M
-
-# Don't send mouse clicks to apps
-bind -n MouseDown1Pane select-pane -t=
-bind -n MouseUp1Pane send-keys "" # NOP
-
-# Dont try to drag-scroll
-bind -n MouseDragEnd1Pane send-keys "" # NOP
-
 # Do not auto-copy on mouse drag end
 unbind -T copy-mode-vi MouseDragEnd1Pane
-
 # Double-clicking starts selection of word (both normal end copy-mode-vi)
 bind -n DoubleClick1Pane copy-mode -t= \; send-keys -X select-word
 bind -T copy-mode-vi DoubleClick1Pane send-keys -X select-word
