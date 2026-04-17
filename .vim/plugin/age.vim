@@ -46,82 +46,127 @@ if !exists("g:age_enc_params")
     endif
 endif
 
+" Save the given list of GLOBAL options into b:age_saved_opts so we can
+" restore them later. We must use the global options (viminfo, clipboard,
+" shelltemp, backup, shell, shellredir are all global) because :setlocal
+" on a global option is either a no-op or affects everyone.
+function! s:AgeSaveOpts()
+    let b:age_saved_opts = {
+        \ 'viminfo':    &g:viminfo,
+        \ 'clipboard':  &g:clipboard,
+        \ 'shelltemp':  &g:shelltemp,
+        \ 'backup':     &g:backup,
+        \ 'writebackup':&g:writebackup,
+        \ 'shell':      &g:shell,
+        \ 'shellredir': &g:shellredir,
+        \ 'cmdheight':  &g:cmdheight,
+        \ }
+endfunction
+
+function! s:AgeRestoreOpts()
+    if !exists("b:age_saved_opts")
+        return
+    endif
+    let &g:viminfo     = b:age_saved_opts.viminfo
+    let &g:clipboard   = b:age_saved_opts.clipboard
+    let &g:shelltemp   = b:age_saved_opts.shelltemp
+    let &g:backup      = b:age_saved_opts.backup
+    let &g:writebackup = b:age_saved_opts.writebackup
+    let &g:shell       = b:age_saved_opts.shell
+    let &g:shellredir  = b:age_saved_opts.shellredir
+    let &g:cmdheight   = b:age_saved_opts.cmdheight
+    unlet b:age_saved_opts
+endfunction
+
+" Harden the environment so plaintext does not leak into viminfo, swap,
+" backup, undo files, the system clipboard, or shell temp files.
+function! s:AgeHarden()
+    call s:AgeSaveOpts()
+    " Global options — must use :set, not :setlocal.
+    set viminfo=
+    set clipboard=
+    set noshelltemp
+    set nobackup
+    set nowritebackup
+    set shell=/bin/sh
+    set shellredir=>
+    set cmdheight=3
+    " Buffer/window-local options.
+    setlocal noswapfile
+    setlocal noundofile
+endfunction
+
 function! s:AgeReadPre()
-    setl secure
-    setl cmdheight=3
-    setl viminfo=
-    setl clipboard=
-    setl noswapfile
-    setl nobackup
-    setl noundofile
-    setl noshelltemp
-    setl shell=/bin/sh
-    setl bin
-    setl shellredir=>
+    call s:AgeHarden()
+    setlocal bin
 endfunction
 
 function! s:AgeReadPost()
-    let l:expr = "%!age " . g:age_dec_params . " " . expand("%")
+    " <afile> is the file being read (correct for both BufReadPost and
+    " FileReadPost); shellescape() prevents command injection via
+    " filenames containing shell metacharacters. The '1' argument to
+    " shellescape() additionally escapes '!', '%' and '#' which are
+    " special to :execute / :!.
+    let l:fname = expand("<afile>")
+    let l:expr = "%!age " . g:age_dec_params . " " . shellescape(l:fname, 1)
 
-    setl undolevels=-1
+    setlocal undolevels=-1
     silent! execute l:expr
     let l:success = ! v:shell_error
 
     if ! l:success
-        " Cleanup.
-        setl nobin
-        setl shellredir&
-        setl shell&
-        setl cmdheight&
+        " Wipe any partial/garbage output that age may have produced
+        " before failing, so plaintext-ish bytes are not left visible.
+        silent! %delete _
+        setlocal nobin
+        setlocal undolevels&
+        call s:AgeRestoreOpts()
         redraw!
         throw "Decryption error!"
     endif
 
-    " Cleanup.
-    setl nobin
-    setl cmdheight&
-    setl shellredir&
-    setl shell&
-    execute ":doautocmd BufReadPost ".expand("%:r")
-    setl undolevels&
+    setlocal nobin
+    " fnameescape() prevents a filename with spaces, '|', '"', backticks,
+    " etc. from breaking out of the :doautocmd argument into further Ex
+    " commands. We pass the root (without the .age extension) so syntax,
+    " filetype, folding, etc. are picked up based on the inner extension
+    " (e.g. foo.md.age -> foo.md).
+    execute "doautocmd BufReadPost " . fnameescape(fnamemodify(l:fname, ":r"))
+    setlocal undolevels&
+    call s:AgeRestoreOpts()
     redraw!
 endfunction
 
 function! s:AgeWritePre()
-    " Save current line number to jump back to after encryption
+    " Save current cursor position to jump back to after encryption.
     let b:line_before_save = getcurpos()
-    setl cmdheight=3
-    setl shell=/bin/sh
-    setl bin
-    setl shellredir=>
+    call s:AgeHarden()
+    setlocal bin
     let l:expr = "%!age " . g:age_enc_params
     silent! execute l:expr
     let l:success = ! v:shell_error
 
     if ! l:success
-        " Cleanup
+        " Revert the failed filter so the buffer contains plaintext again.
         silent! undo
-        setl nobin
-        setl shellredir&
-        setl shell&
-        setl cmdheight&
+        setlocal nobin
+        call s:AgeRestoreOpts()
         unlet b:line_before_save
         redraw!
-        " Display error
         throw "Encryption error!"
     endif
 endfunction
 
 function! s:AgeWritePost()
-    " Undo the encryption.
+    " Undo the encryption so the buffer holds plaintext again.
     silent! undo
-    setl nobin
-    setl shellredir&
-    setl shell&
-    setl cmdheight&
-    " Jump back to saved line number
-    call setpos('.', b:line_before_save)
-    unlet b:line_before_save
+    setlocal nobin
+    call s:AgeRestoreOpts()
+    " Jump back to saved cursor position.
+    if exists("b:line_before_save")
+        call setpos('.', b:line_before_save)
+        unlet b:line_before_save
+    endif
     redraw!
 endfunction
 
