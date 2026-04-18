@@ -187,21 +187,27 @@ set background=dark
 "colorscheme kk-base16-colors
 syn on
 if has("gui_running")
-	"colorscheme kk-rdark
-	set guioptions=e
+	" nvim-qt doesn't have GUI tabs anyway
+	if !has('nvim')
+		set guioptions=e
+	endif
 
 	" OS-specific stuff, like fonts
-	if has("gui_macvim")
-		set guifont=Monaco:h11
-	elseif has("gui_gtk")
+	" if has("gui_macvim")
+	if has("gui_gtk")
+		" pass
 	elseif has("gui_win32")
 		" Font available since Vista
-		set guifont=Consolas:h11
+		set guifont=Consolas:h13
 		" Terminal-like paste of system clipboard
 		imap <c-a-v> <c-r>+
 		nmap <c-a-v> "+p
 		" Start maximized
 		autocmd GUIEnter * simalt ~x
+	else
+		" Hopefully Mac OS X
+		" XXX Didn't find a way to detect nvim-qt...
+		set guifont=Monaco:h13
 	endif
 endif
 

@@ -3,12 +3,6 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
-# Set up colors
-#if [ -z "$SSH_CLIENT" ] && [ -z "$SSH_TTY" ] && [ -z "$VIM_TERMINAL" ]; then
-#	# shellcheck disable=SC1090
-#	. ~/.kkrc/base16-colors.dark.sh 2>/dev/null
-#fi
-
 # If there was a .bashrc we moved away at install, run that first
 # (so we can override)
 # shellcheck disable=SC1090
