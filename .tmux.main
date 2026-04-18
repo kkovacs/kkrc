@@ -215,6 +215,7 @@ bind N previous-window
 # Jump to window with bell
 bind u next-window -a
 bind c-u next-window -a
+bind c-x next-window -a
 
 # Do not auto-copy on mouse drag end
 unbind -T copy-mode-vi MouseDragEnd1Pane
