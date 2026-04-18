@@ -1,21 +1,44 @@
-# OS X fullscreen mode that is compatible with Workspaces.
+# The OS X fullscreen mode that is compatible with Workspaces.
 fullscreen = non-native-visible-menu
-# I'm old school, don't touch my `!=`
+
+# I'm old school, get off my lawn^H^H^H^H characters
+# Demo: `!=`, `:=`, `==`, `<>`, `->` `->>`, `=>`, `>>`, `>>>`, `//`
 font-feature = -calt
+
 # <cmd+`> to toggle quake terminal
 #keybind = global:cmd+backquote=toggle_quick_terminal
 
-# Needed to use ctrl-tab and ctrl-shift-tab with tmux.
+# Needed for `ctrl-tab` and `ctrl-shift-tab` to work with tmux.
 # Thanks, https://github.com/ghostty-org/ghostty/discussions/9381
 keybind = ctrl+tab=esc:[27;5;9~
 keybind = ctrl+shift+tab=esc:[27;6;9~
 
-# Experiment: ghostty +list-themes
+# Color schemes / themes
+# To experiment, run: ghostty +list-themes
+#
+# NOTE: One large limiting factor for themes is tig's "white on green" in
+# status, so I've looked for themes where that is visible. Another is filenames
+# in `ls -a ~`. Of course one could redefine these, but it needs to be done on
+# all remote servers, so... maybe not.
+#
 # Best:
 theme = Synthwave
+#theme = Dark Modern
+#theme = Later This Evening
+#theme = Midnight In Mojave
+#theme = Operator Mono Dark
 #theme = Vercel
-#theme = Kitty Default
 # Good:
-#theme = Dracula+
-#theme = Github Dark
-#theme = Gruber Darker
+#theme = Andromeda
+#theme = Bluloco Dark
+#theme = Broadcast
+#theme = Chalk
+#theme = Doom Peacock
+#theme = Miasma
+#theme = Starlight
+# For fun:
+#theme = Aardvark Blue
+#theme = C64
+#theme = HaX0R Gr33N
+#theme = IC Green PPL
+#theme = IC Orange PPL
