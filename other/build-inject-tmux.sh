@@ -9,4 +9,7 @@ cd "$(dirname $0)"
 # Also, insert a starting space for the next wall-of-text.
 printf 'i\x7f tmux ' >../inject-tmux.txt
 # Process .tmux.conf
-awk 'BEGIN {line=""} /^#/ || /^$/ {next} {if (line=="") line=$0; else line=line " \\; " $0} END {print line}' ../.tmux.conf >>../inject-tmux.txt
+# Process .tmux.conf - escape existing \; within commands as \\\; for shell
+awk 'BEGIN {line=""} /^#/ || /^$/ {next} {gsub(/\\;/, "\\\\\\;"); if (line=="") line=$0; else line=line " \\; " $0} END {print line}' ../.tmux.conf >>../inject-tmux.txt
+# Add clear
+printf '\x0c' >>../inject-tmux.txt
