@@ -480,7 +480,7 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "Install (d)ocker ..................." "d" setup_docker \
 "Install (m)inikube.................." "m" setup_minikube \
 "Install (h)url ....................." "h" "send-keys ' curl -L https://github.com/Orange-OpenSource/hurl/releases/download/7.1.0/hurl-7.1.0-\$(uname -m)-unknown-linux-gnu.tar.gz | sudo tar zxv -C /usr/local/bin/ --strip-components=2 --wildcards \"hurl-*/bin/hurl*\"' enter" \
-"Install ~/(z)ig ...................." "z" "send-keys ' mkdir -p ~/zig && curl -L https://ziglang.org/builds/zig-\$(uname -m)-linux-0.16.0-dev.2565+684032671.tar.xz | tar Jxv --strip-components=1 -C ~/zig' enter"
+"Install ~/(z)ig ...................." "z" "send-keys ' mkdir -p ~/zig && curl -L https://ziglang.org/builds/zig-\$(uname -m)-linux-0.17.0-dev.9+046002d1a.tar.xz | tar Jxv --strip-components=1 -C ~/zig' enter"
 
 # Submenu: AI
 opencode_config="\~/.config/opencode/opencode.json"
