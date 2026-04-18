@@ -120,7 +120,7 @@ alias dd="dd status=progress"
 alias rsync="rsync --info=progress2"
 #alias lr="ls -AR1 -I .git|awk '/:$/{gsub(/[^\/]+\//,\"--\",\$0);printf(\"%d files\n%s \t\",p-2,\$0);p=0}{p++}END{print p \" files\"}'|less -FXn" # Cut -FX in ash
 #alias bell="printf '\a'" # either echo -ne '\007' or printf '\a'" or tput bel
-alias h="history"
+alias h="history|less -Rn +G"
 # PostgreSQL with readline
 function psql() { INPUTRC=/dev/fd/9 command psql 9<<<'set editing-mode vi' "$@" ; }
 # PostgreSQL as above, but as postgres user
