@@ -213,8 +213,8 @@ bind Space next-window
 bind n next-window
 bind N previous-window
 # Jump to window with bell
-bind c-x next-window -a
-bind X previous-window -a
+bind u next-window -a
+bind c-u next-window -a
 
 # Do not auto-copy on mouse drag end
 unbind -T copy-mode-vi MouseDragEnd1Pane
@@ -259,12 +259,11 @@ bind c-e pipe-pane -I 'cat ~/.kkrc/inject-ash.txt'
 #bind "\$" usable
 #bind "%" usable (default: split)
 #bind "!" usable (default: break-pane)
-#bind "&" usable (default: kill-pane, but we have "X" instead)
+#bind "&" usable (default: kill-pane, but we have "x" instead)
 #bind "/" usable
 #bind "-" usable (default: delete-buffer)
 #bind "+" usable
 #bind "*" usable
-#bind "d" usable (default: detach)
 #bind "e" usable
 #bind "g" usable
 #bind "B" usable
@@ -274,6 +273,7 @@ bind c-e pipe-pane -I 'cat ~/.kkrc/inject-ash.txt'
 #bind "Q" usable
 #bind "T" usable
 #bind "T" usable
+#bind "X" usable
 #bind "Z" usable
 #bind "c-c" usable
 #bind "c-d" usable
