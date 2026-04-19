@@ -55,7 +55,7 @@ set -g window-status-activity-style "bg=#{@gray2},fg=#{@gray5}"
 set -g window-status-bell-style "bg=#{@gray2},fg=#{@gray5}"
 set -g window-status-separator ""
 set -g status-justify centre
-set -g pane-border-style "bg=default,fg=colour240"
+set -g pane-border-style "bg=default,fg=#{@themecolour}"
 set -g pane-active-border-style "bg=default,fg=colour240"
 set -gF display-panes-colour "#{@gray4}"
 set -gF display-panes-active-colour "#{@gray3}"
