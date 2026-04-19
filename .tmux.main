@@ -226,6 +226,7 @@ bind "#" set -w monitor-activity
 bind _ if -F '#{monitor-silence}' 'set -w monitor-silence 0' 'set -w monitor-silence 30'
 # Global default
 set -g monitor-activity off
+set -g activity-action any
 
 # Clear pane
 bind r send-keys -R \; clear-history \; refresh-client \; send-keys ^L
