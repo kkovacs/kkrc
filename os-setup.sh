@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # This script installs some basic software on a number of operating systems.
 # Nothing fancy, just basic stuff. Keep it minimal.

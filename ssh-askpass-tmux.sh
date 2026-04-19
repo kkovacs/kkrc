@@ -8,7 +8,7 @@ if [[ "$#" -eq 0 ]]; then
     # NOTE: OS X has its own ssh-agent, but if we are here, then we want to replace it with our own solution.
     if [[ -z $SSH_AUTH_SOCK || $SSH_AUTH_SOCK == *"com.apple.launchd"* ]]; then
         # Start ssh-agent in background, using the right variables
-        eval `DISPLAY=dummy SSH_ASKPASS="$HOME/.kkrc/ssh-askpass-tmux.sh" ssh-agent`
+        eval "$(DISPLAY=dummy SSH_ASKPASS="$HOME/.kkrc/ssh-askpass-tmux.sh" ssh-agent)"
     fi
     # Add with "confirm" option (this makes this work)
     ssh-add -l >/dev/null || echo 'NOTE: Run "ssh-add -c" to add keys!'
@@ -16,8 +16,8 @@ if [[ "$#" -eq 0 ]]; then
 elif [[ "$1" == "popup" ]]; then
     # Colors!
     printf "%s\n\n" "$MSG"
-    printf "\033[1;33m" "$MSG"
-    read -p "To confirm type 'ok' " -s -n 2
+    printf "\033[1;33m"
+    read -r -p "To confirm type 'ok' " -s -n 2
     printf "\033[0m\n"
     # Did the user agree?
     [[ $REPLY == "ok" ]]

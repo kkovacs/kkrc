@@ -39,6 +39,6 @@ fi
 echo "Ready to run 'rm -rf $kkrcdir'? (y/n)"
 read -r A
 if [ "$A" = "y" ]; then
-        cd "$curdir"
+        cd "$curdir" || exit
         rm -rf "$kkrcdir"
 fi

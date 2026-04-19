@@ -1,3 +1,4 @@
+#!/bin/bash
 # Ensure .config directory
 mkdir -p ~/.config
 

@@ -24,16 +24,15 @@ mysoftlink() {
 	local file="$1"
 	local softlink="$2"
 
-	printf "Installing $file: "
+	printf "Installing %s: " "$file"
 
 	if [[ -L "$softlink" ]]; then
-		printf "\033[00;32mOK:\033[00m Your $softlink is already a soft link, nice!\n"
+		printf "\033[00;32mOK:\033[00m Your %s is already a soft link, nice!\n" "$softlink"
 	else
 		if [[ -e "$softlink" ]]; then
-			printf "\033[00;31mWARNING: You have $softlink - please move it away.\033[00m\n"
+			printf "\033[00;31mWARNING: You have %s - please move it away.\033[00m\n" "$softlink"
 		else
-			# NOTE: No quotes on first param or ~ expansion not always happens
-			ln -s ~/.kkrc/$file "$softlink"
+			ln -s ~/.kkrc/"$file" "$softlink"
 			printf "\033[00;32mOK:\033[00m Installed.\n"
 		fi
 	fi
