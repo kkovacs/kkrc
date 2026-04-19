@@ -397,8 +397,6 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "Drop .screenrc ....................." "x" "send-keys ' cat >~/.screenrc <<\"EOF\"' enter ; load-buffer -b staticsendbuf ~/.kkrc/.screenrc ; paste-buffer -d -b staticsendbuf ; send-keys 'EOF' enter" \
 "Drop .(e)ditorconfig ..............." "e" setup_editorconfig \
 "Modify .(b)ashrc ..................." "b" setup_bashrc \
-"Install shell(c)heck ..............." "c" setup_shellcheck \
-"Download (p)rettyping .............." "p" "send-keys ' curl -Lo ./prettyping https://raw.githubusercontent.com/denilsonsa/prettyping/master/prettyping && chmod 755 prettyping' enter './prettyping 1.1.1.1' enter" \
 "" \
 "Setup PROD (w)arn .................." "w" "send-keys ' printf \"\\033[00;31mPRODUCTION SERVER\\033[00m\" | sudo tee /etc/debian_chroot ; . ~/.bashrc' enter" \
 "Remove PROD (W)arn ................." "W" "send-keys ' sudo rm /etc/debian_chroot; unset debian_chroot' enter"
@@ -483,6 +481,8 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "Install (d)ocker ..................." "d" setup_docker \
 "Install (m)inikube.................." "m" setup_minikube \
 "Install (h)url ....................." "h" "send-keys ' curl -L https://github.com/Orange-OpenSource/hurl/releases/download/7.1.0/hurl-7.1.0-\$(uname -m)-unknown-linux-gnu.tar.gz | sudo tar zxv -C /usr/local/bin/ --strip-components=2 --wildcards \"hurl-*/bin/hurl*\"' enter" \
+"Install shell(C)heck ..............." "C" setup_shellcheck \
+"Download (p)rettyping .............." "p" "send-keys ' curl -Lo ./prettyping https://raw.githubusercontent.com/denilsonsa/prettyping/master/prettyping && chmod 755 prettyping' enter './prettyping 1.1.1.1' enter" \
 "Install ~/(z)ig ...................." "z" "send-keys ' mkdir -p ~/zig && curl -L https://ziglang.org/builds/zig-\$(uname -m)-linux-0.17.0-dev.9+046002d1a.tar.xz | tar Jxv --strip-components=1 -C ~/zig' enter"
 
 # Submenu: AI
