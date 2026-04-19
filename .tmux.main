@@ -388,16 +388,14 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "apt basics + setup kkrc............." "r" "send-keys ' time cat <<\"EOF\" | bash' enter '[ ! -f /usr/bin/tig ] && {' ; setup_basics_eatmydata ; send-keys ' } ; [ ! -d ~/.kkrc ] && {' ; setup_kkrc ; send-keys '}' enter 'EOF' enter '. ~/.bashrc' enter" \
 "yum basics ........................." "y" setup_centos \
 "apk add basics ....................." "K" "send-keys ' apk add bash bash-completion curl git htop less psmisc rsync screen shadow socat sudo tig unzip vim wget zip && chsh --shell /bin/bash && exec bash' enter" \
-"" \
-"Downgrade run(C) [TEMPORARY] ......." "C" "send-keys '( source /etc/os-release; [[ \$VERSION_ID == \"24.04\" ]] && sudo apt install -y --allow-downgrades runc=1.1.12-0ubuntu3 && sudo apt-mark hold runc )' enter" \
 "Agressive apt (u)pgrade ............" "u" "send-keys 'sudo \$EAT apt update && sudo \$EAT NEEDRESTART_MODE=a apt upgrade -y'" \
 "" \
 "Modify (A)uthorized_keys ..........." "A" setup_ssh_key \
 "Drop .tmux.conf ...................." "s" "send-keys ' cat >~/.tmux.conf <<\"EOF\"' enter ; load-buffer -b staticsendbuf ~/.kkrc/.tmux.conf ; paste-buffer -d -b staticsendbuf ; send-keys 'EOF' enter" \
 "Drop .screenrc ....................." "x" "send-keys ' cat >~/.screenrc <<\"EOF\"' enter ; load-buffer -b staticsendbuf ~/.kkrc/.screenrc ; paste-buffer -d -b staticsendbuf ; send-keys 'EOF' enter" \
 "Drop .(e)ditorconfig ..............." "e" setup_editorconfig \
-"Modify .(b)ashrc ..................." "b" setup_bashrc \
 "" \
+"Modify .(b)ashrc ..................." "b" setup_bashrc \
 "Setup PROD (w)arn .................." "w" "send-keys ' printf \"\\033[00;31mPRODUCTION SERVER\\033[00m\" | sudo tee /etc/debian_chroot ; . ~/.bashrc' enter" \
 "Remove PROD (W)arn ................." "W" "send-keys ' sudo rm /etc/debian_chroot; unset debian_chroot' enter"
 
