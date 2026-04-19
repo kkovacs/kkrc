@@ -5,7 +5,7 @@
 # new version, the new versoin gets executed.
 
 echo "Updating KKRC from git..."
-cd ~/.kkrc
+cd ~/.kkrc || exit
 git pull origin master
 echo "...done."
 echo
