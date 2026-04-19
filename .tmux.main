@@ -39,25 +39,26 @@ set -g @themecolour colour202 # orange
 
 set -g @gray1 colour235
 set -g @gray2 colour239
-set -g @gray3 colour245
-set -g @gray4 colour243
+set -g @gray3 colour243
+set -g @gray4 colour245
 set -g @gray5 colour250
 
 # I switched colour90 => colour125
-set -g status-style "fg=#{@gray5},bg=#{@gray1}"
-set -g status-left-style "bg=#{@gray1},fg=#{@gray4},bold"
-set -g status-right-style "bg=#{@gray1},fg=#{@gray4},bold"
+set -g status-style "bg=#{@gray1},fg=#{@gray5}"
+set -g status-left-style "bg=#{@gray1},fg=#{@gray3},bold"
+set -g status-right-style "bg=#{@gray1},fg=#{@gray3},bold"
 set -g status-right-length "150"
 set -g window-status-format " #I:#W#F "
 set -g window-status-current-format " #I:#W#F "
 set -g window-status-current-style "bg=#{@themecolour},fg=#{@gray1},bold"
-set -g window-status-activity-style "bg=#{@gray1},fg=colour141"
+set -g window-status-activity-style "bg=#{@gray2},fg=#{@gray5}"
+set -g window-status-bell-style "bg=#{@gray2},fg=#{@gray5}"
 set -g window-status-separator ""
 set -g status-justify centre
 set -g pane-border-style "bg=default,fg=colour240"
 set -g pane-active-border-style "bg=default,fg=colour240"
-set -gF display-panes-colour "#{@gray3}"
-set -gF display-panes-active-colour "#{@gray4}"
+set -gF display-panes-colour "#{@gray4}"
+set -gF display-panes-active-colour "#{@gray3}"
 set -gF clock-mode-colour "#{@themecolour}"
 set -g clock-mode-style "24"
 set -g message-style "bg=#{@themecolour},fg=black"
@@ -66,8 +67,8 @@ set -g mode-style "bg=#{@themecolour},fg=colour231"
 
 # Modifications compared to the original theme
 set -g status-left-length 100
-set -g status-left "#[fg=#{@gray1},bg=#{@themecolour},bold] #{?client_prefix,Q,-}#{?pane_pipe,P,-} #{?alternate_on,A,-}#{?window_zoomed_flag,Z,-} #{?monitor-activity,a,-}#{?monitor-silence,s,-} #{?mouse,-,M}#{?synchronize-panes, [BCAST],}#{?session_many_attached, [MANY],} #[fg=#{@gray4},bg=#{@themecolour},nobold]$sepa#[fg=#{@gray1},bg=#{@gray3}] #{pane_pid} #[fg=#{@gray2},bg=#{@gray3}]$sepa#[fg=#{@gray5},bg=#{@gray2}] #S:#I.#P #[fg=#{@gray1},bg=#{@gray2},nobold]$sepa"
-set -g status-right "#[fg=#{@gray2},bg=#{@gray1}]$sepa#[fg=#{@gray5},bg=#{@gray2}] #{pane_width}x#{pane_height} #[fg=#{@gray3},bg=#{@gray2}]$sepa#[fg=#{@gray1},bg=#{@gray3}] $mystat #[fg=#{@themecolour},bg=#{@gray3}]$sepa#[fg=#{@gray1},bg=#{@themecolour},bold] %H:%M %Z "
+set -g status-left "#[fg=#{@gray1},bg=#{@themecolour},bold] #{?client_prefix,Q,-}#{?pane_pipe,P,-} #{?alternate_on,A,-}#{?window_zoomed_flag,Z,-} #{?monitor-activity,a,-}#{?monitor-silence,s,-} #{?mouse,-,M}#{?synchronize-panes, [BCAST],}#{?session_many_attached, [MANY],} #[fg=#{@gray3},bg=#{@themecolour},nobold]$sepa#[fg=#{@gray1},bg=#{@gray4}] #{pane_pid} #[fg=#{@gray2},bg=#{@gray4}]$sepa#[fg=#{@gray5},bg=#{@gray2}] #S:#I.#P #[fg=#{@gray1},bg=#{@gray2},nobold]$sepa"
+set -g status-right "#[fg=#{@gray2},bg=#{@gray1}]$sepa#[fg=#{@gray5},bg=#{@gray2}] #{pane_width}x#{pane_height} #[fg=#{@gray4},bg=#{@gray2}]$sepa#[fg=#{@gray1},bg=#{@gray4}] $mystat #[fg=#{@themecolour},bg=#{@gray4}]$sepa#[fg=#{@gray1},bg=#{@themecolour},bold] %H:%M %Z "
 
 # Force the status line to ON
 set -g status on
@@ -213,8 +214,6 @@ bind Space next-window
 bind n next-window
 bind N previous-window
 # Jump to window with bell
-bind u next-window -a
-bind c-u next-window -a
 bind c-x next-window -a
 
 # Do not auto-copy on mouse drag end
