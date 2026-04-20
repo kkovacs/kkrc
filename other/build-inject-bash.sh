@@ -12,4 +12,4 @@ printf 'i\x7f HISTCONTROL=ignoreboth\r clear;' >../inject-bash.txt
 # Minify .bashrc's content between the two marker lines.
 cat ../.bashrc | awk '/START of part to be injected/{on=1} {if (on) { print $0 }} /END of part to be injected/{on=0}' | python3 minifier.py >>../inject-bash.txt
 # Add ENTER to minified wall-of-text, add commands for getting a quick status of the remote machine, then a final ENTER.
-printf '\r grep PRETTY_NAME /etc/os-release;uname -prinsm;uptime;free -mwt;h 11;tmux list-sessions;systemd-detect-virt;echo $SSH_AUTH_SOCK\r' >>../inject-bash.txt
+printf '\r grep PRETTY_NAME /etc/os-release;uname -prinsm;uptime;free -mwt;history 12;tmux list-sessions;systemd-detect-virt;echo $SSH_AUTH_SOCK\r' >>../inject-bash.txt
