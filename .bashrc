@@ -337,6 +337,10 @@ function sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 . /usr/share/bash-completion/completions/journalctl 2>/dev/null
 # END of better systemd.
 
+# Controversial, but it's in the XDG Base Directory Specification. IMHO, it's the lesser evil.
+# See: https://specifications.freedesktop.org/basedir/latest/
+export PATH="$HOME/.local/bin:$PATH"
+
 # END of part to be injected
 
 # Commands which are not required in remote inject
@@ -420,10 +424,6 @@ if [[ ! -n "$TMUX" ]]; then
 	tmux list-sessions
 	echo
 fi
-
-# Controversial, but it's in the XDG Base Directory Specification. IMHO, it's the lesser evil.
-# See: https://specifications.freedesktop.org/basedir/latest/
-export PATH="$HOME/.local/bin:$PATH"
 
 # Include ~/.bashrc.local if exists. Example .bashrc.local:
 # ---8<---
