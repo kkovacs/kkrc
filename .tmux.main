@@ -489,8 +489,8 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject (a)i shell+python snippet...." "a" "pipe-pane -I 'cat ~/.kkrc/inject-ai-oneliner.txt'" \
 "Inject plan mode snippet ..........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-planmode.md'" \
 "Inject code review snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
-"Inject duckdb snippet .............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
 "Inject go doc snippet .............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
+"Inject duckdb snippet .............." "d" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
 "Inject work-style snippet .........." "w" "pipe-pane -I 'cat ~/.kkrc/inject-ai-kk.md'" \
 "Inject caveman snippet ............." "c" "pipe-pane -I 'cat ~/.kkrc/inject-ai-caveman.md'" \
 "(g)it commit with AI message ......." "g" "send-keys 'git diff --cached | AI \"Please craft a git commit message from this. Just the text, no markdown code markers.\" | git commit -F -' enter" \
@@ -504,6 +504,7 @@ bind -T menus "a" display-menu -T " AI... " \
 "Download (p)i ......................" "p" "send-keys ' curl -L https://github.com/badlogic/pi-mono/releases/latest/download/pi-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~' enter" \
 "Clean up pi ......................" "c-p" "send-keys ' rm -rf ~/pi ~/.pi' enter" \
 "" \
+"Download (C)laude code ............." "C" "send-keys ' curl -fsSL https://claude.ai/install.sh' enter" \
 "Download (k)ilo cli ................" "K" "send-keys ' curl -L https://github.com/Kilo-Org/kilocode/releases/latest/download/kilo-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | sudo tar zxv -C /usr/local/bin/ kilo' enter"
 
 # Submenu: environment
