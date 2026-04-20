@@ -504,7 +504,7 @@ bind -T menus "a" display-menu -T " AI... " \
 "Download (p)i ......................" "p" "send-keys ' curl -L https://github.com/badlogic/pi-mono/releases/latest/download/pi-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~' enter" \
 "Clean up pi ......................" "c-p" "send-keys ' rm -rf ~/pi ~/.pi' enter" \
 "" \
-"Download (C)laude code ............." "C" "send-keys ' curl -fsSL https://claude.ai/install.sh' enter" \
+"Download (C)laude code ............." "C" "send-keys ' curl -fsSL https://claude.ai/install.sh | bash' enter" \
 "Download (k)ilo cli ................" "K" "send-keys ' curl -L https://github.com/Kilo-Org/kilocode/releases/latest/download/kilo-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | sudo tar zxv -C /usr/local/bin/ kilo' enter"
 
 # Submenu: environment
