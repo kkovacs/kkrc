@@ -421,8 +421,11 @@ if [[ ! -n "$TMUX" ]]; then
 	echo
 fi
 
-# Local commands.
-# Example .bashrc.local:
+# Controversial, but it's in the XDG Base Directory Specification. IMHO, it's the lesser evil.
+# See: https://specifications.freedesktop.org/basedir/latest/
+export PATH="$HOME/.local/bin:$PATH"
+
+# Include ~/.bashrc.local if exists. Example .bashrc.local:
 # ---8<---
 # source ~/.kkrc/.bashrc.osx # Mac OS X specific bash config
 # source ~/.kkrc/ssh-askpass-tmux.sh # ssh-agent confirm in tmux
