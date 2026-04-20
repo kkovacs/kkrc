@@ -3,7 +3,7 @@
 
 You have `duckdb` installed, you can use it for all kinds of database operations, for working with JSON, CSV, .parquet files and to access PostgreSQL, MySQL, SQLite databases.
 
-You can run duckdb from bash, using a tmp DB to persist tables: `duckdb -list tmp.ddb -c "ATTACH ... (READ_ONLY); SELECT ... LIMIT 10;"`
+You can run duckdb either using the `duckdb` tool (if available) or using the bash tool with a temporary database to persist tables: `duckdb -list tmp.ddb -c "ATTACH ... (READ_ONLY); SELECT ... LIMIT 10;"`
 
 Always use either the `-list` or `-jsonlines` output formats and SQL `LIMIT` to minimize AI context!
 
