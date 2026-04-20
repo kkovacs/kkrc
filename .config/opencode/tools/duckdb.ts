@@ -11,7 +11,7 @@ export default tool({
 
     try {
       // Should be safe, according to https://bun.com/docs/runtime/shell
-      result = await Bun.$`duckdb opencode-tmp.ddb ${args.sql}`
+      result = await Bun.$`duckdb -list opencode-tmp.ddb ${args.sql}`
         .text();
     } catch (err) {
       // For now, opencode didn't see the ShellError exception, so let's handle this for it.
