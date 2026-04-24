@@ -496,7 +496,7 @@ bind -T menus "a" display-menu -T " AI... " \
 "(g)it commit with AI message ......." "g" "send-keys 'git diff --cached | AI \"Please craft a git commit message from this. Just the text, no markdown code markers.\" | git commit -F -' enter" \
 "" \
 "Download (o)pencode................." "o" "send-keys ' curl -L https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | sudo tar zxv -C /usr/local/bin/ opencode' enter" \
-"config reset ......................." "r" "send-keys ' echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\" }\" >#{opencode_config}' enter" \
+"config reset ......................." "r" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\" }\" >#{opencode_config}' enter" \
 "config MCP Chrome CDP..............." "9" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
 "config LLM on :8080 ................" "0" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:8080/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
 "Clean up opencode ................" "c-o" "send-keys ' rm -rf ~/{.config,.local/state,.local/share,.cache}/opencode ~/.bun ; sudo rm -rf /usr/local/bin/opencode ' enter" \
@@ -515,6 +515,7 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$GEMINI_API_KEY .................." "g" "send-keys ' stty -echo' enter ' export GEMINI_API_KEY=#{GEMINI_API_KEY} GOOGLE_GENERATIVE_AI_API_KEY=#{GEMINI_API_KEY}; stty echo' enter" \
 "Inject \$GITHUB_TOKEN ...................." "G" "send-keys ' stty -echo' enter ' export GITHUB_TOKEN=#{GITHUB_TOKEN}; stty echo' enter" \
 "Inject \$MISTRAL_API_KEY ................." "m" "send-keys ' stty -echo' enter ' export MISTRAL_API_KEY=#{MISTRAL_API_KEY}; stty echo' enter" \
+"Inject \$NVIDIA_API_KEY .................." "n" "send-keys ' stty -echo' enter ' export NVIDIA_API_KEY=#{NVIDIA_API_KEY}; stty echo' enter" \
 "Inject \$OPENCODE_API_KEY ................" "O" "send-keys ' stty -echo' enter ' export OPENCODE_API_KEY=#{OPENCODE_API_KEY}; stty echo' enter" \
 "Inject \$OPENROUTER_API_KEY .............." "o" "send-keys ' stty -echo' enter ' export OPENROUTER_API_KEY=#{OPENROUTER_API_KEY}; stty echo' enter" \
 "Inject \$OPENROUTER_API_KEY for Claude ..." "C" "send-keys ' stty -echo' enter ' export ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" ANTHROPIC_AUTH_TOKEN=\"#{OPENROUTER_API_KEY}\" ANTHROPIC_API_KEY=\"\"; stty echo' enter" \
