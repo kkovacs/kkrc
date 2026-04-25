@@ -1,4 +1,5 @@
 
+
 ## Use local documentation:
 
 The `go doc` command shows documentation for installed Go packages, use it.
