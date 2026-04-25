@@ -488,7 +488,7 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 # IMPORTANT: In the INJECT_AI_... variables in your ~/.ssh/env.age , use some throw-away key, for example an OpenRouter key restricted to $5/month.
 opencode_config="\~/.config/opencode/opencode.json"
 bind -T menus "a" display-menu -T " AI... " \
-"Inject (a)i shell+python snippet...." "a" "send-keys \" python3 -c \\\"import sys,json,urllib.request,os;u='#{INJECT_AI_URL}';h={'Authorization':'Bearer #{INJECT_AI_KEY}','Content-Type':'application/json'};d=json.dumps({'model':'#{INJECT_AI_MODEL}','messages':[{'role':'system','content':sys.argv[1]},{'role':'user','content':sys.stdin.read()}]}).encode();o=urllib.request.build_opener(urllib.request.ProxyHandler());print(json.loads(o.open(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])\\\" \\\"BLUF only:\\\"\"" \
+"Inject (a)i shell+python snippet...." "a" "send-keys \" python3 -c \\\"import sys,json,urllib.request,os;u='#{INJECT_AI_URL}';h={'Authorization':'Bearer #{INJECT_AI_KEY}','Content-Type':'application/json'};d=json.dumps({'model':sys.argv[1],'messages':[{'role':'system','content':sys.argv[2]},{'role':'user','content':sys.stdin.read()}]}).encode();o=urllib.request.build_opener(urllib.request.ProxyHandler());print(json.loads(o.open(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])\\\" '#{INJECT_AI_MODEL}' 'BLUF only:'\"" \
 "Inject (A)I bash function .........." "A" "pipe-pane -I 'cat ~/.kkrc/inject-ai-func.txt'" \
 "Inject plan mode snippet ..........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-planmode.md'" \
 "Inject code review snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
