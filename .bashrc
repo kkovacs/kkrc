@@ -134,13 +134,9 @@ function gat() { vimdiff "$1" <(git show "${2:-HEAD^}":"$1" ) ; }
 alias gclean="git reset --hard && git clean -f -d -x"
 # xxd alternative. Interestingly, "hexdump" is more widespread than "od"
 alias xxh="hexdump -v -e '\"%08.8_ax:\"' -e '16/1 \" %02x\"' -e '\"  \" 16/1 \"%_p\" \"\n\"'"
-# JSON format
-function J() { python3 -mjson.tool "$@" ; }
-export -f J
 
 # Highlight function, max 5 params. Use "." to skip parameters.
-function hl() { local GR="grep --line-buffered --color=always -E"; GREP_COLORS="mt=01;31" $GR "$1|$" | GREP_COLORS="mt=01;32" $GR "$2|$" | GREP_COLORS="mt=01;33" $GR "$3|$" | GREP_COLORS="mt=01;34" $GR "$4|$" | GREP_COLORS="mt=01;35" $GR "$5|$" ; }
-export -f hl
+function hl() { local GR="grep --line-buffered --color=always -E"; GREP_COLORS="mt=01;31" $GR "$1|$" | GREP_COLORS="mt=01;32" $GR "$2|$" | GREP_COLORS="mt=01;33" $GR "$3|$" | GREP_COLORS="mt=01;34" $GR "$4|$" | GREP_COLORS="mt=01;35" $GR "$5|$" ; } ; export -f hl
 
 # Recursive git
 function G() { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
@@ -155,7 +151,7 @@ alias gi="gii | egrep -v '^vendor/|^node_modules/|^.venv/'"
 # NOTE: GR_EXCLUDE is an array!
 export GR_EXCLUDE=(-I --exclude-dir=.git --exclude=*.min.* --exclude=*.sql --exclude=*.log --exclude=tags --exclude-dir=cache --exclude-dir=vendor --exclude-dir=.venv --exclude-dir=venv --exclude-dir=node_modules --exclude-dir=storage)
 function gr() { command grep --color=auto -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null ; }
-function ggr() { command grep --color=force -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXnr ; }
+#function ggr() { command grep --color=force -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXnr ; }
 # Better git grep
 function gg() { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
 
@@ -163,10 +159,10 @@ function gg() { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :
 function s() { tmux attach-session || tmux new-session \; set prefix2 c-a ; }
 
 # Avoid mandatory reconfiguration of git with user/email for hotfixes. File permission matching git does by itself since 2022 (was here earlier)
-function git() { command git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" "$@" ; } ; export -f git
+function git() { command git -c user.email="${USER:-$LOGNAME}@$HOSTNAME" -c user.name="${USER:-$LOGNAME}" "$@" ; } ; export -f git
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
 function M() { mount "$@" | grep '^\/dev\/' ; }
-function D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none\|^overlay\|^shm' ; }
+function D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none\|^overlay\|^shm\|^efivarfs' ; }
 # Free memory
 function F() { free -h ; }
 # Process list overview (for Linux)
@@ -184,7 +180,7 @@ function lxp() { for ip in $(lxc network forward list lxdbr0 -f csv | awk -F, -e
 # shellcheck disable=SC2033,SC2032
 function docker() { if [[ -r /var/run/docker.sock ]] ; then command docker "$@" ; else sudo docker "$@" ; fi ; }
 # shellcheck disable=SC2033,SC2032
-function docker-compose() { if [[ -r /var/run/docker.sock ]] ; then command docker-compose "$@" ; else sudo docker-compose "$@" ; fi ; }
+#function docker-compose() { if [[ -r /var/run/docker.sock ]] ; then command docker-compose "$@" ; else sudo docker-compose "$@" ; fi ; }
 # Docker containers overview
 alias C="docker ps -as"
 # Docker-compose
@@ -194,12 +190,11 @@ complete -F _docker_compose dc
 alias dc1="dc up -d; dcs"
 alias dc0="dc down"
 alias dcs="dc ps -a"
-alias dci="dc images; echo; docker images"
-alias dcl="dc logs -f"
+#alias dcl="dc logs -f"
 # List docker and docker-compose images
-alias I="docker images"
+alias dci="dc images; echo; docker images"
 # Docker Swarm
-alias S="docker service ls"
+#alias S="docker service ls"
 # Kubernetes overview. Using an alias instead of a function because often kubectl is an alias itself... (minikube, etc)
 alias K="kubectl get all --output=wide"
 # Kubernetes overview, including system
@@ -216,13 +211,8 @@ alias lb="lsblk -Mf"
 alias lvl="pvs; echo; vgs; echo; lvs -o lv_name,pool_lv,size,data_percent,metadata_percent,origin"
 # ZFS "du"
 alias zl="zfs list -t all -o space,compressratio"
-# AI helper function for easy, bash-based interaction. First arg is system prompt, second is optional model, stdin is user message.
-# NOTE: If you edit this, you should edit inject-ai-oneliner.txt too.
-function AI() { AI_SYSTEM="$1" python3 -c "import sys,json,urllib.request,os;u='https://openrouter.ai/api/v1/chat/completions';h={'Authorization':'Bearer '+os.environ.get('OPENROUTER_API_KEY',''),'Content-Type':'application/json'};d=json.dumps({'model':'${2:-x-ai/grok-code-fast-1}','messages':[{'role':'system','content':os.environ.get('AI_SYSTEM','')},{'role':'user','content':sys.stdin.read()}]}).encode();o=urllib.request.build_opener(urllib.request.ProxyHandler());print(json.loads(o.open(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])"; }
-export -f AI
 # Replicate zsh's "vared" command (with autocompletion)
-function vared() { read -r -e -p "$1=" -i "${!1}" "$1" ; }
-complete -v vared
+function vared() { read -r -e -p "$1=" -i "${!1}" "$1" ; } ; complete -v vared
 
 # Only if not on busybox
 [ -L "$(type -p grep)" ] || alias grep="grep --color"
@@ -337,9 +327,9 @@ function sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 . /usr/share/bash-completion/completions/journalctl 2>/dev/null
 # END of better systemd.
 
-# Controversial, but it's in the XDG Base Directory Specification. IMHO, it's the lesser evil.
+# Controversial, but it's in the XDG Base Directory Specification. IMHO it's the lesser evil.
 # See: https://specifications.freedesktop.org/basedir/latest/
-export PATH="$HOME/.local/bin:$PATH"
+if [[ "$PATH" != *"/.local/bin"* ]]; then export PATH="$HOME/.local/bin:$PATH"; fi
 
 # END of part to be injected
 
