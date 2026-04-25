@@ -484,9 +484,12 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "Install ~/(z)ig ...................." "z" "send-keys ' mkdir -p ~/zig && curl -L https://ziglang.org/builds/zig-\$(uname -m)-linux-0.17.0-dev.9+046002d1a.tar.xz | tar Jxv --strip-components=1 -C ~/zig' enter"
 
 # Submenu: AI
+# NOTE: If you edit the AI python code here, you probably want to edit inject-ai-func.txt too
+# IMPORTANT: In the INJECT_AI_... variables in your ~/.ssh/env.age , use some throw-away key, for example an OpenRouter key restricted to $5/month.
 opencode_config="\~/.config/opencode/opencode.json"
 bind -T menus "a" display-menu -T " AI... " \
-"Inject (a)i shell+python snippet...." "a" "pipe-pane -I 'cat ~/.kkrc/inject-ai-oneliner.txt'" \
+"Inject (a)i shell+python snippet...." "a" "send-keys \" python3 -c \\\"import sys,json,urllib.request,os;u='#{INJECT_AI_URL}';h={'Authorization':'Bearer #{INJECT_AI_KEY}','Content-Type':'application/json'};d=json.dumps({'model':'#{INJECT_AI_MODEL}','messages':[{'role':'user','content':sys.stdin.read()}]}).encode();o=urllib.request.build_opener(urllib.request.ProxyHandler());print(json.loads(o.open(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])\\\"\"" \
+"Inject (A)I bash function .........." "A" "pipe-pane -I 'cat ~/.kkrc/inject-ai-func.txt'" \
 "Inject plan mode snippet ..........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-planmode.md'" \
 "Inject code review snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
 "Inject go doc snippet .............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
