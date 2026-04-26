@@ -85,6 +85,7 @@ bind c-q last-window
 
 # To make screen easier to use if accidentally hit CTRL-Q instead of CTRL-A or CTRL-W
 bind c-a send-keys c-a
+bind c-s send-keys c-s
 bind a send-keys c-a
 bind w send-keys c-w
 
