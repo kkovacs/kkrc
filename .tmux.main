@@ -480,6 +480,7 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "Install (d)ocker ..................." "d" setup_docker \
 "Install (m)inikube.................." "m" setup_minikube \
 "Install (h)url ....................." "h" "send-keys ' curl -L https://github.com/Orange-OpenSource/hurl/releases/download/7.1.0/hurl-7.1.0-\$(uname -m)-unknown-linux-gnu.tar.gz | sudo tar zxv -C /usr/local/bin/ --strip-components=2 --wildcards \"hurl-*/bin/hurl*\"' enter" \
+"Install k(6) ......................." "6" "send-keys ' curl -L https://github.com/grafana/k6/releases/download/v1.7.1/k6-v1.7.1-linux-\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | sudo tar zxv -C /usr/local/bin/ --strip-components=1 --wildcards \"*/k6\"' enter" \
 "Install shell(C)heck ..............." "C" setup_shellcheck \
 "Download (p)rettyping .............." "p" "send-keys ' curl -Lo ./prettyping https://raw.githubusercontent.com/denilsonsa/prettyping/master/prettyping && chmod 755 prettyping' enter './prettyping 1.1.1.1' enter" \
 "Install ~/(z)ig ...................." "z" "send-keys ' mkdir -p ~/zig && curl -L https://ziglang.org/builds/zig-\$(uname -m)-linux-0.17.0-dev.9+046002d1a.tar.xz | tar Jxv --strip-components=1 -C ~/zig' enter"
