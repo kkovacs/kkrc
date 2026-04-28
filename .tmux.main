@@ -378,7 +378,8 @@ bind "c-r" display-menu -T " Inject... " \
 "Submenu (n)odejs ................." "c-n" "send-keys -K c-q ^ n" \
 "Submenu (c-t)ools/platforms ......" "c-t" "send-keys -K c-q ^ t" \
 "Submenu (c-v)im .................." "c-v" "send-keys -K c-q ^ v" \
-"Submenu (c-z)modem-like .........." "c-z" "send-keys -K c-q ^ z"
+"Submenu (c-z)modem-like .........." "c-z" "send-keys -K c-q ^ z" \
+"Submenu (c-l)ocal ................" "c-l" "send-keys -K c-q ^ c-l"
 
 # Commands that do CHANGE the remote system.
 # The main purpose of these shortcuts is to quickly set up ephemeral dev-VMs.
@@ -553,4 +554,6 @@ bind -T menus "z" display-menu -T " Zmodem... " \
 "Bytestream reverse ..............." "r" "send-keys 'while read -r -d \" \" x; do [ -n \"\$x\" ] && printf \"\\x\${x}\"; done'"
 
 # Local commands:
-#source-file -q ~/.tmux.local
+# Local menu - override from ~/.tmux.local
+bind -T menus "c-l" display-menu -T " Local... " \
+"Load ~/.tmux.local ..............." "0" "source-file ~/.tmux.local"
