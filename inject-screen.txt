@@ -1,3 +1,4 @@
+:echo loading
 :vbell off
 :bell_msg "^G"
 :defscrollback 10000
