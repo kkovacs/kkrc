@@ -345,7 +345,8 @@ set -s command-alias[130] setup_static_php_cli="send-keys ' mkdir -p ~/.local/bi
 set -s command-alias[131] get_pgweb="send-keys ' mkdir -p ~/.local/bin ; curl -Lo /tmp/pgweb.zip https://github.com/sosedoff/pgweb/releases/download/v0.17.0/pgweb_linux_\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").zip && unzip -o /tmp/pgweb.zip -d ~/.local/bin/' enter"
 set -s command-alias[132] setup_jupyterlab="send-keys 'uv pip install jupyterlab jupysql itables psycopg2-binary jupyterlab-git plotly ipywidgets duckdb duckdb-engine magic-duckdb && while true; do jupyter lab --ip=0.0.0.0 --port=80; sleep 1; done' enter"
 set -s command-alias[134] setup_python_uv="send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/astral-sh/uv/releases/latest/download/uv-\$(uname -m)-unknown-linux-gnu.tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1' enter"
-set -s command-alias[124] setup_brew="send-keys ' NONINTERACTIVE=1 /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"' enter" \
+set -s command-alias[124] setup_brew="send-keys ' NONINTERACTIVE=1 /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"' enter"
+set -Fs command-alias[117] inject_ai_snippet="send-keys \" python3 -c \\\"import sys,json,urllib.request,os;u='#{INJECT_AI_URL}';h={'Authorization':'Bearer #{INJECT_AI_KEY}','Content-Type':'application/json'};d=json.dumps({'model':sys.argv[1],'messages':[{'role':'system','content':sys.argv[2]},{'role':'user','content':sys.stdin.read()}]}).encode();o=urllib.request.build_opener(urllib.request.ProxyHandler());print(json.loads(o.open(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])\\\""
 
 # PLEASE DONT USE: "j", "k", "q" IN ANY MENU!
 
@@ -490,8 +491,8 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 # IMPORTANT: In the INJECT_AI_... variables in your ~/.ssh/env.age , use some throw-away key, for example an OpenRouter key restricted to $5/month.
 opencode_config="\~/.config/opencode/opencode.json"
 bind -T menus "a" display-menu -T " AI... " \
-"Inject (a)i shell+python snippet...." "a" "send-keys \" python3 -c \\\"import sys,json,urllib.request,os;u='#{INJECT_AI_URL}';h={'Authorization':'Bearer #{INJECT_AI_KEY}','Content-Type':'application/json'};d=json.dumps({'model':sys.argv[1],'messages':[{'role':'system','content':sys.argv[2]},{'role':'user','content':sys.stdin.read()}]}).encode();o=urllib.request.build_opener(urllib.request.ProxyHandler());print(json.loads(o.open(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])\\\" \\\"#{INJECT_AI_MODEL}\\\" \\\"BLUF only:\\\"\"" \
-"Inject (A)I bash function .........." "A" "pipe-pane -I 'cat ~/.kkrc/inject-ai-func.txt'" \
+"Inject (a)i shell+python snippet...." "a" "inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"BLUF only:\\\"\"" \
+"Inject (A)I bash function .........." "A" "send-keys \" function AI() {\" ; inject_ai_snippet \; send-keys \" \\\"\\\${2:-#{INJECT_AI_MODEL}}\\\" \\\"\\\$1\\\"; }; export -f AI\" enter" \
 "Inject plan mode snippet ..........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-planmode.md'" \
 "Inject code review snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
 "Inject go doc snippet .............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
@@ -515,8 +516,9 @@ bind -T menus "a" display-menu -T " AI... " \
 # Submenu: environment
 # Load age-encrypted environment variables in tmux session, so they can be injected.
 # -h means hidden: variables don't get automatically added to new windows' environments and not shown by :show-environment
+# NOTE: ENV loading needs to reload .tmux.main so "#{..}" variables in "set command-alias..."-es are expanded
 bind -T menus "e" display-menu -T " inject from tmux session environment... " \
-"Load (e)nv.age to tmux .................." "e" "display-popup -T \"Load env.age to tmux\" -EE bash -c \"age -i ~/.ssh/age.key -d ~/.ssh/env.age | awk '!/^\s*(\\\$|#)/ { sub(/=/, \\\" \\\"); print \\\"set-environment -h\\\", \$0 }' | tmux source-file -\"" \
+"Load (e)nv.age to tmux .................." "e" "display-popup -T \"Load env.age to tmux\" -EE bash -c \"age -i ~/.ssh/age.key -d ~/.ssh/env.age | awk '!/^\s*(\\\$|#)/ { sub(/=/, \\\" \\\"); print \\\"set-environment -h\\\", \$0 }' | tmux source-file -\" ; source-file ~/.kkrc/.tmux.main" \
 "Inject \$GEMINI_API_KEY .................." "g" "send-keys ' stty -echo' enter ' export GEMINI_API_KEY=#{GEMINI_API_KEY} GOOGLE_GENERATIVE_AI_API_KEY=#{GEMINI_API_KEY}; stty echo' enter" \
 "Inject \$GITHUB_TOKEN ...................." "G" "send-keys ' stty -echo' enter ' export GITHUB_TOKEN=#{GITHUB_TOKEN}; stty echo' enter" \
 "Inject \$MISTRAL_API_KEY ................." "m" "send-keys ' stty -echo' enter ' export MISTRAL_API_KEY=#{MISTRAL_API_KEY}; stty echo' enter" \
