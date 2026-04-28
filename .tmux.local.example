@@ -1,6 +1,3 @@
-# Bind "c-q" "c-l" to local menu
-bind "c-l" send-keys -K c-q ^ c-l
-
 # Local menu
 bind -T menus "c-l" display-menu -T " Local... " \
 "Git clone our project .............." "c" "send-keys ' git config --global user.name \"ME\" && git config --global user.email \"me@example.com\" && git clone ...' enter" \
