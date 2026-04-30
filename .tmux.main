@@ -400,7 +400,9 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "" \
 "Modify .(b)ashrc ..................." "b" setup_bashrc \
 "Setup PROD (w)arn .................." "w" "send-keys ' printf \"\\033[00;31mPRODUCTION SERVER\\033[00m\" | sudo tee /etc/debian_chroot ; . ~/.bashrc' enter" \
-"Remove PROD (W)arn ................." "W" "send-keys ' sudo rm /etc/debian_chroot; unset debian_chroot' enter"
+"Remove PROD (W)arn ................." "W" "send-keys ' sudo rm /etc/debian_chroot; unset debian_chroot' enter" \
+"" \
+"sudo touch /(S)napshotme ..........." "S" "send-keys ' sudo touch /snapshotme; echo -n Commencing in ~\$(( 60 - \$( date +%S | sed 's/^0*//' ) )) secs; while [[ -f /snapshotme ]]; do echo -n .; sleep 1; done; echo' enter"
 
 # Submenu: databases
 bind -T menus "d" display-menu -T " DB... " \
@@ -473,10 +475,11 @@ bind -T menus "n" display-menu -T " NodeJS... " \
 
 # Submenu: tools
 bind -T menus "t" display-menu -T " Tools / platforms... " \
-"sudo touch /snapsho(t)me ..........." "t" "send-keys ' sudo touch /snapshotme; echo -n Commencing in ~\$(( 60 - \$( date +%S | sed 's/^0*//' ) )) secs; while [[ -f /snapshotme ]]; do echo -n .; sleep 1; done; echo' enter" \
+"mkdir foo & git init ..............." "g" "send-keys ' mkdir foo && cd foo && git init -b main && touch .gitignore && git add .gitignore && git -c user.email=\\\"$USER@$HOSTNAME\\\" -c user.name=\\\"$USER\\\" commit -m init && git status -sb' enter" \
 "" \
-"git repo (i)nit ...................." "i" "send-keys ' git init && touch README.md && git add README.md && git -c user.email="$USER@$HOSTNAME" -c user.name="$USER" commit -m init' enter" \
-"Params for (c)hrome devtools ......." "c" "send-keys ' --remote-debugging-port=9222 --user-data-dir=/tmp/cdp/ --no-first-run --no-default-browser-check --disable-signin-promo --disable-sync --disable-infobars \"chrome://inspect/#remote-debugging\" ; rm -rf /tmp/cdp' enter" \
+"Docker run chrome --screenshot ....." "s" "send-keys 'sudo docker run -u `id -u $USER` -it --rm -v $(pwd):/usr/src/app --add-host host.docker.internal:host-gateway zenika/alpine-chrome --no-sandbox --window-size=1024,768 --screenshot --hide-scrollbars \"http://host.docker.internal:80/\"'" \
+"Docker run chrome CDP .............." "c" "send-keys 'sudo docker run -u `id -u $USER` -it --rm -v $(pwd):/usr/src/app --add-host host.docker.internal:host-gateway -p 9222:9222 zenika/alpine-chrome --no-sandbox --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --window-size=1024,768' enter" \
+"Params for (c)hrome devtools ......." "d" "send-keys ' --remote-debugging-port=9222 --user-data-dir=/tmp/cdp/ --no-first-run --no-default-browser-check --disable-signin-promo --disable-sync --disable-infobars \\\"chrome://inspect/#remote-debugging\\\" ; rm -rf /tmp/cdp' enter" \
 "" \
 "Install (b)rew ....................." "b" setup_brew \
 "Install (d)ocker ..................." "d" setup_docker \
