@@ -346,6 +346,7 @@ set -s command-alias[131] get_pgweb="send-keys ' mkdir -p ~/.local/bin ; curl -L
 set -s command-alias[132] setup_jupyterlab="send-keys 'uv pip install jupyterlab jupysql itables psycopg2-binary jupyterlab-git plotly ipywidgets duckdb duckdb-engine magic-duckdb && while true; do jupyter lab --ip=0.0.0.0 --port=80; sleep 1; done' enter"
 set -s command-alias[134] setup_python_uv="send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/astral-sh/uv/releases/latest/download/uv-\$(uname -m)-unknown-linux-gnu.tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1' enter"
 set -s command-alias[124] setup_brew="send-keys ' NONINTERACTIVE=1 /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"' enter"
+# IMPORTANT: Uses the INJECT_AI_... env vars. Use some throw-away key because it gets exposed easily, for example an OpenRouter key restricted to $5/month.
 set -Fs command-alias[117] inject_ai_snippet="send-keys \" python3 -c \\\"import sys,json,urllib.request,os;u='#{INJECT_AI_URL}';h={'Authorization':'Bearer #{INJECT_AI_KEY}','Content-Type':'application/json'};d=json.dumps({'model':sys.argv[1],'messages':[{'role':'system','content':sys.argv[2]},{'role':'user','content':sys.stdin.read()}]}).encode();o=urllib.request.build_opener(urllib.request.ProxyHandler());print(json.loads(o.open(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])\\\""
 
 # PLEASE DONT USE: "j", "k", "q" IN ANY MENU!
@@ -491,8 +492,6 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "Install ~/(z)ig ...................." "z" "send-keys ' mkdir -p ~/.local/zig && curl -L https://ziglang.org/builds/zig-\$(uname -m)-linux-0.17.0-dev.9+046002d1a.tar.xz | tar Jxv --strip-components=1 -C ~/.local/zig ; ln -s ~/.local/zig/zig ~/.local/bin/zig' enter"
 
 # Submenu: AI
-# NOTE: If you edit the AI python code here, you probably want to edit inject-ai-func.txt too
-# IMPORTANT: In the INJECT_AI_... variables in your ~/.ssh/env.age , use some throw-away key, for example an OpenRouter key restricted to $5/month.
 opencode_config="\~/.config/opencode/opencode.json"
 bind -T menus "a" display-menu -T " AI... " \
 "Inject (a)i shell+python snippet...." "a" "inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"BLUF only:\\\"\"" \
