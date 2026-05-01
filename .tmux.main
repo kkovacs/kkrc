@@ -480,7 +480,7 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "" \
 "Docker run chrome --screenshot ....." "s" "send-keys 'sudo docker run -u `id -u $USER` -it --rm -v $(pwd):/usr/src/app --add-host host.docker.internal:host-gateway zenika/alpine-chrome --no-sandbox --window-size=1024,768 --screenshot --hide-scrollbars \"http://host.docker.internal:80/\"'" \
 "Docker run chrome CDP .............." "c" "send-keys 'sudo docker run -u `id -u $USER` -it --rm -v $(pwd):/usr/src/app --add-host host.docker.internal:host-gateway -p 9222:9222 zenika/alpine-chrome --no-sandbox --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --window-size=1024,768' enter" \
-"Params for (c)hrome devtools ......." "d" "send-keys ' --remote-debugging-port=9222 --user-data-dir=/tmp/cdp/ --no-first-run --no-default-browser-check --disable-signin-promo --disable-sync --disable-infobars \\\"chrome://inspect/#remote-debugging\\\" ; rm -rf /tmp/cdp' enter" \
+"Params for (c)hrome devtools ......." "D" "send-keys ' --remote-debugging-port=9222 --user-data-dir=/tmp/cdp/ --no-first-run --no-default-browser-check --disable-signin-promo --disable-sync --disable-infobars \\\"chrome://inspect/#remote-debugging\\\" ; rm -rf /tmp/cdp' enter" \
 "" \
 "Install (b)rew ....................." "b" setup_brew \
 "Install (d)ocker ..................." "d" setup_docker \
