@@ -10,3 +10,4 @@
 - **Premature** abstractions are the **root of all evil**, but consolidation is preferable to writing the same code over and over.
 - Technical debt, temporary solutions, unhandled errors are OK in WIP, but **must** be marked with `XXX` comments.
 - **Do not** do any `git` operations without User's explicit request.
+
