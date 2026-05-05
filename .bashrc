@@ -260,7 +260,7 @@ bind -m vi-insert '"\e[B":history-search-forward'
 bind -m vi-insert "C-l:clear-screen"
 
 # Restore default completion for cd, since bash-completion doesn't handle wildcards
-compopt -o bashdefault cd
+compopt -o bashdefault cd 2>/dev/null
 
 # START of better systemd.
 # Makes it almost usable, works around brain-dead-ness, even add some comfort:
