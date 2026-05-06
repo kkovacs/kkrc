@@ -556,6 +556,9 @@ bind -T menus "z" display-menu -T " Zmodem... " \
 "Bytestream reverse ..............." "r" "send-keys 'while read -r -d \" \" x; do [ -n \"\$x\" ] && printf \"\\x\${x}\"; done'"
 
 # Local commands:
-# Local menu - override from ~/.tmux.local
+# Local menu - override this from ~/.tmux.local
 bind -T menus "c-l" display-menu -T " Local... " \
 "Load ~/.tmux.local ..............." "0" "source-file ~/.tmux.local"
+
+# Load ~/.tmux.local but stay silent if does not exist
+source-file -q ~/.tmux.local
