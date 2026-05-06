@@ -511,7 +511,7 @@ bind -T menus "a" display-menu -T " AI... " \
 "Clean up opencode ................" "c-o" "send-keys ' rm -rf ~/{.config,.local/state,.local/share,.cache}/opencode ~/.bun ; rm -rf ~/.local/bin/opencode ' enter" \
 "" \
 "Download (p)i ......................" "p" "send-keys ' mkdir -p ~/.pi ; curl -L https://github.com/badlogic/pi-mono/releases/latest/download/pi-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv --strip-components=1 -C ~/.pi/; ln -s ~/.pi/pi ~/.local/bin/pi' enter" \
-"Clean up pi ......................" "c-p" "send-keys ' rm -rf ~/pi ~/.pi' enter" \
+"Clean up pi ......................" "c-p" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi' enter" \
 "" \
 "Download (C)laude code ............." "C" "send-keys ' curl -fsSL https://claude.ai/install.sh | bash' enter" \
 "Download (k)ilo cli ................" "K" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/Kilo-Org/kilocode/releases/latest/download/kilo-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~/.local/bin/ kilo' enter"
