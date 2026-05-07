@@ -308,8 +308,9 @@ set -s command-alias[108] setup_centos="send-keys ' sudo yum install -y epel-rel
 set -s command-alias[109] setup_docker="send-keys ' [[ \${GROUPS[0]} -gt 0 ]] && sudo groupadd -og \${GROUPS[0]} docker || true && until sudo NEEDRESTART_MODE=a \$EAT apt-get install -y docker.io docker-compose-v2; do sleep 1; done' enter"
 # nodejs install
 set -s command-alias[102] setup_node_snap="send-keys ' sudo snap install node --classic --channel=24' enter"
-set -s command-alias[110] setup_node="send-keys ' mkdir -p ~/.local/node ; curl -L https://nodejs.org/dist/v24.13.1/node-v24.13.1-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\").tar.xz | tar Jxv --strip-components=1 --no-same-owner -C ~/.local/node && find ~/.local/node/bin/ -mindepth 1 -executable -exec ln -s \"{}\" ~/.local/bin/ \\;' enter"
+set -s command-alias[110] setup_node="send-keys ' mkdir -p ~/.local/node ; curl -L https://nodejs.org/dist/v24.15.0/node-v24.15.0-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\").tar.xz | tar Jxv --strip-components=1 --no-same-owner -C ~/.local/node && find ~/.local/node/bin/ -mindepth 1 -executable -exec ln -sf \"{}\" ~/.local/bin/ \\;' enter"
 set -s command-alias[103] setup_bun="send-keys ' mkdir -p ~/.local/bin ; curl -Lo /tmp/bun.zip https://github.com/oven-sh/bun/releases/latest/download/bun-linux-\$(uname -m | sed \"s/x86_64/x64/\").zip && unzip -j -o /tmp/bun.zip -d ~/.local/bin/ && ln -s bun ~/.local/bin/node' enter"
+set -s command-alias[133] setup_deno="send-keys ' mkdir -p ~/.local/bin ; curl -Lo /tmp/deno.zip https://github.com/denoland/deno/releases/latest/download/deno-\$(uname -m\)-unknown-linux-gnu.zip && unzip -j -o /tmp/deno.zip -d ~/.local/bin/' enter"
 set -s command-alias[107] setup_pnpm="send-keys ' mkdir -p ~/.local/bin ; curl -Lo ~/.local/bin/pnpm https://github.com/pnpm/pnpm/releases/latest/download/pnpm-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\") && chmod 755 ~/.local/bin/pnpm' enter"
 # Install PHP & composer
 set -s command-alias[111] setup_php="send-keys ' mkdir -p ~/.local/bin ; NEEDRESTART_MODE=a \$EAT apt-get install -y $BASIC php-cli php-gd php-mbstring php-dom php-xml php-zip php-curl php-intl php-mysql php-pgsql php-sqlite3 php-xdebug && (curl -sS https://getcomposer.org/installer | NEEDRESTART_MODE=a php -- --install-dir=~/.local/bin --filename=composer)' enter"
@@ -468,8 +469,9 @@ bind -T menus "y" display-menu -T " Python... " \
 
 # Submenu: node
 bind -T menus "n" display-menu -T " NodeJS... " \
-"Install nodejs (direct download) ..." "n" setup_node \
-"Install bun ........................" "b" setup_bun \
+"Download bun ......................." "b" setup_bun \
+"Download (d)eno ...................." "d" setup_deno \
+"Download nodejs (direct download) .." "n" setup_node \
 "Install nodejs (snap) .............." "s" setup_node_snap \
 "Install pnpm ......................." "p" setup_pnpm \
 "Docker run (N)ode..................." "N" "send-keys 'docker run -it --rm -v `pwd`:/app -w /app --network=host -u `id -u`:`id -g` node:alpine npm run build'"
