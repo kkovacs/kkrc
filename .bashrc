@@ -386,6 +386,12 @@ function ssh() {
 			[[ $I == "--" ]] && break
 			NAME="$I"
 		done
+		# Strip username
+		NAME="${NAME#*@}"
+		# Shorten to the first two parts (from a.b.c.d => a.b) except if it's an IP
+		if [[ $NAME == *[^0-9.]* ]]; then
+			NAME="${NAME%.${NAME#*.*.}}"
+		fi
 		# Set window name
 		tmux rename-window "${NAME}" >/dev/null 2>&1
 	fi
