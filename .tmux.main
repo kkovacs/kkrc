@@ -500,13 +500,13 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject (A)I bash function .........." "A" "send-keys \" function AI() {\" ; inject_ai_snippet \; send-keys \" \\\"\\\${2:-#{INJECT_AI_MODEL}}\\\" \\\"\\\$1\\\"; }; export -f AI\" enter" \
 "" \
 "Inject work-style snippet .........." "w" "pipe-pane -I 'cat ~/.kkrc/inject-ai-kk.md'" \
-"Inject update docs snippet ........." "d" "pipe-pane -I 'cat ~/.kkrc/inject-ai-update-docs.md'" \
-"Inject code review snippet ........." "r" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
-"Inject go doc snippet .............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
-"Inject duckdb snippet .............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
 "Inject plan mode snippet ..........." "p" "pipe-pane -I 'cat ~/.kkrc/inject-ai-planmode.md'" \
-"Inject caveman snippet ............." "c" "pipe-pane -I 'cat ~/.kkrc/inject-ai-caveman.md'" \
-"(g)it commit with AI message ......." "g" "send-keys 'git diff --cached | AI \"Please craft a git commit message from this. Just the text, no markdown code markers.\" | git commit -F -' enter" \
+"Inject update docs snippet ........." "d" "pipe-pane -I 'cat ~/.kkrc/inject-ai-docs-update.md'" \
+"Inject code review snippet ........." "r" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
+"Inject \"use go doc\" snippet ........" "g" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
+"Inject duckdb snippet .............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
+"Inject caveman snippet ............." "C" "pipe-pane -I 'cat ~/.kkrc/inject-ai-caveman.md'" \
+"git (c)ommit with AI message ......." "c" "send-keys 'git diff --cached | AI \"Please craft a git commit message from this. Just the text, no markdown code markers.\" | git commit -F -' enter" \
 "" \
 "Download (o)pencode................." "o" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~/.local/bin/ opencode' enter" \
 "config reset ......................." "r" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\" }\" >#{opencode_config}' enter" \
