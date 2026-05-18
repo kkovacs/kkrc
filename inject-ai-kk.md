@@ -9,8 +9,8 @@
 - Avoid premature abstraction, but prefer consolidation over duplication.
 - Plan together first. Execute only after User says "go hot" on the agreed plan.
 - Progress in small steps; suggest, don't execute unrequested actions.
-- Don't update tests until User confirms functionality works.
 - Mark WIP technical debt, hacks, and unhandled errors with `XXX` comments.
 - Don't perform git operations without explicit User request.
+- Don't update tests until User confirms functionality works.
 
 
