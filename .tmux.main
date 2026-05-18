@@ -342,7 +342,7 @@ set -s command-alias[126] setup_duckdb="send-keys ' mkdir -p ~/.local/bin ; curl
 set -s command-alias[127] setup_python_venv="send-keys ' sudo apt-get install -y python3-venv && python3 -m venv .venv; . .venv/bin/activate' enter"
 set -s command-alias[128] setup_frankenphp="send-keys ' mkdir -p ~/.local/bin ; curl -Lo ~/.local/bin/frankenphp https://github.com/dunglas/frankenphp/releases/latest/download/frankenphp-linux-\$(uname -m) && chmod 755 ~/.local/bin/frankenphp' enter"
 set -s command-alias[129] setup_composer="send-keys ' mkdir -p ~/.local/bin ; curl -Lo ~/.local/bin/composer https://github.com/composer/composer/releases/latest/download/composer.phar && chmod 755 ~/.local/bin/composer' enter"
-set -s command-alias[130] setup_static_php_cli="send-keys ' mkdir -p ~/.local/bin ; curl -L https://dl.static-php.dev/static-php-cli/bulk/php-8.4.18-cli-linux-\$(uname -m).tar.gz | tar xz --no-same-owner -C ~/.local/bin/' enter"
+set -s command-alias[130] setup_static_php_cli="send-keys ' mkdir -p ~/.local/bin ; curl -L https://dl.static-php.dev/static-php-cli/bulk/php-8.5.6-cli-linux-\$(uname -m).tar.gz | tar xz --no-same-owner -C ~/.local/bin/' enter"
 set -s command-alias[131] get_pgweb="send-keys ' mkdir -p ~/.local/bin ; curl -Lo /tmp/pgweb.zip https://github.com/sosedoff/pgweb/releases/download/v0.17.0/pgweb_linux_\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").zip && unzip -o /tmp/pgweb.zip -d ~/.local/bin/' enter"
 set -s command-alias[132] setup_jupyterlab="send-keys 'uv pip install jupyterlab jupysql itables psycopg2-binary jupyterlab-git plotly ipywidgets duckdb duckdb-engine magic-duckdb && while true; do jupyter lab --ip=0.0.0.0 --port=80; sleep 1; done' enter"
 set -s command-alias[134] setup_python_uv="send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/astral-sh/uv/releases/latest/download/uv-\$(uname -m)-unknown-linux-gnu.tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1' enter"
@@ -487,8 +487,8 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "Install (b)rew ....................." "b" setup_brew \
 "Install (d)ocker ..................." "d" setup_docker \
 "Install (m)inikube.................." "m" setup_minikube \
-"Install (h)url ....................." "h" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/Orange-OpenSource/hurl/releases/download/7.1.0/hurl-7.1.0-\$(uname -m)-unknown-linux-gnu.tar.gz | tar zxv -C ~/.local/bin/ --strip-components=2 --wildcards \"hurl-*/bin/hurl*\"' enter" \
-"Install k(6) ......................." "6" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/grafana/k6/releases/download/v1.7.1/k6-v1.7.1-linux-\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1 --wildcards \"*/k6\"' enter" \
+"Install (h)url ....................." "h" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/Orange-OpenSource/hurl/releases/download/8.0.1/hurl-8.0.1-\$(uname -m)-unknown-linux-gnu.tar.gz | tar zxv -C ~/.local/bin/ --strip-components=2 --wildcards \"hurl-*/bin/hurl*\"' enter" \
+"Install k(6) ......................." "6" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/grafana/k6/releases/download/v2.0.0/k6-v2.0.0-linux-\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1 --wildcards \"*/k6\"' enter" \
 "Install shell(C)heck ..............." "C" setup_shellcheck \
 "Download (p)rettyping .............." "p" "send-keys ' mkdir -p ~/.local/bin ; curl -Lo ~/.local/bin/prettyping https://raw.githubusercontent.com/denilsonsa/prettyping/master/prettyping && chmod 755 ~/.local/bin/prettyping' enter 'prettyping 1.1.1.1' enter" \
 "Install ~/(z)ig ...................." "z" "send-keys ' mkdir -p ~/.local/zig && curl -L https://ziglang.org/builds/zig-\$(uname -m)-linux-0.17.0-dev.9+046002d1a.tar.xz | tar Jxv --strip-components=1 -C ~/.local/zig ; ln -s ~/.local/zig/zig ~/.local/bin/zig' enter"
@@ -500,10 +500,10 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject (A)I bash function .........." "A" "send-keys \" function AI() {\" ; inject_ai_snippet \; send-keys \" \\\"\\\${2:-#{INJECT_AI_MODEL}}\\\" \\\"\\\$1\\\"; }; export -f AI\" enter" \
 "" \
 "Inject work-style snippet .........." "w" "pipe-pane -I 'cat ~/.kkrc/inject-ai-kk.md'" \
-"Inject plan mode snippet ..........." "p" "pipe-pane -I 'cat ~/.kkrc/inject-ai-planmode.md'" \
+"Inject plan mode snippet ..........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-planmode.md'" \
 "Inject update docs snippet ........." "d" "pipe-pane -I 'cat ~/.kkrc/inject-ai-docs-update.md'" \
-"Inject code review snippet ........." "r" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
-"Inject \"use go doc\" snippet ........" "g" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
+"Inject code review snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
+"Inject \"use go doc\" snippet ........" "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
 "Inject duckdb snippet .............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
 "Inject caveman snippet ............." "C" "pipe-pane -I 'cat ~/.kkrc/inject-ai-caveman.md'" \
 "git (c)ommit with AI message ......." "c" "send-keys 'git diff --cached | AI \"Please craft a git commit message from this. Just the text, no markdown code markers.\" | git commit -F -' enter" \
