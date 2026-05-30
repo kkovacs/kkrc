@@ -221,6 +221,9 @@ bind c-x next-window -a
 unbind -T copy-mode-vi MouseDragEnd1Pane
 # Drag start in normal mode also starts selection of word
 bind -n MouseDrag1Pane copy-mode -t= \; send-keys -X select-word
+# Use "c-q M" to disable tmux's selection and pass through mouse drag.
+# XXX: reload config to reset, for now
+bind M bind -n MouseDrag1Pane send-keys -M
 
 # Toggle monitoring activity and/or silence. Have the same keys as `screen`
 bind "#" set -w monitor-activity
