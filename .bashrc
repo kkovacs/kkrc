@@ -122,11 +122,14 @@ function ppsql() { sudo -u postgres -- bash -c "$(declare -f psql); psql \"\$@\"
 alias mysql="INPUTRC=/dev/fd/9 mysql 9<<<'set editing-mode vi'"
 # This is getting even uglier, but must have on remote machines
 alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-view = line-number:no,interval=5 id:yes date:relative author:abbreviated commit-title:yes,graph,refs,overflow=no${IFS}bind generic } :toggle split-view-width -10%${IFS}bind generic { :toggle split-view-width +10%"'
-alias ts="tig status"
-alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order"
-alias gs="git status -sb"
-alias gf="git fetch --all -v"
-alias gp="git pull --ff-only -v"
+# Git shortcuts
+unalias ts gl gs gf gp 2>/dev/null # XXX temporary
+function ts(){ tig status "$@"; }
+function gl(){ git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order "$@"; }
+function gs(){ git status -sb "$@"; }
+function gf(){ git fetch --all -v "$@"; }
+function gp(){ git pull --ff-only -v "$@"; }
+export -f ts gl gs gf gp
 # gap: "git pull + add + push": sync, to be used with a notes directory
 function gap() { gs ; gp ; git add . ; git commit -m sync ; git push ; } ; export -f gap
 # gat: "git at": diff a file with itself at a given ref
