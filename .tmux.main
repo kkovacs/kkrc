@@ -543,6 +543,7 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject proxy socks5h:(1)080 (ssh -D 1080)" "1" 'send-keys " export all_proxy=socks5h://127.0.0.1:1080" enter' \
 "Inject proxy http:888(8)................." "8" 'send-keys " export {http,https}_proxy=http://127.0.0.1:8888 {HTTP,HTTPS}_PROXY=http://127.0.0.1:8888" enter' \
 "Inject proxy http:808(0)................." "0" 'send-keys " export {http,https}_proxy=http://127.0.0.1:8080 {HTTP,HTTPS}_PROXY=http://127.0.0.1:8080" enter' \
+"Inject \$HTTPS_PROXY ....................." "p" "send-keys ' stty -echo' enter ' export HTTPS_PROXY=\"#{HTTPS_PROXY}\" HTTP_PROXY=\"#{HTTPS_PROXY}\"; stty echo' enter" \
 "" \
 "Inject \$SSH_AUTH_SOCK ..................." "a" 'send-keys " export SSH_AUTH_SOCK=$(tmux show-environment SSH_AUTH_SOCK | cut -d= -f2)" enter'
 
