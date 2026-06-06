@@ -342,6 +342,7 @@ set -s command-alias[123] setup_shellcheck="send-keys ' mkdir -p ~/.local/bin ; 
 # XXX If apt actually installs, it "eats" the pre-typed command.
 set -s command-alias[125] get_adminer="send-keys ' curl -Lo adminer.php https://www.adminer.org/latest-en.php' enter"
 set -s command-alias[126] setup_duckdb="send-keys ' mkdir -p ~/.local/bin ; curl -Lo /tmp/duckdb.zip https://github.com/duckdb/duckdb/releases/latest/download/duckdb_cli-linux-\$(uname -m | sed s/x86_64/amd64/).zip && unzip -o /tmp/duckdb.zip -d ~/.local/bin/' enter"
+set -s command-alias[135] setup_ladybug="send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/LadybugDB/ladybug/releases/latest/download/lbug_cli-linux-\$(uname -m).tar.gz | tar xz --no-same-owner -C ~/.local/bin/' enter"
 set -s command-alias[127] setup_python_venv="send-keys ' sudo apt-get install -y python3-venv && python3 -m venv .venv; . .venv/bin/activate' enter"
 set -s command-alias[128] setup_frankenphp="send-keys ' mkdir -p ~/.local/bin ; curl -Lo ~/.local/bin/frankenphp https://github.com/dunglas/frankenphp/releases/latest/download/frankenphp-linux-\$(uname -m) && chmod 755 ~/.local/bin/frankenphp' enter"
 set -s command-alias[129] setup_composer="send-keys ' mkdir -p ~/.local/bin ; curl -Lo ~/.local/bin/composer https://github.com/composer/composer/releases/latest/download/composer.phar && chmod 755 ~/.local/bin/composer' enter"
@@ -414,10 +415,11 @@ bind -T menus "d" display-menu -T " DB... " \
 "Download duckdb ...................." "d" setup_duckdb \
 "Download pgweb ....................." "w" get_pgweb \
 "" \
-"apt install postgresql-client ......" "c" "send-keys 'sudo apt install -y postgresql-client' enter" \
-"Install postgres ..................." "P" setup_postgres \
-"Install mysql ......................" "M" setup_mysql \
-"Install sqlite3 ...................." "L" "send-keys ' sudo apt-get install -y sqlite3' enter" \
+"apt install postgresql-(c)lient ...." "c" "send-keys 'sudo apt install -y postgresql-client' enter" \
+"Install (P)ostgres ................." "P" setup_postgres \
+"Install (M)ysql ...................." "M" setup_mysql \
+"Install sq(L)ite3 .................." "L" "send-keys ' sudo apt-get install -y sqlite3' enter" \
+"Install lady(B)ug (ex-kuzu) ........" "B" setup_ladybug \
 "" \
 "Inject (p)sql config ..............." "p" "pipe-pane -I 'cat ~/.kkrc/.psqlrc'" \
 "" \
