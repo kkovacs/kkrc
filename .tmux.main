@@ -503,8 +503,10 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject (A)I bash function .........." "A" "send-keys \" function AI() {\" ; inject_ai_snippet \; send-keys \" \\\"\\\${2:-#{INJECT_AI_MODEL}}\\\" \\\"\\\$1\\\"; }; export -f AI\" enter" \
 "" \
 "Inject work-style snippet .........." "w" "pipe-pane -I 'cat ~/.kkrc/inject-ai-kk.md'" \
+"Inject pi-subagent snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-subagent.md'" \
+"Inject bun-webview snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-bun-webview.md'" \
 "Inject plan mode snippet ..........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-planmode.md'" \
-"Inject update docs snippet ........." "d" "pipe-pane -I 'cat ~/.kkrc/inject-ai-docs-update.md'" \
+"Inject update docs snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-docs-update.md'" \
 "Inject code review snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
 "Inject \"use go doc\" snippet ........" "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
 "Inject duckdb snippet .............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
