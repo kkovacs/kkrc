@@ -511,7 +511,7 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject \"use go doc\" snippet ........" "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
 "Inject duckdb snippet .............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
 "Inject caveman snippet ............." "C" "pipe-pane -I 'cat ~/.kkrc/inject-ai-caveman.md'" \
-"git (c)ommit with AI message ......." "c" "send-keys 'git diff --cached | AI \"Please craft a git commit message from this. Just the text, no markdown code markers.\" | git commit -F -' enter" \
+"git (c)ommit with AI message ......." "c" "send-keys 'git diff --cached | ' ; inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"Please craft a git commit message from this. Just the text, no markdown code markers.\\\" | git commit -F -\" enter" \
 "" \
 "Download (o)pencode................." "o" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~/.local/bin/ opencode' enter" \
 "config reset ......................." "r" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\" }\" >#{opencode_config}' enter" \
