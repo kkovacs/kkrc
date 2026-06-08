@@ -413,15 +413,14 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 # Submenu: databases
 bind -T menus "d" display-menu -T " DB... " \
 "Download duckdb ...................." "d" setup_duckdb \
-"Download pgweb ....................." "w" get_pgweb \
+"Download lady(B)ug (ex-kuzu) ......." "b" setup_ladybug \
+"Install (s)qlite3 .................." "s" "send-keys ' sudo apt-get install -y sqlite3' enter" \
+"Install (M)ysql ...................." "M" setup_mysql \
+"Install (P)ostgres ................." "P" setup_postgres \
 "" \
 "apt install postgresql-(c)lient ...." "c" "send-keys 'sudo apt install -y postgresql-client' enter" \
-"Install (P)ostgres ................." "P" setup_postgres \
-"Install (M)ysql ...................." "M" setup_mysql \
-"Install sq(L)ite3 .................." "L" "send-keys ' sudo apt-get install -y sqlite3' enter" \
-"Install lady(B)ug (ex-kuzu) ........" "B" setup_ladybug \
-"" \
 "Inject (p)sql config ..............." "p" "pipe-pane -I 'cat ~/.kkrc/.psqlrc'" \
+"Download pgweb ....................." "w" get_pgweb \
 "" \
 "CSV: startrek.csv (30 rows) ........" "1" "send-keys 'https://blobs.duckdb.org/data/Star_Trek-Season_1.csv'" \
 "CSV: penguins.csv (344 rows) ......." "2" "send-keys 'https://blobs.duckdb.org/data/penguins.csv'" \
