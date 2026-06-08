@@ -131,7 +131,7 @@ function gf(){ git fetch --all -v "$@"; }
 function gp(){ git pull --ff-only -v "$@"; }
 export -f ts gl gs gf gp
 # gap: "git pull + add + push": sync, to be used with a notes directory
-function gap() { gs ; gp ; git add . ; git commit -m sync ; git push ; } ; export -f gap
+function gap() { gs ; gp ; git add . ; git commit -m wip ; git push ; } ; export -f gap
 # gat: "git at": diff a file with itself at a given ref
 function gat() { vimdiff "$1" <(git show "${2:-HEAD^}":"$1" ) ; }
 alias gclean="git reset --hard && git clean -f -d -x"
