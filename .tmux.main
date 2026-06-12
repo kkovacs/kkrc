@@ -501,6 +501,8 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject pi-(s)ubagent snippet ......." "s" "pipe-pane -I 'cat ~/.kkrc/inject-ai-subagent.md'" \
 "Inject (t)mux snippet .............." "t" "pipe-pane -I 'cat ~/.kkrc/inject-ai-tmux.md'" \
 "Inject (b)un-webview snippet ......." "b" "pipe-pane -I 'cat ~/.kkrc/inject-ai-bun-webview.md'" \
+"Inject (e)xa-search snippet ........" "e" "pipe-pane -I 'cat ~/.kkrc/inject-ai-exa-search.md'" \
+"Inject (E)xa-fetch snippet ........." "E" "pipe-pane -I 'cat ~/.kkrc/inject-ai-exa-fetch.md'" \
 "Inject (d)uckdb snippet ............" "d" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
 "Inject (g)odoc snippet ............." "g" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
 "Inject code review snippet ........." "7" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
@@ -533,7 +535,8 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$OPENROUTER_API_KEY .............." "o" "send-keys ' stty -echo' enter ' export OPENROUTER_API_KEY=#{OPENROUTER_API_KEY}; stty echo' enter" \
 "Inject \$OPENCODE_API_KEY ................" "O" "send-keys ' stty -echo' enter ' export OPENCODE_API_KEY=#{OPENCODE_API_KEY}; stty echo' enter" \
 "Inject \$OLLAMA_API_KEY .................." "a" "send-keys ' stty -echo' enter ' export OLLAMA_API_KEY=#{OLLAMA_API_KEY}; stty echo' enter" \
-"Inject \$XAI_API_KEY ....................." "x" "send-keys ' stty -echo' enter ' export XAI_API_KEY=#{XAI_API_KEY}; stty echo' enter" \
+"Inject \$EXA_API_KEY ....................." "x" "send-keys ' stty -echo' enter ' export EXA_API_KEY=#{EXA_API_KEY}; stty echo' enter" \
+"Inject \$XAI_API_KEY ....................." "X" "send-keys ' stty -echo' enter ' export XAI_API_KEY=#{XAI_API_KEY}; stty echo' enter" \
 "Inject \$OPENROUTER_API_KEY for Claude ..." "C" "send-keys ' stty -echo' enter ' export ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" ANTHROPIC_AUTH_TOKEN=\"#{OPENROUTER_API_KEY}\" ANTHROPIC_API_KEY=\"\"; stty echo' enter" \
 "" \
 "Unset proxies ..........................." "-" 'send-keys " unset {http,https,all}_proxy {HTTP,HTTPS,ALL}_PROXY WSL_PAC_URL" enter' \
