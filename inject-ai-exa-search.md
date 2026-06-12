@@ -1,6 +1,6 @@
 
 
-# Web search with Exa API
+## Web search with Exa API
 
 You have the `EXA_API_KEY` env var.
 

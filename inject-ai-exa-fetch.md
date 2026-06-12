@@ -1,6 +1,6 @@
 
 
-# Fetch URLs contents with Exa when curl is blocked
+## Fetch URLs contents with Exa when curl is blocked
 
 You have the `EXA_API_KEY` env var.
 
