@@ -2,16 +2,10 @@
 
 ## Guidelines for working with the User:
 
-- User prefers clean, minimalist solutions and small, precise code changes (C/bash background).
-- Simple is beautiful; all added complexity must justify itself.
-- Keep related things close together (same file, directory, naming patterns).
-- Avoid premature abstraction, but prefer consolidation over duplication.
-- Plan together first. Make changes only after User says "go hot" on the agreed plan.
-- Progress in small steps; suggest, but never execute unrequested operations.
-- Especially no systemwide installs without asking permission.
-- Mark WIP technical debt, hacks, and unhandled errors with `XXX` comments.
-- Always use English with User.
-- Don't perform git operations without explicit User request.
-- Don't update tests until User confirms functionality works.
+- Think like a C programmer: minimal, precise, no fluff. Prefer clean, minimalist solutions and small, precise changes.
+- Keep related things close; avoid premature abstraction, consolidate over duplication. Simple is beautiful; all added complexity must justify itself.
+- Plan together first: ask questions; make changes only after User says "go hot". Progress in small steps; never execute unrequested tasks, just suggest next action(s).
+- Mark technical debt, hacks, unhandled errors with `XXX`. Obtain permission for systemwide changes.
+- Update tests only after user confirms functionality works. No git operations unless explicitly requested.
 
 

@@ -501,22 +501,22 @@ opencode_config="\~/.config/opencode/opencode.json"
 bind -T menus "a" display-menu -T " AI... " \
 "Inject (a)i shell+python snippet...." "a" "inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"BLUF only:\\\"\"" \
 "Inject (A)I bash function .........." "A" "send-keys \" function AI() {\" ; inject_ai_snippet \; send-keys \" \\\"\\\${2:-#{INJECT_AI_MODEL}}\\\" \\\"\\\$1\\\"; }; export -f AI\" enter" \
-"git (c)ommit with AI message ......." "c" "send-keys 'git diff --cached | ' ; inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"Please craft a git commit message from this. Just the text, no markdown code markers.\\\" | git commit -F -\" enter" \
 "" \
-"Inject work-style snippet .........." "w" "pipe-pane -I 'cat ~/.kkrc/inject-ai-kk.md'" \
-"Inject pi-subagent snippet ........." "s" "pipe-pane -I 'cat ~/.kkrc/inject-ai-subagent.md'" \
-"Inject bun-webview snippet ........." "w" "pipe-pane -I 'cat ~/.kkrc/inject-ai-bun-webview.md'" \
-"Inject plan mode snippet ..........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-planmode.md'" \
-"Inject update docs snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-docs-update.md'" \
-"Inject code review snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
-"Inject \"use go doc\" snippet ........" "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
-"Inject duckdb snippet .............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
-"Inject caveman snippet ............." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-caveman.md'" \
+"Inject work-style snippet .........." "0" "pipe-pane -I 'cat ~/.kkrc/inject-ai-kk.md'" \
+"Inject (p)i-subagent snippet ......." "p" "pipe-pane -I 'cat ~/.kkrc/inject-ai-subagent.md'" \
+"Inject (t)mux snippet .............." "t" "pipe-pane -I 'cat ~/.kkrc/inject-ai-tmux.md'" \
+"Inject (b)un-webview snippet ......." "b" "pipe-pane -I 'cat ~/.kkrc/inject-ai-bun-webview.md'" \
+"Inject (d)uckdb snippet ............" "d" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
+"Inject (g)odoc snippet ............." "g" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
+"Inject code review snippet ........." "7" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
+"Inject update docs snippet ........." "8" "pipe-pane -I 'cat ~/.kkrc/inject-ai-docs-update.md'" \
+"git commit with AI message ........." "9" "send-keys 'git diff --cached | ' ; inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"Please craft a git commit message from this. Just the text, no markdown code markers.\\\" | git commit -F -\" enter" \
+"" \
 "" \
 "Download (o)pencode................." "o" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~/.local/bin/ opencode' enter" \
-"config reset ......................." "r" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\" }\" >#{opencode_config}' enter" \
-"config MCP Chrome CDP..............." "9" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
-"config LLM on :8080 ................" "0" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:8080/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
+"config reset ......................." "O" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\" }\" >#{opencode_config}' enter" \
+"config MCP Chrome CDP..............." "c" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
+"config LLM on :8080 ................" "l" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:8080/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
 "Clean up opencode ................" "c-o" "send-keys ' rm -rf ~/{.config,.local/state,.local/share,.cache}/opencode ~/.bun ; rm -rf ~/.local/bin/opencode ' enter" \
 "" \
 "Download (p)i ......................" "p" "send-keys ' mkdir -p ~/.pi ~/.local/bin ; curl -L https://github.com/badlogic/pi-mono/releases/latest/download/pi-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv --strip-components=1 -C ~/.pi/; ln -s ~/.pi/pi ~/.local/bin/pi' enter" \
