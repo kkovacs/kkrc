@@ -484,8 +484,7 @@ bind -T menus "n" display-menu -T " NodeJS... " \
 bind -T menus "t" display-menu -T " Tools / platforms... " \
 "mkdir foo & git init ..............." "g" "send-keys ' mkdir foo && cd foo && git init -b main && touch .gitignore && git add .gitignore && git -c user.email=\\\"$USER@$HOSTNAME\\\" -c user.name=\\\"$USER\\\" commit -m init && git status -sb' enter" \
 "" \
-"Docker run chrome --screenshot ....." "s" "send-keys 'sudo docker run -u `id -u $USER` -it --rm -v $(pwd):/usr/src/app --add-host host.docker.internal:host-gateway zenika/alpine-chrome --no-sandbox --window-size=1024,768 --screenshot --hide-scrollbars \"http://host.docker.internal:80/\"'" \
-"Docker run chrome CDP .............." "c" "send-keys 'sudo docker run -u `id -u $USER` -it --rm -v $(pwd):/usr/src/app --add-host host.docker.internal:host-gateway -p 9222:9222 zenika/alpine-chrome --no-sandbox --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --window-size=1024,768' enter" \
+"Docker run chrome CDP .............." "c" "send-keys 'sudo docker run -u `id -u $USER` -it --rm --add-host host.docker.internal:host-gateway -p 9222:9222 chromedp/headless-shell:latest --no-sandbox --window-size=1280,720' enter" \
 "Params for (c)hrome devtools ......." "D" "send-keys ' --remote-debugging-port=9222 --user-data-dir=/tmp/cdp/ --no-first-run --no-default-browser-check --disable-signin-promo --disable-sync --disable-infobars \\\"chrome://inspect/#remote-debugging\\\" ; rm -rf /tmp/cdp' enter" \
 "" \
 "Install (b)rew ....................." "b" setup_brew \
@@ -505,8 +504,8 @@ bind -T menus "a" display-menu -T " AI... " \
 "git (c)ommit with AI message ......." "c" "send-keys 'git diff --cached | ' ; inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"Please craft a git commit message from this. Just the text, no markdown code markers.\\\" | git commit -F -\" enter" \
 "" \
 "Inject work-style snippet .........." "w" "pipe-pane -I 'cat ~/.kkrc/inject-ai-kk.md'" \
-"Inject pi-subagent snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-subagent.md'" \
-"Inject bun-webview snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-bun-webview.md'" \
+"Inject pi-subagent snippet ........." "s" "pipe-pane -I 'cat ~/.kkrc/inject-ai-subagent.md'" \
+"Inject bun-webview snippet ........." "w" "pipe-pane -I 'cat ~/.kkrc/inject-ai-bun-webview.md'" \
 "Inject plan mode snippet ..........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-planmode.md'" \
 "Inject update docs snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-docs-update.md'" \
 "Inject code review snippet ........." "" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
