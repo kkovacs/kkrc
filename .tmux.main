@@ -352,7 +352,7 @@ set -s command-alias[132] setup_jupyterlab="send-keys 'uv pip install jupyterlab
 set -s command-alias[134] setup_python_uv="send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/astral-sh/uv/releases/latest/download/uv-\$(uname -m)-unknown-linux-gnu.tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1' enter"
 set -s command-alias[124] setup_brew="send-keys ' NONINTERACTIVE=1 /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"' enter"
 # IMPORTANT: Uses the INJECT_AI_... env vars. Use some throw-away key because it gets exposed easily, for example an OpenRouter key restricted to $5/month.
-set -Fs command-alias[117] inject_ai_snippet="send-keys \" python3 -c \\\"import sys,json,urllib.request,os;u='#{INJECT_AI_URL}';h={'Authorization':'Bearer #{INJECT_AI_KEY}','Content-Type':'application/json'};d=json.dumps({'model':sys.argv[1],'messages':[{'role':'system','content':sys.argv[2]},{'role':'user','content':sys.stdin.read()}]}).encode();o=urllib.request.build_opener(urllib.request.ProxyHandler());print(json.loads(o.open(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])\\\""
+set -Fs command-alias[117] inject_ai_snippet="send-keys \" python3 -c \\\"import sys,json,urllib.request,os;u='#{INJECT_AI_URL}';h={'Authorization':'Bearer #{INJECT_AI_KEY}','Content-Type':'application/json'};d=json.dumps({'model':sys.argv[1],'messages':[{'role':'system','content':sys.argv[2]},{'role':'user','content':sys.stdin.read()or sys.argv[2]}]}).encode();o=urllib.request.build_opener(urllib.request.ProxyHandler());print(json.loads(o.open(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])\\\""
 
 # PLEASE DONT USE: "j", "k", "q" IN ANY MENU!
 
