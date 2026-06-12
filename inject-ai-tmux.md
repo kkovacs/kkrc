@@ -1,6 +1,6 @@
 
 
-# Long-running daemons (dev servers, etc.) in tmux windows
+## Long-running daemons (dev servers, etc.) in tmux windows
 
 Shared session `llm`. Always target `llm:NAME` (distinct NAMEs; never bare `:NAME`). Bootstrap tmux session (safe to repeat):
 

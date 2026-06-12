@@ -1,6 +1,6 @@
 
 
-# Web search and content retrieval via Perplexity Sonar on OpenRouter
+## Web research via Perplexity Sonar on OpenRouter
 
 You have `$OPENROUTER_API_KEY` in the environment.
 
