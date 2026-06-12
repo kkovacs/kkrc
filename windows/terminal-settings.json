@@ -1,0 +1,471 @@
+{
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "actions": 
+    [
+        {
+            "command": 
+            {
+                "action": "copy",
+                "singleLine": false
+            },
+            "id": "User.copy.644BA8F2"
+        },
+        {
+            "command": 
+            {
+                "action": "sendInput",
+                "input": "Test"
+            },
+            "id": "User.sendInput.Test"
+        },
+        {
+            "command": 
+            {
+                "action": "sendInput",
+                "input": "\u001b[27;5;9~"
+            },
+            "id": "User.sendInput.C-Tab"
+        },
+        {
+            "command": 
+            {
+                "action": "sendInput",
+                "input": "\u001b[27;6;9~"
+            },
+            "id": "User.sendInput.C-S-Tab"
+        },
+        {
+            "command": 
+            {
+                "action": "sendInput",
+                "input": "\u001b[127;5u"
+            },
+            "id": "User.sendInput.C-Backspace"
+        },
+        {
+            "command": 
+            {
+                "action": "sendInput",
+                "input": "\u001b[13;2u"
+            },
+            "id": "User.sendInput.S-Enter"
+        },
+        {
+            "command": "paste",
+            "id": "User.paste"
+        },
+        {
+            "command": "find",
+            "id": "User.find"
+        },
+        {
+            "command": 
+            {
+                "action": "nextTab"
+            },
+            "id": "User.nextTab.0"
+        },
+        {
+            "command": 
+            {
+                "action": "prevTab"
+            },
+            "id": "User.prevTab.0"
+        }
+    ],
+    "centerOnLaunch": true,
+    "copyFormatting": "none",
+    "copyOnSelect": false,
+    "defaultProfile": "{1dca8917-2de6-5101-9f2e-73ba0aaec399}",
+    "keybindings": 
+    [
+        {
+            "id": "User.sendInput.C-Tab",
+            "keys": "ctrl+tab"
+        },
+        {
+            "id": "User.sendInput.C-S-Tab",
+            "keys": "ctrl+shift+tab"
+        },
+        {
+            "id": "User.sendInput.C-Backspace",
+            "keys": "ctrl+backspace"
+        },
+        {
+            "id": "User.sendInput.S-Enter",
+            "keys": "shift+enter"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+1"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+v"
+        },
+        {
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+c"
+        },
+        {
+            "id": "User.find",
+            "keys": "ctrl+shift+f"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+v"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+2"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+5"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+3"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+4"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+6"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+9"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+8"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+7"
+        },
+        {
+            "id": "User.paste",
+            "keys": "ctrl+alt+v"
+        },
+        {
+            "id": null,
+            "keys": "win+sc(41)"
+        },
+        {
+            "id": "User.prevTab.0",
+            "keys": "ctrl+alt+7"
+        }
+    ],
+    "launchMode": "maximized",
+    "newTabMenu": 
+    [
+        {
+            "type": "remainingProfiles"
+        }
+    ],
+    "profiles": 
+    {
+        "defaults": 
+        {
+            "colorScheme": "Campbell (modified)",
+            "font": 
+            {
+                "size": 11
+            }
+        },
+        "list": 
+        [
+            {
+                "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "font": 
+                {
+                    "size": 12
+                },
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "hidden": false,
+                "name": "Windows PowerShell"
+            },
+            {
+                "commandline": "%SystemRoot%\\System32\\cmd.exe",
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "hidden": false,
+                "name": "Command Prompt"
+            },
+            {
+                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+                "hidden": false,
+                "name": "Azure Cloud Shell",
+                "source": "Windows.Terminal.Azure"
+            },
+            {
+                "bellStyle": "audible",
+                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
+                "hidden": true,
+                "name": "Ubuntu",
+                "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "bellStyle": 
+                [
+                    "audible",
+                    "taskbar"
+                ],
+                "colorScheme": "GitHub Dark",
+                "experimental.retroTerminalEffect": false,
+                "font": 
+                {
+                    "size": 12
+                },
+                "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
+                "hidden": false,
+                "name": "Ubuntu",
+                "scrollbarState": "hidden",
+                "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc"
+            },
+            {
+                "colorScheme": "Campbell (modified)",
+                "cursorShape": "filledBox",
+                "font": 
+                {
+                    "size": 10
+                },
+                "guid": "{58ad8b0c-3ef8-5f4d-bc6f-13e4c00f2530}",
+                "hidden": false,
+                "intenseTextStyle": "bold",
+                "name": "Debian",
+                "scrollbarState": "hidden",
+                "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "guid": "{2ece5bfe-50ed-5f3a-ab87-5cd4baafed2b}",
+                "hidden": false,
+                "name": "Git Bash",
+                "source": "Git"
+            },
+            {
+                "guid": "{963ff2f7-6aed-5ce3-9d91-90d99571f53a}",
+                "hidden": true,
+                "name": "Ubuntu-24.04",
+                "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "colorScheme": "synthwave",
+                "guid": "{d8e96812-b789-5068-a5ae-10b2fb53e95f}",
+                "hidden": false,
+                "name": "Ubuntu 24.04.1 LTS",
+                "source": "CanonicalGroupLimited.Ubuntu24.04LTS_79rhkp1fndgsc"
+            },
+            {
+                "guid": "{479856b6-be4f-5aa3-93de-3de451ff4c43}",
+                "hidden": false,
+                "name": "Developer Command Prompt for VS 2022 (2)",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{9d7b5681-daff-520c-b8b2-c21ed6081058}",
+                "hidden": false,
+                "name": "Developer PowerShell for VS 2022 (2)",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "commandline": "C:/DuckDB/DuckDB-ui.bat",
+                "guid": "{cd1711df-d0ee-42d9-919c-0080b426d6f2}",
+                "hidden": false,
+                "name": "Duckdb UI"
+            },
+            {
+                "guid": "{d8b99c0f-36cf-5dfa-86a6-d5b85feef876}",
+                "hidden": false,
+                "name": "Debian",
+                "source": "Microsoft.WSL"
+            },
+            {
+                "colorScheme": "synthwave",
+                "font": 
+                {
+                    "face": "Cascadia Mono"
+                },
+                "guid": "{1dca8917-2de6-5101-9f2e-73ba0aaec399}",
+                "hidden": false,
+                "name": "Ubuntu-26.04",
+                "source": "Microsoft.WSL"
+            },
+            {
+                "guid": "{ed563c61-eda1-5dbc-b7b7-30a913a12fe7}",
+                "hidden": false,
+                "name": "Debian",
+                "source": "Microsoft.WSL"
+            }
+        ]
+    },
+    "schemes": 
+    [
+        {
+            "background": "#121212",
+            "black": "#0C0C0C",
+            "blue": "#0037DA",
+            "brightBlack": "#767676",
+            "brightBlue": "#3B78FF",
+            "brightCyan": "#61D6D6",
+            "brightGreen": "#16C60C",
+            "brightPurple": "#B4009E",
+            "brightRed": "#E74856",
+            "brightWhite": "#F2F2F2",
+            "brightYellow": "#F9F1A5",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#3A96DD",
+            "foreground": "#CCCCCC",
+            "green": "#13A10E",
+            "name": "Campbell (modified)",
+            "purple": "#881798",
+            "red": "#C50F1F",
+            "selectionBackground": "#FFFFFF",
+            "white": "#CCCCCC",
+            "yellow": "#C19C00"
+        },
+        {
+            "background": "#101216",
+            "black": "#000000",
+            "blue": "#6CA4F8",
+            "brightBlack": "#4D4D4D",
+            "brightBlue": "#6CA4F8",
+            "brightCyan": "#2B7489",
+            "brightGreen": "#56D364",
+            "brightPurple": "#DB61A2",
+            "brightRed": "#F78166",
+            "brightWhite": "#FFFFFF",
+            "brightYellow": "#E3B341",
+            "cursorColor": "#C9D1D9",
+            "cyan": "#2B7489",
+            "foreground": "#8B949E",
+            "green": "#56D364",
+            "name": "GitHub Dark",
+            "purple": "#DB61A2",
+            "red": "#F78166",
+            "selectionBackground": "#3B5070",
+            "white": "#FFFFFF",
+            "yellow": "#E3B341"
+        },
+        {
+            "background": "#222222",
+            "black": "#2B2B2B",
+            "blue": "#A0BAD6",
+            "brightBlack": "#454747",
+            "brightBlue": "#6699D6",
+            "brightCyan": "#5FC0AE",
+            "brightGreen": "#AABB39",
+            "brightPurple": "#AB53D6",
+            "brightRed": "#D3232F",
+            "brightWhite": "#C1C2C2",
+            "brightYellow": "#E5BE39",
+            "cursorColor": "#424242",
+            "cyan": "#91BFB7",
+            "foreground": "#959595",
+            "green": "#AFBA67",
+            "name": "Later This Evening",
+            "purple": "#C092D6",
+            "red": "#D45A60",
+            "selectionBackground": "#424242",
+            "white": "#3C3D3D",
+            "yellow": "#E5D289"
+        },
+        {
+            "background": "#191919",
+            "black": "#5A5A5A",
+            "blue": "#4387CF",
+            "brightBlack": "#9A9B99",
+            "brightBlue": "#89D3F6",
+            "brightCyan": "#82EADA",
+            "brightGreen": "#83D0A2",
+            "brightPurple": "#FF2C7A",
+            "brightRed": "#C37D62",
+            "brightWhite": "#FDFDF6",
+            "brightYellow": "#FDFDC5",
+            "cursorColor": "#FCDC08",
+            "cyan": "#72D5C6",
+            "foreground": "#C3CAC2",
+            "green": "#4D7B3A",
+            "name": "Operator Mono Dark",
+            "purple": "#B86CB4",
+            "red": "#CA372D",
+            "selectionBackground": "#19273B",
+            "white": "#CED4CD",
+            "yellow": "#D4D697"
+        },
+        {
+            "background": "#181818",
+            "black": "#000000",
+            "blue": "#3465A4",
+            "brightBlack": "#555753",
+            "brightBlue": "#729FCF",
+            "brightCyan": "#34E2E2",
+            "brightGreen": "#8AE234",
+            "brightPurple": "#AD7FA8",
+            "brightRed": "#EF2929",
+            "brightWhite": "#EEEEEC",
+            "brightYellow": "#FCE94F",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#06989A",
+            "foreground": "#D3D7CF",
+            "green": "#4E9A06",
+            "name": "Tango Dark (modified)",
+            "purple": "#75507B",
+            "red": "#CC0000",
+            "selectionBackground": "#FFFFFF",
+            "white": "#D3D7CF",
+            "yellow": "#C4A000"
+        },
+        {
+            "background": "#1E1E1E",
+            "black": "#1E1E1E",
+            "blue": "#0A84FF",
+            "brightBlack": "#1E1E1E",
+            "brightBlue": "#0A84FF",
+            "brightCyan": "#5AC8FA",
+            "brightGreen": "#32D74B",
+            "brightPurple": "#BF5AF2",
+            "brightRed": "#FF453A",
+            "brightWhite": "#FFFFFF",
+            "brightYellow": "#FFD60A",
+            "cursorColor": "#32D74B",
+            "cyan": "#5AC8FA",
+            "foreground": "#FFFFFF",
+            "green": "#32D74B",
+            "name": "midnight-in-mojave",
+            "purple": "#BF5AF2",
+            "red": "#FF453A",
+            "selectionBackground": "#4A504D",
+            "white": "#FFFFFF",
+            "yellow": "#FFD60A"
+        },
+        {
+            "background": "#000000",
+            "black": "#000000",
+            "blue": "#2186EC",
+            "brightBlack": "#000000",
+            "brightBlue": "#2F9DED",
+            "brightCyan": "#19CDE6",
+            "brightGreen": "#25C141",
+            "brightPurple": "#F97137",
+            "brightRed": "#F841A0",
+            "brightWhite": "#FFFFFF",
+            "brightYellow": "#FDF454",
+            "cursorColor": "#19CDE6",
+            "cyan": "#12C3E2",
+            "foreground": "#DAD9C7",
+            "green": "#1EBB2B",
+            "name": "synthwave",
+            "purple": "#F85A21",
+            "red": "#F6188F",
+            "selectionBackground": "#19CDE6",
+            "white": "#FFFFFF",
+            "yellow": "#FDF834"
+        }
+    ],
+    "themes": []
+}

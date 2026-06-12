@@ -31,3 +31,8 @@ This registry file only replaces Caps Lock with Right Ctrl.
 
 This registry file makes Windows Explorer open the "Downloads" folder instead
 of whatever when a new window is opened.
+
+# terminal-settings.json
+
+Windows Terminal `settings.json`, set up with CTRL+TAB, SHIFT+ENTER, etc.
+Probably contains trash too, not clean, but I don't dare to remove anything now :)
