@@ -121,7 +121,7 @@ function ppsql() { sudo -u postgres -- bash -c "$(declare -f psql); psql \"\$@\"
 # MySQL with readline
 alias mysql="INPUTRC=/dev/fd/9 mysql 9<<<'set editing-mode vi'"
 # This is getting even uglier, but must have on remote machines
-alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-view = line-number:no,interval=5 id:yes date:relative author:abbreviated commit-title:yes,graph,refs,overflow=no${IFS}bind generic } :toggle split-view-width -10%${IFS}bind generic { :toggle split-view-width +10%"'
+alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-view = line-number:no,interval=5 id:yes date:relative author:abbreviated commit-title:yes,graph,refs,overflow=no${IFS}set blame-view-date-display = relative${IFS}bind generic } :toggle split-view-width -10%${IFS}bind generic { :toggle split-view-width +10%"'
 # Git shortcuts
 unalias ts gl gs gf gp 2>/dev/null # XXX temporary
 function ts(){ tig status "$@"; }
