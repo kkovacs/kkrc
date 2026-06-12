@@ -13,6 +13,35 @@ font-feature = -calt
 keybind = ctrl+tab=esc:[27;5;9~
 keybind = ctrl+shift+tab=esc:[27;6;9~
 
+# On OS X, Use Option as Alt. But, it disables flying accents.
+#macos-option-as-alt = true
+
+# Make Ghostty send CSI-U codes:
+# --- Enter (13) ---
+#keybind = shift+enter=esc:[13;2u
+#keybind = opt+enter=esc:[13;3u
+#keybind = opt+shift+enter=esc:[13;4u
+#keybind = ctrl+enter=esc:[13;5u
+#keybind = ctrl+shift+enter=esc:[13;6u
+#keybind = opt+ctrl+enter=esc:[13;7u
+#keybind = opt+ctrl+shift+enter=esc:[13;8u
+# --- Space (32) ---
+#keybind = shift+space=esc:[32;2u
+#keybind = opt+space=esc:[32;3u
+#keybind = opt+shift+space=esc:[32;4u
+#keybind = ctrl+space=esc:[32;5u
+#keybind = ctrl+shift+space=esc:[32;6u
+#keybind = opt+ctrl+space=esc:[32;7u
+#keybind = opt+ctrl+shift+space=esc:[32;8u
+# --- Backspace (127) ---
+#keybind = shift+backspace=esc:[127;2u
+#keybind = opt+backspace=esc:[127;3u
+#keybind = opt+shift+backspace=esc:[127;4u
+keybind = ctrl+backspace=esc:[127;5u
+#keybind = ctrl+shift+backspace=esc:[127;6u
+#keybind = opt+ctrl+backspace=esc:[127;7u
+#keybind = opt+ctrl+shift+backspace=esc:[127;8u
+
 # Color schemes / themes
 # To experiment, run: ghostty +list-themes
 #
