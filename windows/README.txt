@@ -36,3 +36,9 @@ of whatever when a new window is opened.
 
 Windows Terminal `settings.json`, set up with CTRL+TAB, SHIFT+ENTER, etc.
 Probably contains trash too, not clean, but I don't dare to remove anything now :)
+
+On my PC the location is:
+
+`C:\Users\<USERNAME>\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json`
+
+But you can use Terminal's "Open JSON config" (Settings, bottom left) to open it in VS Code. :)
