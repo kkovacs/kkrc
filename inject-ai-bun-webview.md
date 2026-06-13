@@ -5,7 +5,7 @@
 Bun ships a headless browser. Use for screenshots, scraping, clicking, form-fill, JS evaluation.
 
 Verify the CDP endpoint is up before opening the view: `curl -fsS http://127.0.0.1:9222/json/version`.
-If not running, start with: `docker container run -d --add-host host.docker.internal:host-gateway -p 9222:9222 chromedp/headless-shell:latest --no-sandbox`
+If not running, start with: `docker container run -d --add-host host.docker.internal:host-gateway -p 9222:9222 chromedp/headless-shell:latest`
 
 Example:
 
