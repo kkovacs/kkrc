@@ -7,12 +7,11 @@ Here are some alternatives to curl.
 ### markdown.new (fast, simple, CloudFlare)
 
 ```bash
-curl -s "https://markdown.new/<url>"
+curl -s 'https://markdown.new/https://example.com/'
 ```
+Converts webpage to markdown for LLMs. 500 requests per day per IP address. If you exceed the limit, you’ll receive an HTTP 429 response. Check the x-rate-limit-remaining header to track your usage.  Works with webpages, and also .pdf .docx .odt .xlsx .xls .xlsm .xlsb .et .ods .numbers .jpg .jpeg .png .webp .svg
 
-Converts webpage to markdown for easier digest and much smaller size.
-
-### Exa - if `$EXA_API_KEY` is set (paid, clean, has summary and schema)
+### Exa - if `$EXA_API_KEY` is set (paid, clean, can do summary and schema)
 
 ```bash
 curl -s -X POST 'https://api.exa.ai/contents' \
