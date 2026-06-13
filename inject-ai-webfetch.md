@@ -2,9 +2,17 @@
 
 ## Web fetch options
 
-Always `curl` if it works for the URL; otherwise, use Exa if `$EXA_API_KEY` is set or fall back to the two no-key hosted readers.
+Here are some alternatives to curl.
 
-### Exa - if `$EXA_API_KEY` is set (paid, clean)
+### markdown.new (fast, simple, CloudFlare)
+
+```bash
+curl -s "https://markdown.new/<url>"
+```
+
+Converts webpage to markdown for easier digest and much smaller size.
+
+### Exa - if `$EXA_API_KEY` is set (paid, clean, has summary and schema)
 
 ```bash
 curl -s -X POST 'https://api.exa.ai/contents' \
@@ -24,7 +32,7 @@ curl -s -X POST 'https://api.exa.ai/contents' \
   }'
 ```
 
-### Otherwise — Jina Reader (slow, clean)
+### Jina Reader (slower, rate-limited, but has "links" and "images-summary")
 
 ```bash
 curl -s "https://r.jina.ai/<url>" \
@@ -39,13 +47,5 @@ curl -s "https://r.jina.ai/<url>" \
 ```
 
 Response carries `x-usage-tokens: <n>`. Speed: ~1.5 s static, ~3-7 s SPAs.
-
-### Otherwise — markdown.new (fast, messy)
-
-```bash
-curl -s "https://markdown.new/<url>"
-```
-
-Response carries `x-markdown-tokens: <n>`. Speed: ~0.5-1 s static and SPA alike, but raw JSX/HTML leaks into the output. Cache: 5 min (`cache-control: public, max-age=300`).
 
 
