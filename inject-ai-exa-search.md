@@ -10,7 +10,7 @@ curl -s -X POST 'https://api.exa.ai/search' \
   -H 'Content-Type: application/json' \
   -d '{
     "query": "describe the ideal page, not keywords",
-    "type": "auto",                          # auto|fast|instant|deep-lite|deep
+    "type": "auto",                          # auto|fast|instant|deep
     "contents": {"highlights": true}         # true or {"query": "..."} for targeted
     # ,"numResults": 10
     # ,"category": "company"                 # company|research paper|news|personal site|people|financial report
