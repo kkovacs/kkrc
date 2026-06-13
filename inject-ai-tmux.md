@@ -8,33 +8,32 @@ Shared session `llm`. Always target `llm:NAME` (distinct NAMEs; never bare `:NAM
 tmux has-session -t llm 2>/dev/null || tmux new-session -d -s llm
 ```
 
-Inspect:
+**Inspect tmux windows:**
 
 ```bash
-tmux list-windows -t llm
-tmux capture-pane -t llm:NAME -p
+tmux list-windows -t llm -F '#{window_index}: #{window_name}' # list
+tmux capture-pane -t llm:NAME -p # get content
 ```
 
-Initial start (one daemon per window; wait for startup; use `-S` to avoid duplicates):
+**Start/restart daemons** (one daemon per window):
 
 ```bash
-tmux new-window -t llm -n NAME -S; tmux send-keys -t llm:NAME 'command here' Enter
+tmux new-window -t llm -S -n NAME # idempotent with -S
+tmux send-keys -t llm:NAME C-c # To stop running daemon; always send ctrl+c in separate send-keys
+tmux send-keys -t llm:NAME 'command here' Enter
+tmux capture-pane -t llm:NAME -p # verify running
 ```
 
-- `-S` + `-n NAME` = "create the window if it doesn't exist, otherwise select the existing one".
+**Stop** (force kill, last resort):
+
+```bash
+tmux kill-window -t llm:NAME
+```
+
+Gotchas:
+- Always use `-S` + `-n NAME` to create the window if it doesn't exist, otherwise select the existing one.
 - Without `-S`, re-running creates duplicate windows with the same name (making `llm:NAME` targets unreliable).
-
-Restart (same window; preferred for updates):
-
-```bash
-tmux send-keys -t llm:NAME C-c; tmux send-keys -t llm:NAME 'command here' Enter
-tmux capture-pane -t llm:NAME -p
-```
-
-Stop (force kill, last resort):
-
-```bash
-tmux kill-window -t llm:NAME || true
-```
+- Start daemons with send-keys after creating an empty window, not as the window command — otherwise C-c kills the window, not just the process.
+- Kill/stop **only sessions/windows you created**. Others might be working in the same tmux.
 
 
