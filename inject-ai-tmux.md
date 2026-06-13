@@ -15,11 +15,14 @@ tmux list-windows -t llm
 tmux capture-pane -t llm:NAME -p
 ```
 
-Initial start (one daemon per window; duplicate NAMEs lead to errors; wait for startup):
+Initial start (one daemon per window; wait for startup; use `-S` to avoid duplicates):
 
 ```bash
-tmux new-window -t llm -n NAME; tmux send-keys -t llm:NAME 'command here' Enter
+tmux new-window -t llm -n NAME -S; tmux send-keys -t llm:NAME 'command here' Enter
 ```
+
+- `-S` + `-n NAME` = "create the window if it doesn't exist, otherwise select the existing one".
+- Without `-S`, re-running creates duplicate windows with the same name (making `llm:NAME` targets unreliable).
 
 Restart (same window; preferred for updates):
 
