@@ -540,7 +540,8 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$OLLAMA_API_KEY .................." "a" "send-keys ' stty -echo' enter ' export OLLAMA_API_KEY=#{OLLAMA_API_KEY}; stty echo' enter" \
 "Inject \$EXA_API_KEY ....................." "x" "send-keys ' stty -echo' enter ' export EXA_API_KEY=#{EXA_API_KEY}; stty echo' enter" \
 "Inject \$XAI_API_KEY ....................." "X" "send-keys ' stty -echo' enter ' export XAI_API_KEY=#{XAI_API_KEY}; stty echo' enter" \
-"Inject \$OPENROUTER_API_KEY for Claude ..." "C" "send-keys ' stty -echo' enter ' export ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" ANTHROPIC_AUTH_TOKEN=\"#{OPENROUTER_API_KEY}\" ANTHROPIC_API_KEY=\"\"; stty echo' enter" \
+"Rich man's Claude (OpenRouter+opus,sonnet)" "" "send-keys ' stty -echo' enter ' export ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" ANTHROPIC_AUTH_TOKEN=\"#{OPENROUTER_API_KEY}\" ANTHROPIC_API_KEY=\"\"; stty echo' enter" \
+"Poor man's Claude (OpenCode Go+minimax)"    "" "send-keys ' stty -echo' enter ' export ANTHROPIC_DEFAULT_OPUS_MODEL=minimax-m3 ANTHROPIC_DEFAULT_SONNET_MODEL=minimax-m3 ANTHROPIC_DEFAULT_HAIKU_MODEL=minimax-m3 CLAUDE_CODE_SUBAGENT_MODEL=minimax-m3 ANTHROPIC_BASE_URL=\"https://opencode.ai/zen/go/\" ANTHROPIC_AUTH_TOKEN=\"\" ANTHROPIC_API_KEY=\"#{OPENCODE_API_KEY}\"; stty echo' enter" \
 "" \
 "Unset proxies ..........................." "-" 'send-keys " unset {http,https,all}_proxy {HTTP,HTTPS,ALL}_PROXY WSL_PAC_URL" enter' \
 "Inject proxy socks5h:(1)080 (ssh -D 1080)" "1" 'send-keys " export all_proxy=socks5h://127.0.0.1:1080" enter' \
