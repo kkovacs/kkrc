@@ -196,6 +196,7 @@ bind c-l select-pane -R
 bind [ select-pane -t :.-
 bind ] select-pane -t :.+
 bind Tab select-pane -t :.+
+bind c-] switch-client -n
 bind i display-panes
 
 # Use Alt-arrow keys without prefix key to switch panes
