@@ -112,8 +112,8 @@ nmap <silent> <leader>w :setlocal nowrap<cr>
 " Turn off expandtab
 nmap <silent> <leader>W :setlocal wrap<cr>
 
-" Force filetype to markdown
-nmap <silent> <leader>d :set filetype=markdown<cr>
+" Force filetype to wdiff (was markdown, but that gets properly auto-recognized nowadays)
+nmap <silent> <leader>d :set filetype=wdiff<cr>
 " Re-run filetype autodetection (not reliable...)
 nmap <silent> <leader>D :doautocmd FileType<cr>
 
