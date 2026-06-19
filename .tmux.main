@@ -538,7 +538,7 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$NVIDIA_API_KEY .................." "n" "send-keys ' stty -echo' enter ' export NVIDIA_API_KEY=#{NVIDIA_API_KEY}; stty echo' enter" \
 "Inject \$OPENROUTER_API_KEY .............." "o" "send-keys ' stty -echo' enter ' export OPENROUTER_API_KEY=#{OPENROUTER_API_KEY}; stty echo' enter" \
 "Inject \$OPENCODE_API_KEY ................" "O" "send-keys ' stty -echo' enter ' export OPENCODE_API_KEY=#{OPENCODE_API_KEY}; stty echo' enter" \
-"Inject \$OLLAMA_API_KEY .................." "a" "send-keys ' stty -echo' enter ' export OLLAMA_API_KEY=#{OLLAMA_API_KEY}; stty echo' enter" \
+"Inject \$OLLAMA_API_KEY .................." "l" "send-keys ' stty -echo' enter ' export OLLAMA_API_KEY=#{OLLAMA_API_KEY}; stty echo' enter" \
 "Inject \$EXA_API_KEY ....................." "x" "send-keys ' stty -echo' enter ' export EXA_API_KEY=#{EXA_API_KEY}; stty echo' enter" \
 "Inject \$XAI_API_KEY ....................." "X" "send-keys ' stty -echo' enter ' export XAI_API_KEY=#{XAI_API_KEY}; stty echo' enter" \
 "Rich man's Claude (OpenRouter+opus,sonnet)" "" "send-keys ' stty -echo' enter ' export ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" ANTHROPIC_AUTH_TOKEN=\"#{OPENROUTER_API_KEY}\" ANTHROPIC_API_KEY=\"\"; stty echo' enter" \
