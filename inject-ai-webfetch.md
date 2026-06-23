@@ -4,12 +4,28 @@
 
 Here are some alternatives to curl.
 
-### markdown.new (fast, simple, CloudFlare)
+### markdown.new (fast, free, simple, CloudFlare)
 
 ```bash
 curl -s 'https://markdown.new/https://example.com/'
 ```
 Converts webpage to markdown for LLMs. 500 requests per day per IP address. If you exceed the limit, you’ll receive an HTTP 429 response. Check the x-rate-limit-remaining header to track your usage.  Works with webpages, and also .pdf .docx .odt .xlsx .xls .xlsm .xlsb .et .ods .numbers .jpg .jpeg .png .webp .svg
+
+### Jina Reader (slower, free, rate-limited, has "links" and "images-summary")
+
+```bash
+curl -s "https://r.jina.ai/<url>" \
+  -H "Accept: text/markdown" \
+  -H "X-No-Cache: true" \
+  # ,"X-Target-Selector": "h1, p:first-of-type"   # CSS-selector targeting
+  # ,"X-Return-Format": "markdown"                # default
+  # ,"X-With-Generated-Alt": "true"               # alt text for images
+  # ,"X-With-Links-Summary": "true"               # append links list
+  # ,"X-With-Images-Summary": "true"              # append images list
+  # ,"X-Token-Budget": "20000"                    # hard cap on response tokens
+```
+
+Response carries `x-usage-tokens: <n>`. Speed: ~1.5 s static, ~3-7 s SPAs.
 
 ### Exa - if `$EXA_API_KEY` is set (paid, clean, can do summary and schema)
 
@@ -30,21 +46,5 @@ curl -s -X POST 'https://api.exa.ai/contents' \
     # ,"subpageTarget": ["docs", "api"]
   }'
 ```
-
-### Jina Reader (slower, rate-limited, but has "links" and "images-summary")
-
-```bash
-curl -s "https://r.jina.ai/<url>" \
-  -H "Accept: text/markdown" \
-  -H "X-No-Cache: true" \
-  # ,"X-Target-Selector": "h1, p:first-of-type"   # CSS-selector targeting
-  # ,"X-Return-Format": "markdown"                # default
-  # ,"X-With-Generated-Alt": "true"               # alt text for images
-  # ,"X-With-Links-Summary": "true"               # append links list
-  # ,"X-With-Images-Summary": "true"              # append images list
-  # ,"X-Token-Budget": "20000"                    # hard cap on response tokens
-```
-
-Response carries `x-usage-tokens: <n>`. Speed: ~1.5 s static, ~3-7 s SPAs.
 
 
