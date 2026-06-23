@@ -509,6 +509,7 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject (m)arkdownit snippet ........" "m" "pipe-pane -I 'cat ~/.kkrc/inject-ai-office.md'" \
 "Inject (d)uckdb snippet ............" "d" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
 "Inject (g)odoc snippet ............." "g" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
+"Inject (i)mages via openrouter ....." "i" "pipe-pane -I 'cat ~/.kkrc/inject-ai-image-openrouter.md'" \
 "Inject code review snippet ........." "7" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
 "Inject update docs snippet ........." "8" "pipe-pane -I 'cat ~/.kkrc/inject-ai-docs-update.md'" \
 "git commit with AI message ........." "9" "send-keys 'git diff --cached | ' ; inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"Please craft a git commit message from this. Just the text, no markdown code markers.\\\" | git commit -F -\" enter" \
