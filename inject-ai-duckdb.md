@@ -9,6 +9,13 @@ You have `duckdb` cli.
 SELECT * FROM read_csv('data.csv', header = true, auto_detect = true);
 SELECT * FROM read_parquet('data.parquet');
 SELECT * FROM read_json('data.json');
+SELECT * FROM read_csv('data/*.csv', union_by_name = true);
+INSTALL excel; LOAD excel; SELECT * FROM read_xlsx('report.xlsx', sheet = 'Sheet1');
+
+-- JSON (with JSONPath)
+SELECT json_extract('{"a": [1,2]}', '$.a[0]');
+SELECT json_array_length(j, ['$.x']) FROM t;
+SELECT * FROM json_each('{"arr":[1,2,3]}', '$.arr');
 
 -- Attach/query other DBs (SQLite, Postgres, etc.)
 ATTACH 'file.sqlite' AS other_db (READ_ONLY);
@@ -37,26 +44,26 @@ SELECT dayname(DATE '2024-06-15');
 SELECT time_bucket(INTERVAL '1 hour', TIMESTAMP '2024-06-15');
 SELECT strftime(NOW(), '%Y-%m-%d %H:%M');
 SELECT strptime('2024-01-15', '%Y-%m-%d')::DATE;
-
--- JSON (with JSONPath)
-SELECT json_extract('{"a": [1,2]}', '$.a[0]');
-SELECT json_array_length(j, ['$.x']) FROM t;
-SELECT * FROM json_each('{"arr":[1,2,3]}', '$.arr');
-
--- Aggregates
 SELECT list(name ORDER BY name) FROM t;
 
--- DuckDB-specific: QUALIFY, FILL, SEMI/ANTI/ASOF/POSITIONAL joins
-SELECT * FROM events QUALIFY row_number() OVER (PARTITION BY user_id ORDER BY ts DESC) = 1;
-SELECT ts, FILL(temp) OVER (ORDER BY ts) FROM readings;
+-- Friendly SQL
+SELECT * EXCLUDE (id, ts) FROM t;
+SELECT * REPLACE (upper(name) AS name) FROM t;
+SELECT sum(COLUMNS('revenue_.*')) FROM t;
+SELECT * FROM t1 UNION ALL BY NAME SELECT * FROM t2;
+SELECT grp, count(*) FROM t GROUP BY ALL;
+CREATE OR REPLACE TABLE t AS SELECT * FROM src;
+INSERT OR REPLACE INTO t BY NAME (a, b) VALUES (1, 2);
+PIVOT sales ON year USING sum(revenue);
+SELECT max(val, 3) FROM t GROUP BY grp;
+SELECT i + 1 AS j, j + 2 AS k FROM range(0, 3) r(i);
+SET VARIABLE n = 5; SELECT getvariable('n');
+SELECT 'hello'[1:3], [1, 2, 3, 4][-1];
+SELECT * FROM events QUALIFY row_number() OVER (PARTITION BY uid ORDER BY ts DESC) = 1;
 SELECT * FROM a SEMI JOIN b ON a.id = b.id;
-SELECT * FROM a ANTI JOIN b ON a.id = b.id;
 SELECT * FROM trades ASOF JOIN quotes ON trades.ticker = quotes.ticker AND trades.ts >= quotes.ts;
-SELECT * FROM a POSITIONAL JOIN b;
-
--- Extensions
-INSTALL httpfs;
-LOAD httpfs;
 ```
 
 Detailed functions documentation: <https://duckdb.org/docs/current/sql/functions/overview>
+
+
