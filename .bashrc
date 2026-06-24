@@ -331,7 +331,7 @@ function sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 # END of better systemd.
 
 # Isolated pi agent (attachments and prompt only). See inject-ai-subagent.md
-function pii() { pi -ne -ns -nt -nc "$@" ; }
+function pi0() { pi -ne -ns -nt -nc "$@" ; }
 # read-only pi agent (read/grep/find/ls tools only).
 function pir() { pi -ne -ns --tools read,grep,find,ls "$@" ; }
 
