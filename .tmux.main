@@ -500,14 +500,14 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject (A)I bash function .........." "A" "send-keys \" function AI() {\" ; inject_ai_snippet \; send-keys \" \\\"\\\${2:-#{INJECT_AI_MODEL}}\\\" \\\"\\\$1\\\"; }; export -f AI\" enter" \
 "" \
 "Inject work-style snippet .........." "0" "pipe-pane -I 'cat ~/.kkrc/inject-ai-kk.md'" \
+"Inject bun-(w)ebview snippet ......." "w" "pipe-pane -I 'cat ~/.kkrc/inject-ai-bun-webview.md'" \
 "Inject pi-(s)ubagent snippet ......." "s" "pipe-pane -I 'cat ~/.kkrc/inject-ai-subagent.md'" \
 "Inject (t)mux snippet .............." "t" "pipe-pane -I 'cat ~/.kkrc/inject-ai-tmux.md'" \
-"Inject (b)un-webview snippet ......." "b" "pipe-pane -I 'cat ~/.kkrc/inject-ai-bun-webview.md'" \
 "Inject web(f)etch snippet .........." "f" "pipe-pane -I 'cat ~/.kkrc/inject-ai-webfetch.md'" \
 "Inject e(x)a-search snippet ........" "x" "pipe-pane -I 'cat ~/.kkrc/inject-ai-exa-search.md'" \
 "Inject perplexity sona(r) snippet .." "r" "pipe-pane -I 'cat ~/.kkrc/inject-ai-perplexity.md'" \
-"Inject (m)arkdownit snippet ........" "m" "pipe-pane -I 'cat ~/.kkrc/inject-ai-office.md'" \
 "Inject (d)uckdb snippet ............" "d" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
+"Inject (m)arkdownit snippet ........" "m" "pipe-pane -I 'cat ~/.kkrc/inject-ai-office.md'" \
 "Inject (g)odoc snippet ............." "g" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
 "Inject (i)mages via openrouter ....." "i" "pipe-pane -I 'cat ~/.kkrc/inject-ai-image-openrouter.md'" \
 "Inject code review snippet ........." "7" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
