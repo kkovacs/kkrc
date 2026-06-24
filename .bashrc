@@ -131,7 +131,7 @@ function gf(){ git fetch --all -v "$@"; }
 function gp(){ git pull --ff-only -v "$@"; }
 export -f ts gl gs gf gp
 # gap: "git pull + add + push": sync, to be used with a notes directory
-function gap() { gs ; gp ; git add . ; git commit -m wip ; git push ; } ; export -f gap
+function gap() { gs ; gp ; git add -A ; git commit -m wip ; git push ; } ; export -f gap
 # gat: "git at": diff a file with itself at a given ref
 function gat() { vimdiff "$1" <(git show "${2:-HEAD^}":"$1" ) ; }
 alias gclean="git reset --hard && git clean -f -d -x"
@@ -329,6 +329,11 @@ function sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 # shellcheck disable=SC1091
 . /usr/share/bash-completion/completions/journalctl 2>/dev/null
 # END of better systemd.
+
+# Isolated pi agent (attachments and prompt only). See inject-ai-subagent.md
+function pii() { pi -ne -ns -nt -nc "$@" ; }
+# read-only pi agent (read/grep/find/ls tools only).
+function pir() { pi -ne -ns --tools read,grep,find,ls "$@" ; }
 
 # Controversial, but it's in the XDG Base Directory Specification. IMHO it's the lesser evil.
 # See: https://specifications.freedesktop.org/basedir/latest/
