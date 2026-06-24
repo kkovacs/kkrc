@@ -11,7 +11,9 @@ font-feature = -calt
 # On OS X, Use Option as Alt. But, it disables flying accents.
 #macos-option-as-alt = true
 
-# Instead, make Ghostty send CSI-U codes:
+# Instead, make Ghostty send CSI-U codes.
+# Useful:
+#   ghostty +list-keybinds --default
 # --- Tab (9) ---
 #keybind = shift+tab=esc:[27;2;9~
 #keybind = opt+tab=esc:[27;3;9~
@@ -44,6 +46,38 @@ keybind = ctrl+backspace=esc:[127;5u
 #keybind = ctrl+shift+backspace=esc:[127;6u
 #keybind = opt+ctrl+backspace=esc:[127;7u
 #keybind = opt+ctrl+shift+backspace=esc:[127;8u
+# --- Up ---
+#keybind = shift+up=esc:[1;2A
+#keybind = opt+up=esc:[1;3A
+#keybind = opt+shift+up=esc:[1;4A
+#keybind = ctrl+up=esc:[1;5A
+#keybind = ctrl+shift+up=esc:[1;6A
+#keybind = opt+ctrl+up=esc:[1;7A
+#keybind = opt+ctrl+shift+up=esc:[1;8A
+# --- Down ---
+#keybind = shift+down=esc:[1;2B
+#keybind = opt+down=esc:[1;3B
+#keybind = opt+shift+down=esc:[1;4B
+#keybind = ctrl+down=esc:[1;5B
+#keybind = ctrl+shift+down=esc:[1;6B
+#keybind = opt+ctrl+down=esc:[1;7B
+#keybind = opt+ctrl+shift+down=esc:[1;8B
+# --- Right ---
+#keybind = shift+right=esc:[1;2C
+#keybind = opt+right=esc:[1;3C
+#keybind = opt+shift+right=esc:[1;4C
+#keybind = ctrl+right=esc:[1;5C
+#keybind = ctrl+shift+right=esc:[1;6C
+#keybind = opt+ctrl+right=esc:[1;7C
+#keybind = opt+ctrl+shift+right=esc:[1;8C
+# --- Left ---
+#keybind = shift+left=esc:[1;2D
+#keybind = opt+left=esc:[1;3D
+#keybind = opt+shift+left=esc:[1;4D
+#keybind = ctrl+left=esc:[1;5D
+#keybind = ctrl+shift+left=esc:[1;6D
+#keybind = opt+ctrl+left=esc:[1;7D
+#keybind = opt+ctrl+shift+left=esc:[1;8D
 
 # Color schemes / themes
 # To experiment, run: ghostty +list-themes
