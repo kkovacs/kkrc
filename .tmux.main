@@ -504,7 +504,7 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject (t)mux snippet .............." "t" "pipe-pane -I 'cat ~/.kkrc/inject-ai-tmux.md'" \
 "Inject (b)un-webview snippet ......." "b" "pipe-pane -I 'cat ~/.kkrc/inject-ai-bun-webview.md'" \
 "Inject web(f)etch snippet .........." "f" "pipe-pane -I 'cat ~/.kkrc/inject-ai-webfetch.md'" \
-"Inject (e)xa-search snippet ........" "e" "pipe-pane -I 'cat ~/.kkrc/inject-ai-exa-search.md'" \
+"Inject e(x)a-search snippet ........" "x" "pipe-pane -I 'cat ~/.kkrc/inject-ai-exa-search.md'" \
 "Inject perplexity sona(r) snippet .." "r" "pipe-pane -I 'cat ~/.kkrc/inject-ai-perplexity.md'" \
 "Inject (m)arkdownit snippet ........" "m" "pipe-pane -I 'cat ~/.kkrc/inject-ai-office.md'" \
 "Inject (d)uckdb snippet ............" "d" "pipe-pane -I 'cat ~/.kkrc/inject-ai-duckdb.md'" \
