@@ -461,12 +461,12 @@ bind -T menus "p" display-menu -T " PHP... " \
 
 # Submenu: python
 bind -T menus "y" display-menu -T " Python... " \
-". ./.venv/bin/activate ............." "y" "send-keys '. .venv/bin/activate' enter" \
-"" \
 "Setup (u)v ........................." "u" setup_python_uv \
 "Setup classic .venv ................" "V" setup_python_venv \
 "Setup jupyterlab ..................." "J" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_python_uv ; send-keys 'uv venv ; . .venv/bin/activate ;' ; setup_jupyterlab ; send-keys 'EOF' enter '" \
-"Setup (s)treamlit .................." "s" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_python_uv ; send-keys 'uv venv ; . .venv/bin/activate ; uv pip install streamlit[charts] ; streamlit hello ' ; send-keys enter 'EOF' enter '"
+"Setup (s)treamlit .................." "s" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_python_uv ; send-keys 'uv venv ; . .venv/bin/activate ; uv pip install streamlit[charts] ; streamlit hello ' ; send-keys enter 'EOF' enter '" \
+"" \
+". ./.venv/bin/activate ............." "0" "send-keys '. .venv/bin/activate' enter"
 
 # Submenu: node
 bind -T menus "n" display-menu -T " NodeJS... " \
@@ -532,28 +532,28 @@ bind -T menus "a" display-menu -T " AI... " \
 # -h means hidden: variables don't get automatically added to new windows' environments and not shown by :show-environment
 # NOTE: ENV loading needs to reload .tmux.main so "#{..}" variables in "set command-alias..."-es are expanded
 bind -T menus "e" display-menu -T " inject from tmux session environment... " \
+"Inject \$SSH_AUTH_SOCK ..................." "a" 'send-keys " export SSH_AUTH_SOCK=$(tmux show-environment SSH_AUTH_SOCK | cut -d= -f2)" enter' \
+"" \
 "Load (e)nv.age to tmux .................." "e" "display-popup -T \"Load env.age to tmux\" -EE bash -c \"age -i ~/.ssh/age.key -d ~/.ssh/env.age | awk '!/^\s*(\\\$|#)/ { sub(/=/, \\\" \\\"); print \\\"set-environment -h\\\", \$0 }' | tmux source-file -\" ; source-file ~/.kkrc/.tmux.main" \
+"Inject \$ELEVENLABS_API_KEY .............." "E" "send-keys ' stty -echo' enter ' export ELEVENLABS_API_KEY=#{ELEVENLABS_API_KEY}; stty echo' enter" \
+"Inject \$EXA_API_KEY ....................." "x" "send-keys ' stty -echo' enter ' export EXA_API_KEY=#{EXA_API_KEY}; stty echo' enter" \
 "Inject \$GEMINI_API_KEY .................." "g" "send-keys ' stty -echo' enter ' export GEMINI_API_KEY=#{GEMINI_API_KEY} GOOGLE_GENERATIVE_AI_API_KEY=#{GEMINI_API_KEY}; stty echo' enter" \
 "Inject \$GITHUB_TOKEN ...................." "G" "send-keys ' stty -echo' enter ' export GITHUB_TOKEN=#{GITHUB_TOKEN}; stty echo' enter" \
+"Inject \$HTTPS_PROXY ....................." "p" "send-keys ' stty -echo' enter ' export HTTPS_PROXY=\"#{HTTPS_PROXY}\" HTTP_PROXY=\"#{HTTPS_PROXY}\"; stty echo' enter" \
 "Inject \$MISTRAL_API_KEY ................." "m" "send-keys ' stty -echo' enter ' export MISTRAL_API_KEY=#{MISTRAL_API_KEY}; stty echo' enter" \
 "Inject \$NVIDIA_API_KEY .................." "n" "send-keys ' stty -echo' enter ' export NVIDIA_API_KEY=#{NVIDIA_API_KEY}; stty echo' enter" \
-"Inject \$OPENROUTER_API_KEY .............." "o" "send-keys ' stty -echo' enter ' export OPENROUTER_API_KEY=#{OPENROUTER_API_KEY}; stty echo' enter" \
-"Inject \$OPENCODE_API_KEY ................" "O" "send-keys ' stty -echo' enter ' export OPENCODE_API_KEY=#{OPENCODE_API_KEY}; stty echo' enter" \
 "Inject \$OLLAMA_API_KEY .................." "l" "send-keys ' stty -echo' enter ' export OLLAMA_API_KEY=#{OLLAMA_API_KEY}; stty echo' enter" \
-"Inject \$EXA_API_KEY ....................." "x" "send-keys ' stty -echo' enter ' export EXA_API_KEY=#{EXA_API_KEY}; stty echo' enter" \
+"Inject \$OPENCODE_API_KEY ................" "O" "send-keys ' stty -echo' enter ' export OPENCODE_API_KEY=#{OPENCODE_API_KEY}; stty echo' enter" \
+"Inject \$OPENROUTER_API_KEY .............." "o" "send-keys ' stty -echo' enter ' export OPENROUTER_API_KEY=#{OPENROUTER_API_KEY}; stty echo' enter" \
 "Inject \$RECRAFT_API_KEY ................." "r" "send-keys ' stty -echo' enter ' export RECRAFT_API_KEY=#{RECRAFT_API_KEY}; stty echo' enter" \
-"Inject \$ELEVENLABS_API_KEY .............." "E" "send-keys ' stty -echo' enter ' export ELEVENLABS_API_KEY=#{ELEVENLABS_API_KEY}; stty echo' enter" \
 "Inject \$XAI_API_KEY ....................." "X" "send-keys ' stty -echo' enter ' export XAI_API_KEY=#{XAI_API_KEY}; stty echo' enter" \
-"Rich man's Claude (OpenRouter+opus,sonnet)" "" "send-keys ' stty -echo' enter ' export ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" ANTHROPIC_AUTH_TOKEN=\"#{OPENROUTER_API_KEY}\" ANTHROPIC_API_KEY=\"\"; stty echo' enter" \
 "Poor man's Claude (OpenCode Go+minimax)"    "" "send-keys ' stty -echo' enter ' export ANTHROPIC_DEFAULT_OPUS_MODEL=minimax-m3 ANTHROPIC_DEFAULT_SONNET_MODEL=minimax-m3 ANTHROPIC_DEFAULT_HAIKU_MODEL=minimax-m3 CLAUDE_CODE_SUBAGENT_MODEL=minimax-m3 ANTHROPIC_BASE_URL=\"https://opencode.ai/zen/go/\" ANTHROPIC_AUTH_TOKEN=\"\" ANTHROPIC_API_KEY=\"#{OPENCODE_API_KEY}\"; stty echo' enter" \
+"Rich man's Claude (OpenRouter+opus,sonnet)" "" "send-keys ' stty -echo' enter ' export ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" ANTHROPIC_AUTH_TOKEN=\"#{OPENROUTER_API_KEY}\" ANTHROPIC_API_KEY=\"\"; stty echo' enter" \
 "" \
-"Unset proxies ..........................." "-" 'send-keys " unset {http,https,all}_proxy {HTTP,HTTPS,ALL}_PROXY WSL_PAC_URL" enter' \
 "Inject proxy socks5h:(1)080 (ssh -D 1080)" "1" 'send-keys " export all_proxy=socks5h://127.0.0.1:1080" enter' \
 "Inject proxy http:888(8)................." "8" 'send-keys " export {http,https}_proxy=http://127.0.0.1:8888 {HTTP,HTTPS}_PROXY=http://127.0.0.1:8888" enter' \
 "Inject proxy http:808(0)................." "0" 'send-keys " export {http,https}_proxy=http://127.0.0.1:8080 {HTTP,HTTPS}_PROXY=http://127.0.0.1:8080" enter' \
-"Inject \$HTTPS_PROXY ....................." "p" "send-keys ' stty -echo' enter ' export HTTPS_PROXY=\"#{HTTPS_PROXY}\" HTTP_PROXY=\"#{HTTPS_PROXY}\"; stty echo' enter" \
-"" \
-"Inject \$SSH_AUTH_SOCK ..................." "a" 'send-keys " export SSH_AUTH_SOCK=$(tmux show-environment SSH_AUTH_SOCK | cut -d= -f2)" enter'
+"Unset proxies ..........................." "-" 'send-keys " unset {http,https,all}_proxy {HTTP,HTTPS,ALL}_PROXY WSL_PAC_URL" enter'
 
 # Submenu: vim
 bind -T menus "v" display-menu -T " vim... " \
