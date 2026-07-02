@@ -470,7 +470,7 @@ bind -T menus "y" display-menu -T " Python... " \
 
 # Submenu: node
 bind -T menus "n" display-menu -T " NodeJS... " \
-"Download bun ......................." "b" setup_bun \
+"Download b(u)n ....................." "u" setup_bun \
 "Download (d)eno ...................." "d" setup_deno \
 "Download nodejs (direct download) .." "n" setup_node \
 "Install nodejs (snap) .............." "s" setup_node_snap \
