@@ -410,7 +410,7 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "Setup PROD (w)arn .................." "w" "send-keys ' printf \"\\033[00;31mPRODUCTION SERVER\\033[00m\" | sudo tee /etc/debian_chroot ; . ~/.bashrc' enter" \
 "Remove PROD (W)arn ................." "W" "send-keys ' sudo rm /etc/debian_chroot; unset debian_chroot' enter" \
 "" \
-"sudo (t)ouch /snapshotme ..........." "t" "send-keys ' sudo touch /snapshotme; echo -n Commencing in ~\$(( 60 - \$( date +%S | sed 's/^0\\\\+//' ) )) secs; while [[ -f /snapshotme ]]; do echo -n .; sleep 1; done; echo' enter"
+"sudo (t)ouch /snapshotme ..........." "t" "send-keys ' sudo touch /snapshotme; echo -n Commencing in ~\$(( 60 - \$( date +%-S ) )) secs; while [[ -f /snapshotme ]]; do echo -n .; sleep 1; done; echo' enter"
 
 # Submenu: databases
 bind -T menus "d" display-menu -T " DB... " \
