@@ -331,9 +331,9 @@ function sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 # END of better systemd.
 
 # Isolated pi agent (attachments and prompt only). See inject-ai-subagent.md
-function pi0() { pi -ne -ns -nt -nc "$@" ; }
+function pi0() { pi -ne -ns -nt -nc "$@" ; } ; export -f pi0
 # read-only pi agent (read/grep/find/ls tools only).
-function pir() { pi -ne -ns --tools read,grep,find,ls "$@" ; }
+function pir() { pi -ne -ns --tools read,grep,find,ls "$@" ; } ; export -f pir
 
 # Controversial, but it's in the XDG Base Directory Specification. IMHO it's the lesser evil.
 # See: https://specifications.freedesktop.org/basedir/latest/
