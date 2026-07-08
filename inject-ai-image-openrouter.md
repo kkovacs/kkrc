@@ -1,31 +1,26 @@
-
-
-## Image gen/edit (OpenRouter + Recraft)
+## Image gen/edit
 
 ```bash
-# ref is optional; drop the base64+image_url lines (and strength) to generate from scratch
-base64 -w0 ref.webp > /tmp/b64   # omit for text-only gen
+# ref is optional; omit the input_references block to generate from scratch
+base64 < ref.jpg | tr -d '\n' > /tmp/b64   # omit for text-only gen
 jq -n --rawfile b /tmp/b64 '{
-  model:"recraft/recraft-v4.1", modalities:["image"],
-  messages:[{role:"user", content:[
-    {type:"text",      text:"prompt here"},
-    {type:"image_url", image_url:{url:"data:image/webp;base64,\($b)"}}   # optional ref
-  ]}],
-  image_config:{
-    aspect_ratio:"1:1",   # 1:1|2:3|3:2|3:4|4:3|4:5|5:4|9:16|16:9|21:9
-    image_size:"1K",      # 1K|2K
-    strength:0.5          # 0=keep refs → 1=ignore (only with input images)
-  }
+  model:"google/gemini-3.1-flash-lite-image",
+  prompt:"prompt here",
+  resolution:"1K",
+  aspect_ratio:"1:1",  # 1:1|16:9|9:16|4:3|3:4|3:2|2:3|4:5|5:4
+  input_references:[{  # optional reference image(s)
+    type:"image_url",
+    image_url:{url:"data:image/jpeg;base64,\($b)"}
+  }]
 }' > /tmp/p.json
 
-curl -s https://openrouter.ai/api/v1/chat/completions \
+curl -s -X POST https://openrouter.ai/api/v1/images \
   -H "Authorization: Bearer $OPENROUTER_API_KEY" -H 'Content-Type: application/json' \
   -d @/tmp/p.json \
-  | jq -r '.choices[0].message.images[0].image_url.url' \
-  | { read u; ext=.${u#data:image/}; ext=${ext%%;*}; echo "${u#*,}" | base64 -d > "out$ext"; }
+  | jq -r '.data[0].b64_json' \
+  | base64 -d > out.jpg
 ```
 
-- Compose: add more `image_url` entries and describe each by position ("image 1 = character, image 2 = scene"). `strength`: 0=keep refs → 1=ignore.
+- Compose/edit: add more `input_references` entries and describe each by position.
+- OpenRouter image generation reference: <https://openrouter.ai/docs/guides/overview/multimodal/image-generation>
 - List image capable models: `curl https://openrouter.ai/api/v1/images/models -H "Authorization: Bearer $OPENROUTER_API_KEY"`
-
-
