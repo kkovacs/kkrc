@@ -198,12 +198,12 @@ alias dcs="dc ps -a"
 alias dci="dc images; echo; docker images"
 # Docker Swarm
 #alias S="docker service ls"
-# Kubernetes overview. Using an alias instead of a function because often kubectl is an alias itself... (minikube, etc)
-alias K="kubectl get all --output=wide"
+# Kubernetes overview.
+alias K="sudo kubectl get all --output=wide"
 # Kubernetes overview, including system
-alias KA="kubectl get all --output=wide --all-namespaces"
+alias KA="sudo kubectl get all --output=wide --all-namespaces"
 # Kubernetes nodes (not included in "all")
-alias KN="kubectl get nodes --output=wide"
+alias KN="sudo kubectl get nodes --output=wide"
 # nftables show all
 alias N="sudo nft list ruleset"
 # Firefox private window
