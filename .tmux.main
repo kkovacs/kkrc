@@ -319,8 +319,6 @@ set -s command-alias[133] setup_deno="send-keys ' mkdir -p ~/.local/bin ; curl -
 set -s command-alias[107] setup_pnpm="send-keys ' mkdir -p ~/.local/bin ; curl -Lo ~/.local/bin/pnpm https://github.com/pnpm/pnpm/releases/latest/download/pnpm-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\") && chmod 755 ~/.local/bin/pnpm' enter"
 # Install PHP & composer
 set -s command-alias[111] setup_php="send-keys ' mkdir -p ~/.local/bin ; NEEDRESTART_MODE=a \$EAT apt-get install -y $BASIC php-cli php-gd php-mbstring php-dom php-xml php-zip php-curl php-intl php-mysql php-pgsql php-sqlite3 php-xdebug && (curl -sS https://getcomposer.org/installer | NEEDRESTART_MODE=a php -- --install-dir=~/.local/bin --filename=composer)' enter"
-# Minikube but running on local docker (for setting up playground/dev VMs)
-set -s command-alias[112] setup_minikube="load-buffer -b staticsendbuf ~/.kkrc/inject-setup-minikube.txt \; paste-buffer -d -b staticsendbuf"
 # Mysql, without any real password protection (default oracle password as cultural nod)
 set -s command-alias[113] setup_mysql="send-keys ' sudo debconf-set-selections <<< \"mysql-server mysql-server/root_password password tiger\"; sudo debconf-set-selections <<< \"mysql-server mysql-server/root_password_again password tiger\"; sudo NEEDRESTART_MODE=a \$EAT apt-get install -y mysql-server' enter"
 # Golang latest
@@ -491,7 +489,7 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "" \
 "Install (b)rew ....................." "b" setup_brew \
 "Install (d)ocker ..................." "d" setup_docker \
-"Install (m)inikube.................." "m" setup_minikube \
+"Install k(3)s ......................" "3" "send-keys ' curl -sfL https://get.k3s.io | sh -' enter" \
 "Install (h)url ....................." "h" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/Orange-OpenSource/hurl/releases/download/8.0.1/hurl-8.0.1-\$(uname -m)-unknown-linux-gnu.tar.gz | tar zxv -C ~/.local/bin/ --strip-components=2 --wildcards \"hurl-*/bin/hurl*\"' enter" \
 "Install k(6) ......................." "6" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/grafana/k6/releases/download/v2.0.0/k6-v2.0.0-linux-\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1 --wildcards \"*/k6\"' enter" \
 "Install shell(C)heck ..............." "C" setup_shellcheck \
@@ -515,6 +513,7 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject (m)arkdownit snippet ........" "m" "pipe-pane -I 'cat ~/.kkrc/inject-ai-office.md'" \
 "Inject (g)odoc snippet ............." "g" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
 "Inject (i)mages via openrouter ....." "i" "pipe-pane -I 'cat ~/.kkrc/inject-ai-image-openrouter.md'" \
+"Inject work summary snippet ........" "6" "pipe-pane -I 'cat ~/.kkrc/inject-ai-summary.md'" \
 "Inject code review snippet ........." "7" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
 "Inject update docs snippet ........." "8" "pipe-pane -I 'cat ~/.kkrc/inject-ai-docs-update.md'" \
 "git commit with AI message ........." "9" "send-keys 'git diff --cached | ' ; inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"Please craft a git commit message from this. Just the text, no markdown code markers.\\\" | git commit -F -\" enter" \
