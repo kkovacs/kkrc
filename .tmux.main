@@ -503,6 +503,7 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject (A)I bash function .........." "A" "send-keys \" function AI() {\" ; inject_ai_snippet \; send-keys \" \\\"\\\${2:-#{INJECT_AI_MODEL}}\\\" \\\"\\\$1\\\"; }; export -f AI\" enter" \
 "" \
 "Inject work-style snippet .........." "0" "pipe-pane -I 'cat ~/.kkrc/inject-ai-kk.md'" \
+"Inject ponytail review snippet ....." "1" "pipe-pane -I 'cat ~/.kkrc/inject-ai-ponytail.md'" \
 "Inject bun-(w)ebview snippet ......." "w" "pipe-pane -I 'cat ~/.kkrc/inject-ai-bun-webview.md'" \
 "Inject pi-(s)ubagent snippet ......." "s" "pipe-pane -I 'cat ~/.kkrc/inject-ai-subagent.md'" \
 "Inject (t)mux snippet .............." "t" "pipe-pane -I 'cat ~/.kkrc/inject-ai-tmux.md'" \
