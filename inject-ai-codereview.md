@@ -1,5 +1,5 @@
 
-
+!pi -p -ne -ns -np --model opencode-go/minimax-m3 "
 I need an expert and senior code review. Do you see any:
 
 - potential security issues?
@@ -11,5 +11,4 @@ I need an expert and senior code review. Do you see any:
 - tests testing less than they used to be?
 
 Review the code change in `git diff --cached`
-
-
+"
