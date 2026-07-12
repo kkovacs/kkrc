@@ -225,6 +225,11 @@ def build_filtered_table(
         return r["cache_write"] if r["cache_write"] is not None else float("inf")
 
     if date_sort:
+        show_date = True
+    if cache_sort:
+        show_cache = True
+
+    if date_sort:
         rows.sort(key=lambda r: (r["age_days"] if r["age_days"] is not None else float("inf"), r["label"].lower(), r["provider"].lower()))
     elif cache_sort:
         rows.sort(key=lambda r: (_cache_key(r), r["label"].lower(), r["provider"].lower()))
