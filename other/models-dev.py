@@ -12,6 +12,7 @@ Usage:
     ./models-dev.py -p opencode-go -i aud
     ./models-dev.py -m deepseek-v4-flash -M 0.3   # defaults to -p openrouter
     ./models-dev.py -m '.*gpt.*' -M 10
+    ./models-dev.py -p openrouter -P               # sort by output price
 """
 
 from __future__ import annotations
@@ -23,6 +24,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -84,6 +86,15 @@ def make_row(label: str, info: dict[str, Any]) -> dict[str, Any]:
         f"${cache_write:.2f}" if cache_write is not None else "-",
     ]
 
+    age_days: int | None = None
+    release_date_str = info.get("release_date")
+    if release_date_str:
+        try:
+            rd = datetime.strptime(release_date_str, "%Y-%m-%d").date()
+            age_days = (date.today() - rd).days
+        except ValueError:
+            pass
+
     return {
         "label": label,
         "input_modality": ", ".join(MODALITY_SHORT.get(m, m) for m in modalities.get("input", [])),
@@ -91,6 +102,9 @@ def make_row(label: str, info: dict[str, Any]) -> dict[str, Any]:
         "out_price": cost.get("output", 0.0),
         "has_tiers": has_tiers,
         "cache_rw": " / ".join(cache_parts),
+        "cache_read": cache_read,
+        "cache_write": cache_write,
+        "age_days": age_days,
     }
 
 
@@ -129,6 +143,7 @@ def build_table(
                 "in_out": f"${r['in_price']:.2f} / ${r['out_price']:.2f}{tier_marker}",
                 "cache_rw": r["cache_rw"],
                 "chart": format_chart(r["out_price"], max_out),
+                "age_days": str(r["age_days"]) if r["age_days"] is not None else "-",
             }
         )
 
@@ -163,6 +178,11 @@ def build_filtered_table(
     model_filter: str | None = None,
     input_filter: str | None = None,
     chart_max: float | None = None,
+    price_sort: bool = False,
+    show_date: bool = False,
+    date_sort: bool = False,
+    show_cache: bool = False,
+    cache_sort: bool = False,
 ) -> str:
     providers = catalog.get("providers", {})
     if provider_filter is not None:
@@ -201,16 +221,29 @@ def build_filtered_table(
         suffix = " ".join(parts)
         raise RuntimeError(f"No models found{(' ' + suffix) if suffix else '.'}")
 
-    rows.sort(key=lambda r: (r["label"].lower(), r["provider"].lower(), r["out_price"]))
+    def _cache_key(r: dict[str, Any]) -> float:
+        return r["cache_write"] if r["cache_write"] is not None else float("inf")
+
+    if date_sort:
+        rows.sort(key=lambda r: (r["age_days"] if r["age_days"] is not None else float("inf"), r["label"].lower(), r["provider"].lower()))
+    elif cache_sort:
+        rows.sort(key=lambda r: (_cache_key(r), r["label"].lower(), r["provider"].lower()))
+    elif price_sort:
+        rows.sort(key=lambda r: (r["out_price"], r["label"].lower(), r["provider"].lower()))
+    else:
+        rows.sort(key=lambda r: (r["label"].lower(), r["out_price"], r["provider"].lower()))
 
     columns = [
         ("Model", "label"),
         ("Provider", "provider"),
         ("Input modality", "input_modality"),
         ("In/Out ($/M)", "in_out"),
-        ("Cache r/w ($/M)", "cache_rw"),
-        ("Output price chart", "chart"),
     ]
+    if show_cache:
+        columns.append(("Cache r/w (M)", "cache_rw"))
+    if show_date:
+        columns.append(("Age (days)", "age_days"))
+    columns.append(("Output price chart", "chart"))
 
     filter_notes = []
     if model_filter:
@@ -289,6 +322,36 @@ def main() -> int:
         metavar="MODALITY",
         help="Filter by input modality, e.g. txt, img, aud, vid, pdf (or text, image, etc.)",
     )
+    parser.add_argument(
+        "-P",
+        "--price",
+        action="store_true",
+        help="Sort by output price ascending, then model, then provider",
+    )
+    parser.add_argument(
+        "-d",
+        "--date",
+        action="store_true",
+        help="Show model age in days from release_date",
+    )
+    parser.add_argument(
+        "-D",
+        "--date-sort",
+        action="store_true",
+        help="Sort by model age ascending",
+    )
+    parser.add_argument(
+        "-c",
+        "--cache",
+        action="store_true",
+        help="Show cache read/write price column",
+    )
+    parser.add_argument(
+        "-C",
+        "--cache-sort",
+        action="store_true",
+        help="Sort by cache write price ascending",
+    )
     args = parser.parse_args()
 
     try:
@@ -322,6 +385,11 @@ def main() -> int:
             model_filter=args.model,
             input_filter=args.input,
             chart_max=args.max,
+            price_sort=args.price,
+            show_date=args.date,
+            date_sort=args.date_sort,
+            show_cache=args.cache,
+            cache_sort=args.cache_sort,
         )
     except RuntimeError as exc:
         print(f"Error: {exc}", file=sys.stderr)
