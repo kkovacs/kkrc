@@ -70,6 +70,8 @@ Tags:
 - `yagni:` abstraction with one implementation, config nobody sets, layer with one caller.
 - `shrink:` same logic, fewer lines. Show the shorter form.
 
+**Boundary**: Do not apply the fixes, only list them. Let the User decide.
+
 ### Examples
 
 ❌ "This EmailValidator class might be more complex than necessary, have you considered whether all these validation rules are needed at this stage?"
@@ -83,9 +85,5 @@ Tags:
 ✅ `L52-71: delete: retry wrapper around an idempotent local call. Nothing replaces it.`
 
 ✅ `L30-44: shrink: manual loop builds dict. dict(zip(keys, values)), 1 line.`
-
-### Boundaries
-
-Do not apply the fixes, only list them.
 
 
