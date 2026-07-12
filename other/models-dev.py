@@ -13,6 +13,8 @@ Usage:
     ./models-dev.py -m deepseek-v4-flash -M 0.3   # defaults to -p openrouter
     ./models-dev.py -m '.*gpt.*' -M 10
     ./models-dev.py -p openrouter -P               # sort by output price
+    ./models-dev.py -p openrouter -c               # context column, sorted desc by context
+    ./models-dev.py -p openrouter -C               # cache r/w column
 """
 
 from __future__ import annotations
@@ -95,6 +97,10 @@ def make_row(label: str, info: dict[str, Any]) -> dict[str, Any]:
         except ValueError:
             pass
 
+    limit = info.get("limit", {}) or {}
+    context_limit = limit.get("context")
+    output_limit = limit.get("output")
+
     return {
         "label": label,
         "input_modality": ", ".join(MODALITY_SHORT.get(m, m) for m in modalities.get("input", [])),
@@ -105,6 +111,8 @@ def make_row(label: str, info: dict[str, Any]) -> dict[str, Any]:
         "cache_read": cache_read,
         "cache_write": cache_write,
         "age_days": age_days,
+        "context_limit": context_limit,
+        "output_limit": output_limit,
     }
 
 
@@ -144,6 +152,7 @@ def build_table(
                 "cache_rw": r["cache_rw"],
                 "chart": format_chart(r["out_price"], max_out),
                 "age_days": str(r["age_days"]) if r["age_days"] is not None else "-",
+                "context_limit": f"{r['context_limit']:,}" if r.get("context_limit") is not None else "-",
             }
         )
 
@@ -182,7 +191,7 @@ def build_filtered_table(
     show_date: bool = False,
     date_sort: bool = False,
     show_cache: bool = False,
-    cache_sort: bool = False,
+    show_context: bool = False,
 ) -> str:
     providers = catalog.get("providers", {})
     if provider_filter is not None:
@@ -221,29 +230,28 @@ def build_filtered_table(
         suffix = " ".join(parts)
         raise RuntimeError(f"No models found{(' ' + suffix) if suffix else '.'}")
 
-    def _cache_key(r: dict[str, Any]) -> float:
-        return r["cache_write"] if r["cache_write"] is not None else float("inf")
-
     if date_sort:
         show_date = True
-    if cache_sort:
-        show_cache = True
 
     if date_sort:
         rows.sort(key=lambda r: (r["age_days"] if r["age_days"] is not None else float("inf"), r["label"].lower(), r["provider"].lower()))
-    elif cache_sort:
-        rows.sort(key=lambda r: (_cache_key(r), r["label"].lower(), r["provider"].lower()))
     elif price_sort:
         rows.sort(key=lambda r: (r["out_price"], r["label"].lower(), r["provider"].lower()))
+    elif show_context:
+        rows.sort(key=lambda r: (-r["context_limit"] if r["context_limit"] is not None else float("inf"), r["label"].lower(), r["provider"].lower()))
     else:
         rows.sort(key=lambda r: (r["label"].lower(), r["out_price"], r["provider"].lower()))
 
     columns = [
         ("Model", "label"),
         ("Provider", "provider"),
+    ]
+    if show_context:
+        columns.append(("Context", "context_limit"))
+    columns.extend([
         ("Input modality", "input_modality"),
         ("In/Out ($/M)", "in_out"),
-    ]
+    ])
     if show_cache:
         columns.append(("Cache r/w (M)", "cache_rw"))
     if show_date:
@@ -347,15 +355,15 @@ def main() -> int:
     )
     parser.add_argument(
         "-c",
-        "--cache",
+        "--context",
         action="store_true",
-        help="Show cache read/write price column",
+        help="Show context length column and sort by it (descending)",
     )
     parser.add_argument(
         "-C",
-        "--cache-sort",
+        "--cache",
         action="store_true",
-        help="Sort by cache write price ascending",
+        help="Show cache read/write price column",
     )
     args = parser.parse_args()
 
@@ -394,7 +402,7 @@ def main() -> int:
             show_date=args.date,
             date_sort=args.date_sort,
             show_cache=args.cache,
-            cache_sort=args.cache_sort,
+            show_context=args.context,
         )
     except RuntimeError as exc:
         print(f"Error: {exc}", file=sys.stderr)
