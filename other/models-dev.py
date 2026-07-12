@@ -247,7 +247,7 @@ def build_filtered_table(
     if show_cache:
         columns.append(("Cache r/w (M)", "cache_rw"))
     if show_date:
-        columns.append(("Age (days)", "age_days"))
+        columns.append(("Age", "age_days"))
     columns.append(("Output price chart", "chart"))
 
     filter_notes = []
