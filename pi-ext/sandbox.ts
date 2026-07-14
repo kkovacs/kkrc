@@ -9,12 +9,15 @@
  * and /etc are bind-mounted read-only from the host (so binaries and
  * /etc/passwd are visible, but writable). /run is not mounted: every
  * daemon socket under it (docker.sock, snapd.socket, libvirt-sock,
- * podman.sock, /run/user/<uid>/{bus,wayland-0,pipewire-0}, ...) is
- * unreachable, and the only file the agent can reach under /run is the
- * one /etc/resolv.conf symlinks to (typically
- * /run/systemd/resolve/stub-resolv.conf), surfaced as a regular-file
- * bind so DNS keeps working. Everything else from the host (other
- * paths under /home, /var, /opt, /root, ssh keys, ...) is invisible.
+ * podman.sock, /run/systemd/resolve/io.systemd.Resolve,
+ * /run/user/<uid>/{bus,wayland-0,pipewire-0}, ...) is unreachable.
+ * DNS still works because the script binds the specific regular file
+ * /etc/resolv.conf resolves to (typically
+ * /run/systemd/resolve/stub-resolv.conf) read-only into the new root,
+ * so the symlink in /etc reaches a real file with the actual contents
+ * and nothing else under /run is exposed. Everything else from the
+ * host (other paths under /home, /var, /opt, /root, ssh keys, ...) is
+ * invisible.
  *
  * No install. Requires:
  *   - Linux
@@ -266,28 +269,28 @@ for entry in bin sbin lib lib64; do
 done
 # /run is intentionally NOT rbind-mounted. Binding the whole /run subtree
 # would surface docker.sock, podman/podman.sock, snapd.socket, libvirt-sock,
-# systemd/private, /run/user/<uid>/{bus,wayland-0,pipewire-0}, etc. — all
-# inward-facing escalation vectors the model has no business talking to.
-# DNS still works because the only /etc/* path that reaches /run in
-# practice is a symlink (typically just /etc/resolv.conf on systemd-resolved
-# hosts, target ../run/systemd/resolve/stub-resolv.conf). For every /etc/*
-# symlink whose canonical target is under /run or /var/run, recreate that
-# path under NEWTMP and bind-mount the host file onto it. The rbind of /etc
-# below brings in /etc/resolv.conf as a symlink; inside the namespace the
-# symlink resolves to the bind we just placed at NEWTMP/run/... — a
-# regular file with the actual contents. Nothing else under /run is
-# reachable. Symlinks whose target is not under /run (e.g. /etc/mtab
-# -> /proc/self/mounts) are left alone: /proc is mounted separately and
-# resolves them into the namespace's own /proc, not the host's.
+# systemd/private, /run/user/<uid>/{bus,wayland-0,pipewire-0}, and systemd-
+# resolved's io.systemd.Resolve D-Bus socket — all inward-facing escalation
+# vectors the model has no business talking to.
 #
-# Note: we cannot just \`mount --bind\` the target onto the symlink path
-# (mount(8) refuses a bind onto a symlink), and we don't want to unlink
-# the host's symlink from inside the namespace. The NEWTMP-side bind is
-# the clean fix: NEWTMP/run is a bare tmpfs directory, so creating a
-# deeper path there and binding onto it is safe.
-while IFS= read -r -d '' link; do
-	target=$(readlink -f "$link" 2>/dev/null) || continue
-	case "$target" in /run/*|/var/run/*) ;; *) continue ;; esac
+# DNS still works because the only /etc path that reaches /run in practice
+# is /etc/resolv.conf, a symlink to a regular file (typically
+# /run/systemd/resolve/stub-resolv.conf on systemd-resolved hosts). The
+# rbind of /etc below brings the symlink along; inside the namespace the
+# symlink resolves through NEWTMP/run/... to the regular file we just
+# bound in here. Nothing else under /run is reachable.
+#
+# We bring in only the known candidate files (regular files only; the
+# [-f $target] test filters out sockets, devices, and symlinks). Adding
+# a new entry here is how to support a distro that puts resolv.conf
+# somewhere we don't list.
+for target in \
+	/run/systemd/resolve/stub-resolv.conf \
+	/run/systemd/resolve/resolv.conf \
+	/run/resolv.conf \
+	/run/resolvconf/resolv.conf \
+	/var/run/systemd/resolve/stub-resolv.conf \
+	/var/run/systemd/resolve/resolv.conf; do
 	[ -f "$target" ] || continue
 	rel="\${target#/}"
 	dst="$NEWTMP/$rel"
@@ -295,7 +298,7 @@ while IFS= read -r -d '' link; do
 	: > "$dst"
 	mount --bind "$target" "$dst"
 	mount -o remount,ro,bind "$dst"
-done < <(find /etc -xdev -maxdepth 6 -type l -print0 2>/dev/null || true)
+done
 if [ -d /etc ]; then
   mount --rbind /etc "$NEWTMP/etc"
   mount -o remount,ro,bind "$NEWTMP/etc"
