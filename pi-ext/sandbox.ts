@@ -1,23 +1,26 @@
 /**
  * ns-sandbox Extension - Linux user-namespace sandbox for built-in tools.
  *
- * Host pi; bash, read, write, edit, grep, find, ls are constrained so the
- * model only sees the current working directory. Bash runs inside a fresh
- * user + mount + PID + IPC namespace built with `unshare`, `pivot_root`,
- * and a tmpfs root. The host cwd is bind-mounted at its actual host path
- * (so `cd /home/user/project1` just works) with nosuid, nodev. /usr
- * and /etc are bind-mounted read-only from the host (so binaries and
- * /etc/passwd are visible, but writable). /run is not mounted: every
- * daemon socket under it (docker.sock, snapd.socket, libvirt-sock,
+ * Host pi; the file tools (read, write, edit, grep, find, ls) are
+ * constrained to the current working directory, and bash runs in a
+ * Linux user-namespace so the model can only modify the workspace
+ * even though it can see /usr, /etc, /dev, /proc, /tmp. Bash runs
+ * inside a fresh user + mount + PID + IPC namespace built with
+ * `unshare`, `pivot_root`, and a tmpfs root. The host cwd is
+ * bind-mounted at its actual host path (so `cd /home/user/project1`
+ * just works) with nosuid, nodev. /usr and /etc are bind-mounted
+ * read-only from the host (so binaries and /etc/passwd are visible,
+ * but not writable). The host's /run is not rbind'd: every daemon
+ * socket under it (docker.sock, snapd.socket, libvirt-sock,
  * podman.sock, /run/systemd/resolve/io.systemd.Resolve,
  * /run/user/<uid>/{bus,wayland-0,pipewire-0}, ...) is unreachable.
- * DNS still works because the script binds the specific regular file
- * /etc/resolv.conf resolves to (typically
- * /run/systemd/resolve/stub-resolv.conf) read-only into the new root,
- * so the symlink in /etc reaches a real file with the actual contents
- * and nothing else under /run is exposed. Everything else from the
- * host (other paths under /home, /var, /opt, /root, ssh keys, ...) is
- * invisible.
+ * A small set of resolv.conf candidate files is bound in under
+ * /run/systemd/resolve/, /run/, and /run/resolvconf/ so DNS works
+ * on systemd-resolved hosts: the rbind of /etc below brings the
+ * /etc/resolv.conf symlink along, and that symlink resolves through
+ * NEWTMP/run/... to the regular file we just bound in. Nothing else
+ * under /run is reachable. Everything else from the host (other
+ * paths under /home, /var, /opt, /root, ssh keys, ...) is invisible.
  *
  * No install. Requires:
  *   - Linux
@@ -44,11 +47,13 @@
  *   unsandboxed tools. If the sandbox cannot enable — a host assumption
  *   above is violated, the setup script cannot be written, or any
  *   other initialization step fails — the extension prints the reason
- *   to stderr, notifies the UI, throws, and calls process.exit(1).
- *   The user must either fix the host assumption or remove the
- *   ns-sandbox extension from their pi command. A soft fallback to
- *   unsandboxed tools is explicitly out of scope: opting in to the
- *   sandbox means the agent does not run unsandboxed by accident.
+ *   to stderr, notifies the UI, and calls process.exit(1) (it does
+ *   NOT throw, because the runner would catch that and fall back to
+ *   the built-in tools). The user must either fix the host assumption
+ *   or remove the ns-sandbox extension from their pi command. A soft
+ *   fallback to unsandboxed tools is explicitly out of scope: opting
+ *   in to the sandbox means the agent does not run unsandboxed by
+ *   accident.
  *
  * Usage:
  *   cd /path/to/project
@@ -63,8 +68,8 @@
  *     The setup script does the pivot_root; commands are sent via stdin
  *     to avoid shell-quoting issues.
  *   - Network access is inherited from the host. The user can `npm install`,
- *     `git clone`, etc. To isolate the network, add `--net` to the
- *     UNSHARE_FLAGS array below.
+ *     `git clone`, etc. To isolate the network, pass `--airgap` (this
+ *     appends `--net` to the unshare flags at spawn time).
  *   - The default `!` user-bash path is also routed through the sandbox.
  *
  * Security notes:
@@ -82,13 +87,14 @@
  *     pivot_root could run. The user command does NOT execute in this
  *     outer namespace. At the end of the setup script we
  *     `unshare -U --map-user=$REAL_UID --map-group=$REAL_GID` into a
- *     nested user namespace where the real host UID is mapped back in
- *     (this is the only place that needs the 1:1 mapping), then
- *     `setpriv --reuid= --regid= --clear-groups` to drop to it. The
- *     model ends up as its own UID, so `ls -l` inside the sandbox
- *     shows its own UID against the files it owns on the host — same
- *     UX as a 1:1 outer mapping — without any setup-time tool having
- *     to bypass the `mount` binary's UID check.
+ *     nested user namespace where the calling process's UID is mapped
+ *     to $REAL_UID. Because the mapping is to a non-zero UID, the
+ *     kernel strips capabilities on entry to the inner — see the
+ *     "model runs as a true unprivileged user" bullet below. The model
+ *     ends up as its own UID, so `ls -l` inside the sandbox shows its
+ *     own UID against the files it owns on the host — same UX as a 1:1
+ *     outer mapping — without any setup-time tool having to bypass the
+ *     `mount` binary's UID check.
  *   - The model runs as a true unprivileged user inside the inner
  *     namespace. The `--map-user=$REAL_UID` mapping places it at
  *     UID $REAL_UID (not 0), and the kernel strips all capabilities
@@ -154,11 +160,13 @@ const SETUP_SCRIPT_NAME = "pi-ns-sandbox-setup.sh";
 // before calling mount(2), and so do `mknod`, `pivot_root`, etc. The
 // user command itself does NOT run in this outer namespace — the
 // setup script's last step is `unshare -U --map-user=$REAL_UID
-// --map-group=$REAL_GID` followed by `setpriv --reuid= --regid=`, so
-// the model ends up as its real UID inside a nested user namespace.
-// This keeps the "ls -l shows the model's own uid" UX that a 1:1
-// outer mapping would give, without making the setup steps fail
-// their UID checks. SANDBOX=ns-sandbox is set in the env whitelist
+// --map-group=$REAL_GID` to enter a nested user namespace where the
+// calling process is mapped to the real host UID, and
+// `setpriv --no-new-privs` runs immediately before that to disable
+// SUID/file-cap elevation across the rest of the exec chain. This
+// keeps the "ls -l shows the model's own uid" UX that a 1:1 outer
+// mapping would give, without making the setup steps fail their
+// UID checks. SANDBOX=ns-sandbox is set in the env whitelist
 // as a marker for processes that want to know they are sandboxed;
 // USER is deliberately not set (the process is unprivileged) to
 // avoid lying to tools that read USER for behavior. --propagation
@@ -198,24 +206,25 @@ const HOST_GID = process.getgid();
 // arguments: $1 the per-call tmpfs mount point, $2 the host path to
 // bind-mount (fixed at extension load, not from the model), $3 the
 // bash command's working directory (model-controlled, used only
-// post-pivot_root), and $4/$5 the real host UID/GID (used only by the
-// final `unshare -U` + `setpriv` chain, which creates a nested user
-// namespace mapping them back in and drops to them so the user
-// command runs as the real identity, not as the outer-namespace
-// root). The script runs as namespace root for the setup phase
-// (so the `mount` binary's `getuid() == 0` check passes), builds a
-// new tmpfs root, bind-mounts the workspace at its actual host path
+// post-pivot_root), and $4/$5 the real host UID/GID (passed to the
+// final `unshare -U --map-user=...` so the model is mapped to its
+// real host identity inside the nested user namespace, instead of
+// running as the outer-namespace root). The script runs as
+// namespace root for the setup phase (so the `mount` binary's
+// `getuid() == 0` check passes), builds a new tmpfs root,
+// bind-mounts the workspace at its actual host path
 // (rw,nosuid,nodev) so absolute paths from the LLM keep working,
 // read-only-binds the host's /usr (+ /bin /sbin /lib /lib64 as
 // symlinks on merged-usr systems) and /etc, mounts a minimal /dev
 // and /proc, pivot_roots into the new root, then execs into a
 // nested user namespace for the user command.
 //
-// /tmp inside the namespace is bind-mounted to "${setupDir}/tmp" on the
-// host, which is created lazily on the first call. That host dir is
-// shared across every call in the same session, so files written to
-// /tmp inside one call survive to the next. session_shutdown's
-// rm -rf of setupDir cleans it up.
+// /tmp inside the namespace is bind-mounted to "${setupDir}/tmp" on
+// the host, which is created eagerly by `session_start` (and also
+// re-created here on first invocation as a safety net). That host
+// dir is shared across every call in the same session, so files
+// written to /tmp inside one call survive to the next.
+// session_shutdown's rm -rf of setupDir cleans it up.
 const SETUP_SCRIPT = `#!/bin/bash
 set -e
 NEWTMP="$1"
@@ -230,10 +239,13 @@ BIND_SOURCE="$2"
 # is bounded by the mount namespace.
 BASH_CWD="$3"
 # $4 and $5 are the real host UID and GID of the pi process. They are
-# used only in the final \`unshare -U\` + \`setpriv\` chain, which creates
-# a nested user namespace mapping them back in and drops to them, so
-# the user command runs as the real identity (preserving the
-# \`ls -l\` ownership UX) instead of as the outer-namespace root.
+# used only by the final \`unshare -U --map-user=$HOST_UID
+# --map-group=$HOST_GID\`, which creates a nested user namespace
+# mapping the calling process to that real host identity so the user
+# command runs as the real UID/GID (preserving the \`ls -l\` ownership
+# UX) instead of as the outer-namespace root. The earlier
+# \`setpriv --no-new-privs\` does not change identity; it just sets
+# PR_SET_NO_NEW_PRIVS across the rest of the exec chain.
 HOST_UID="$4"
 HOST_GID="$5"
 COMMAND=$(cat)
@@ -477,9 +489,10 @@ async function probeUnshare(): Promise<{ ok: boolean; reason?: string }> {
 // We probe with `--help` rather than --no-new-privs because the
 // real call must run inside the unshared namespace (it has to be
 // applied to the process that becomes the user command), and the
-// --help invocation confirms the binary is present and parses our
-// options. A wrong-version setpriv (older than 2.31 / 2017) would
-// surface as a setpriv error printed to the bash tool's output.
+// --help invocation confirms only that the binary is present and
+// runnable. A wrong-version setpriv (older than 2.31 / 2017) that
+// supports --help but not --no-new-privs would pass this probe and
+// then surface as a setpriv error printed to the bash tool's output.
 async function probeSetpriv(): Promise<{ ok: boolean; reason?: string }> {
 	return new Promise((resolveProbe) => {
 		const child = spawn("setpriv", ["--help"], { stdio: "ignore" });
@@ -536,7 +549,8 @@ interface SandboxTestResult {
 	pass: boolean;
 	skipped: boolean;
 	detail?: string;
-	// Bounded output of the test command, for inclusion in the table.
+	// Length-captured (truncated to 200 chars + "…") output of the test command,
+	// for inclusion in the table; full output for a failing test goes in `detail`.
 	stdout: string;
 	stderr: string;
 }
@@ -557,7 +571,7 @@ async function runOneSandboxTest(
 	try {
 		const { exitCode, timedOut } = await runSandboxCommand(setupDir, bindSource, noNetwork, {
 			command: `${test.cmd}\nexit`, // trailing `exit` so any sub-bash the test spawns still terminates the run
-			bashCwd: bindSource,         // tests run with cwd == workspace, the same invariant the agent has at startup
+			bashCwd: bindSource,         // tests force cwd == workspace; the real agent's cwd is whatever the model passes
 			timeoutSeconds: test.timeoutSeconds ?? 10,
 			capture,
 		});
@@ -829,8 +843,9 @@ function makeLsOps(workspace: string, setupDir: string): LsOperations {
 // evidence the agent will also work on this host. Used at the shipped
 // version too: a user can run `pi -e ./sandbox.ts --sandbox-test` to
 // verify their Linux has everything the sandbox needs (unshare with
-// --map-user/--map-group, setpriv, /etc+resolv.conf reachable,
-// /run/{docker.sock,.ssh} correctly hidden, network/TLS, etc.).
+// --map-root-user, setpriv --no-new-privs, the inner unshare with
+// --map-user/--map-group, /etc+resolv.conf reachable, /run/docker.sock
+// and ~/.ssh correctly hidden, network/TLS, etc.).
 interface SandboxTest {
 	name: string;
 	cmd: string;
