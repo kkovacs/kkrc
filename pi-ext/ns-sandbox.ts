@@ -92,24 +92,14 @@ BASH_CWD="$3"
 HOST_UID="$4"
 HOST_GID="$5"
 COMMAND=$(cat)
-HOST_TMP="$(dirname "$NEWTMP")/tmp"
 mount -t tmpfs tmpfs "$NEWTMP"
 cd "$NEWTMP"
-mkdir -p "$NEWTMP$BIND_SOURCE" "$HOST_TMP" tmp dev proc usr etc run
+mkdir -p "$NEWTMP$BIND_SOURCE" tmp dev proc usr etc run
 mount --bind "$BIND_SOURCE" "$NEWTMP$BIND_SOURCE"
 mount -o remount,bind,rw,nosuid,nodev "$NEWTMP$BIND_SOURCE"
-# Per-session persistent /tmp: shared host dir so /tmp contents
-# survive between bash calls. Same nosuid,nodev as the workspace.
-# Skipped when the workspace itself lives under /tmp on the host, since
-# the /tmp mount would shadow the workspace's path through the namespace.
-case "$BIND_SOURCE" in
-	/tmp|/tmp/*)
-		;;
-	*)
-		mount --bind "$HOST_TMP" "$NEWTMP/tmp"
-		mount -o remount,bind,rw,nosuid,nodev "$NEWTMP/tmp"
-		;;
-esac
+# Bind the host's real /tmp into the sandbox (nosuid,nodev).
+mount --bind /tmp "$NEWTMP/tmp"
+mount -o remount,bind,rw,nosuid,nodev "$NEWTMP/tmp"
 mount --rbind /usr "$NEWTMP/usr"
 mount -o remount,ro,bind "$NEWTMP/usr"
 # Re-create the host's compatibility symlinks (merged-usr systems have
@@ -198,28 +188,22 @@ function isInsideWorkspace(workspace: string, target: string): boolean {
 
 const TMP_ROOT = "/tmp";
 
-// Resolve a path against the workspace or the per-session persistent
-// /tmp, following symlinks at every existing component. The lexical
-// check is necessary but not sufficient: a symlink can pass it while
-// pointing outside (e.g. `ln -s ~/.ssh/id_rsa /tmp/key` from bash).
-// We walk up the longest existing prefix, realpath it, re-join the
-// remaining suffix, and re-check the canonical form is under one of
-// the two roots. For a non-existent target, the deepest existing
-// ancestor is canonicalized and the new suffix appended.
-async function resolveInsideWorkspace(workspace: string, setupDir: string, target: string): Promise<string> {
-	const persistentTmp = join(setupDir, "tmp");
+// Resolve a path against the workspace or /tmp, following symlinks at
+// every existing component. The lexical check is necessary but not
+// sufficient: a symlink can pass it while pointing outside
+// (e.g. `ln -s ~/.ssh/id_rsa /tmp/key` from bash). We walk up the
+// longest existing prefix, realpath it, re-join the remaining suffix,
+// and re-check the canonical form is under one of the two roots. For a
+// non-existent target, the deepest existing ancestor is canonicalized
+// and the new suffix appended.
+async function resolveInsideWorkspace(workspace: string, target: string): Promise<string> {
 	const lexicallyAllowed =
 		isInsideWorkspace(workspace, target) || target === TMP_ROOT || target.startsWith(`${TMP_ROOT}/`);
 	if (!lexicallyAllowed) {
 		throw new Error(`Refused: path is outside the sandbox workspace: ${target}`);
 	}
-	// /tmp/... → setupDir/tmp/...; the model sees /tmp/foo, the file
-	// tools operate on setupDir/tmp/foo.
-	const translated =
-		target === TMP_ROOT ? join(setupDir, "tmp") :
-		target.startsWith(`${TMP_ROOT}/`) ? join(setupDir, "tmp", target.slice(TMP_ROOT.length + 1)) :
-		target;
-	let existing = translated;
+	// /tmp in the sandbox is the host's /tmp — no translation needed.
+	let existing = target;
 	let suffix = "";
 	for (;;) {
 		let real: string;
@@ -235,7 +219,7 @@ async function resolveInsideWorkspace(workspace: string, setupDir: string, targe
 			continue;
 		}
 		const resolved = suffix ? join(real, suffix) : real;
-		if (!isInsideWorkspace(workspace, resolved) && !isInsideWorkspace(persistentTmp, resolved)) {
+		if (!isInsideWorkspace(workspace, resolved) && !isInsideWorkspace(TMP_ROOT, resolved)) {
 			throw new Error(`Refused: path resolves outside the sandbox workspace: ${target} -> ${resolved}`);
 		}
 		return resolved;
@@ -304,36 +288,19 @@ async function probeSetpriv(): Promise<{ ok: boolean; reason?: string }> {
 	});
 }
 
-// Stable per pi session: the session id (UUID v7 from
-// ctx.sessionManager.getSessionId()) is identical across `pi -c <file>`
-// invocations of the same session, so the dir — and therefore the
-// model's /tmp — survives the process boundary. A fresh pi session has
-// a fresh id, so two parallel sessions on the same workspace don't
-// share /tmp. Reused (mkdir -p) rather than mkdtemp: a previous
-// process's setupDir is the whole point of the persistence.
-// /run/user/<uid>/ is tmpfs; cleaned by systemd-logind on logout,
-// reaped on reboot.
-async function writeSetupScript(sessionId: string): Promise<{ dir: string; path: string }> {
-	// /run/user/<uid>/ (not /tmp) because /run is never bound into
-	// the sandbox namespace (see SETUP_SCRIPT). The model has no
-	// path to it, so setupDir — setup script, per-call NEWTMP, and
-	// per-session /tmp backing — is physically unreachable from
-	// bash. Requires systemd-logind (or equivalent) to have
-	// populated /run/user/<uid>/; hard-fails otherwise.
-	const dir = `/run/user/${HOST_UID}/pi-ns-sandbox-${sessionId}`;
-	await mkdir(dir, { recursive: true });
-	const path = join(dir, SETUP_SCRIPT_NAME);
-	await writeFile(path, SETUP_SCRIPT, { mode: 0o700 });
-	return { dir, path };
-}
+// Static paths under /run/user/<uid>/ (tmpfs, never bind-mounted into
+// the sandbox — see SETUP_SCRIPT). The setup script is rewritten on
+// every call for defense-in-depth. Per-call tmpfs roots are created
+// with mkdtemp under RUN_PREFIX.
+const SETUP_SCRIPT_HOST_PATH = `/run/user/${HOST_UID}/${SETUP_SCRIPT_NAME}`;
+const RUN_PREFIX = `/run/user/${HOST_UID}/pi-ns-`;
 
 // Refuse to enable when the workspace is so broad that the
 // "workspace is the cwd" confinement becomes meaningless. The
-// bind-mount source is localCwd, so /, $HOME, or /tmp would
-// give the model access to ~/.ssh, /etc, etc.
+// bind-mount source is localCwd, so / or $HOME would give the
+// model access to ~/.ssh, /etc, etc.
 async function assertWorkspaceIsBounded(localCwd: string): Promise<void> {
 	const home = process.env.HOME ? await realpath(process.env.HOME).catch(() => process.env.HOME) : undefined;
-	const tmp = await realpath("/tmp").catch(() => "/tmp");
 	const resolvedCwd = await realpath(localCwd).catch(() => localCwd);
 	if (resolvedCwd === "/") {
 		throw new Error(
@@ -344,19 +311,6 @@ async function assertWorkspaceIsBounded(localCwd: string): Promise<void> {
 	if (home && resolvedCwd === home) {
 		throw new Error(
 			`ns-sandbox: refusing to enable — workspace is $HOME (${home}). This would expose ~/.ssh, ~/.gnupg, browser profiles, etc. ` +
-			`Run pi from a project subdirectory.`,
-		);
-	}
-	if (resolvedCwd === tmp) {
-		// setupDir moved to /run/user/<uid>/, so binding /tmp as the
-		// workspace no longer exposes sandbox internals. What it DOES
-		// do: the per-call /tmp bind is skipped (case in SETUP_SCRIPT)
-		// to avoid shadowing the workspace, so the namespace's /tmp is
-		// the host's /tmp — no per-session persistence, other users'
-		// files visible.
-		throw new Error(
-			`ns-sandbox: refusing to enable — workspace is /tmp (${tmp}). ` +
-			`The per-call /tmp bind is skipped when the workspace is /tmp, so the model sees the host's /tmp directly. ` +
 			`Run pi from a project subdirectory.`,
 		);
 	}
@@ -388,7 +342,6 @@ interface SandboxTestResult {
 // Spawn one test through the same unshare+setup flow the agent's
 // bash tool uses; assert against `test.expect`. Default 10s timeout.
 async function runOneSandboxTest(
-	setupDir: string,
 	bindSource: string,
 	noNetwork: boolean,
 	test: SandboxTest,
@@ -398,7 +351,7 @@ async function runOneSandboxTest(
 	}
 	const capture = { stdout: "", stderr: "" };
 	try {
-		const { exitCode, timedOut } = await runSandboxCommand(setupDir, bindSource, noNetwork, {
+		const { exitCode, timedOut } = await runSandboxCommand(bindSource, noNetwork, {
 			command: `${test.cmd}\nexit`, // trailing `exit` so any sub-bash the test spawns still terminates the run
 			bashCwd: bindSource,         // tests force cwd == workspace; the real agent's cwd is whatever the model passes
 			timeoutSeconds: test.timeoutSeconds ?? 10,
@@ -431,8 +384,6 @@ async function runOneSandboxTest(
 // Reports to stdout and UI, then process.exit(0|1).
 async function runSandboxTestSuite(
 	localCwd: string,
-	setupPath: string,
-	setupDir: string,
 	noNetwork: boolean,
 	ctx: { ui: { notify: (msg: string, kind: "info" | "error") => void } },
 ): Promise<void> {
@@ -441,7 +392,7 @@ async function runSandboxTestSuite(
 	const results: SandboxTestResult[] = [];
 	for (const test of SANDBOX_TESTS) {
 		// Mark "skipped" inline so the row is unambiguous.
-		const result = await runOneSandboxTest(setupDir, localCwd, noNetwork, test);
+		const result = await runOneSandboxTest(localCwd, noNetwork, test);
 		results.push(result);
 		const mark = result.skipped ? "⏭" : result.pass ? "✓" : "✗";
 		const suffix = result.skipped ? " [skipped: --airgap]"
@@ -483,7 +434,6 @@ interface SandboxRunResult {
 }
 
 async function runSandboxCommand(
-	setupDir: string,
 	bindSource: string,
 	noNetwork: boolean,
 	opts: SandboxRunOptions,
@@ -501,23 +451,23 @@ async function runSandboxCommand(
 	// cwd is the bash command's working dir post-pivot_root.
 	const flags = noNetwork ? [...UNSHARE_BASE_FLAGS, "--net"] : UNSHARE_BASE_FLAGS;
 	// Defense in depth: rewrite the setup script on every call. If
-	// the LLM ever reaches setupDir, any tamper is overwritten before
+	// the LLM ever reaches /run, any tamper is overwritten before
 	// exec. The rm-then-write defeats symlink/FIFO substitution and
 	// the "writeFile only sets mode on create" perm-change attack.
-	const setupPath = join(setupDir, SETUP_SCRIPT_NAME);
+	const setupPath = SETUP_SCRIPT_HOST_PATH;
+	await mkdir(dirname(setupPath), { recursive: true });
 	await rm(setupPath, { force: true });
 	await writeFile(setupPath, SETUP_SCRIPT, { mode: 0o700 });
-	const runDir = await mkdtemp(join(setupDir, opts.capture ? "test-XXXXXX" : "run-XXXXXX"));
+	const runDir = await mkdtemp(`${RUN_PREFIX}${opts.capture ? "test-" : "run-"}XXXXXX`);
 	// Clean up runDir after the process settles. Handles EBUSY
-	// (tmpfs still mounted) and failed-setup stragglers; the
-	// session_shutdown rm of setupDir is the outer net.
+	// (tmpfs still mounted) and failed-setup stragglers.
 	try {
 		return await new Promise<SandboxRunResult>((resolveRun, rejectRun) => {
 			const child = spawn(
 				"unshare",
 				[
 					...flags, "--",
-					"/bin/bash", join(setupDir, SETUP_SCRIPT_NAME),
+					"/bin/bash", SETUP_SCRIPT_HOST_PATH,
 					runDir, bindSource, opts.bashCwd,
 					String(HOST_UID), String(HOST_GID),
 				],
@@ -564,10 +514,10 @@ async function runSandboxCommand(
 	}
 }
 
-function makeBashOps(localCwd: string, setupDir: string, noNetwork: boolean): BashOperations {
+function makeBashOps(localCwd: string, noNetwork: boolean): BashOperations {
 	return {
 		exec(command, cwd, { onData, signal, timeout }) {
-			return runSandboxCommand(setupDir, localCwd, noNetwork, {
+			return runSandboxCommand(localCwd, noNetwork, {
 				command,
 				bashCwd: cwd,
 				signal,
@@ -581,55 +531,55 @@ function makeBashOps(localCwd: string, setupDir: string, noNetwork: boolean): Ba
 	};
 }
 
-function makeReadOps(workspace: string, setupDir: string): ReadOperations {
+function makeReadOps(workspace: string): ReadOperations {
 	return {
 		readFile: async (absolutePath) => {
-			const safe = await resolveInsideWorkspace(workspace, setupDir, absolutePath);
+			const safe = await resolveInsideWorkspace(workspace, absolutePath);
 			return readFile(safe);
 		},
 		access: async (absolutePath) => {
-			const safe = await resolveInsideWorkspace(workspace, setupDir, absolutePath);
+			const safe = await resolveInsideWorkspace(workspace, absolutePath);
 			await access(safe, constants.R_OK);
 		},
 	};
 }
 
-function makeWriteOps(workspace: string, setupDir: string): WriteOperations {
+function makeWriteOps(workspace: string): WriteOperations {
 	return {
 		writeFile: async (absolutePath, content) => {
-			const safe = await resolveInsideWorkspace(workspace, setupDir, absolutePath);
+			const safe = await resolveInsideWorkspace(workspace, absolutePath);
 			// fs.writeFile doesn't create intermediate dirs; the model
 			// shouldn't have to mkdir before writing to /tmp/whatever.
 			await mkdir(dirname(safe), { recursive: true });
 			await writeFile(safe, content, "utf-8");
 		},
 		mkdir: async (dir) => {
-			const safe = await resolveInsideWorkspace(workspace, setupDir, dir);
+			const safe = await resolveInsideWorkspace(workspace, dir);
 			await mkdir(safe, { recursive: true });
 		},
 	};
 }
 
-function makeEditOps(workspace: string, setupDir: string): EditOperations {
-	return { ...makeReadOps(workspace, setupDir), ...makeWriteOps(workspace, setupDir) };
+function makeEditOps(workspace: string): EditOperations {
+	return { ...makeReadOps(workspace), ...makeWriteOps(workspace) };
 }
 
-function makeGrepOps(workspace: string, setupDir: string): GrepOperations {
+function makeGrepOps(workspace: string): GrepOperations {
 	return {
 		isDirectory: async (absolutePath) => {
-			const safe = await resolveInsideWorkspace(workspace, setupDir, absolutePath);
+			const safe = await resolveInsideWorkspace(workspace, absolutePath);
 			return (await stat(safe)).isDirectory();
 		},
 		readFile: async (absolutePath) => {
-			const safe = await resolveInsideWorkspace(workspace, setupDir, absolutePath);
+			const safe = await resolveInsideWorkspace(workspace, absolutePath);
 			return readFile(safe, "utf-8");
 		},
 	};
 }
 
-async function existsOp(workspace: string, setupDir: string, absolutePath: string): Promise<boolean> {
+async function existsOp(workspace: string, absolutePath: string): Promise<boolean> {
 	try {
-		const safe = await resolveInsideWorkspace(workspace, setupDir, absolutePath);
+		const safe = await resolveInsideWorkspace(workspace, absolutePath);
 		await access(safe, constants.F_OK);
 		return true;
 	} catch {
@@ -650,15 +600,15 @@ function matchesToolGlob(relativePath: string, pattern: string): boolean {
 	return posix.matchesGlob(posix.basename(relativePath), normalized);
 }
 
-function makeFindOps(workspace: string, setupDir: string): FindOperations {
+function makeFindOps(workspace: string): FindOperations {
 	return {
-		exists: (p) => existsOp(workspace, setupDir, p),
+		exists: (p) => existsOp(workspace, p),
 		glob: async (pattern, cwd, options) => {
 			// `cwd` is what the model sees (workspace or /tmp/...);
 			// `safeRoot` is the real on-disk location. Walk safeRoot,
 			// return paths rooted at cwd — otherwise the find tool's
-			// `relative(cwd, p)` postproc leaks setupDir.
-			const safeRoot = await resolveInsideWorkspace(workspace, setupDir, cwd);
+			// `relative(cwd, p)` postproc leaks internal paths.
+			const safeRoot = await resolveInsideWorkspace(workspace, cwd);
 			// Skip the default ignore set at the directory level (cheaper
 			// than per-file match) and refuse to follow symlinks — lstat
 			// already does, and a target outside the workspace would
@@ -689,15 +639,15 @@ function makeFindOps(workspace: string, setupDir: string): FindOperations {
 	};
 }
 
-function makeLsOps(workspace: string, setupDir: string): LsOperations {
+function makeLsOps(workspace: string): LsOperations {
 	return {
-		exists: (p) => existsOp(workspace, setupDir, p),
+		exists: (p) => existsOp(workspace, p),
 		stat: async (absolutePath) => {
-			const safe = await resolveInsideWorkspace(workspace, setupDir, absolutePath);
+			const safe = await resolveInsideWorkspace(workspace, absolutePath);
 			return stat(safe);
 		},
 		readdir: async (absolutePath) => {
-			const safe = await resolveInsideWorkspace(workspace, setupDir, absolutePath);
+			const safe = await resolveInsideWorkspace(workspace, absolutePath);
 			return readdir(safe);
 		},
 	};
@@ -771,19 +721,18 @@ export default function (pi: ExtensionAPI) {
 	let noNetwork = false;
 	let runSandboxTests = false;
 
-	let setupPath: string | undefined;
-	let setupDir: string | undefined;
+	let sandboxReady = false;
 
-	// Each entry: [tool name, base tool (built-in), factory(localCwd, setupDir, noNetwork) -> sandboxed tool].
+	// Each entry: [tool name, base tool (built-in), factory(localCwd, noNetwork) -> sandboxed tool].
 	// Adding a new tool is one line; the loop below wires label, execute guard, and the active-set filter.
-	const TOOL_OVERRIDES: ReadonlyArray<readonly [string, any, (cwd: string, dir: string, noNet: boolean) => any]> = [
-		["bash", createBashTool(localCwd), (cwd, dir, noNet) => createBashTool(cwd, { operations: makeBashOps(cwd, dir, noNet) })],
-		["read", createReadTool(localCwd), (cwd, dir) => createReadTool(cwd, { operations: makeReadOps(cwd, dir) })],
-		["write", createWriteTool(localCwd), (cwd, dir) => createWriteTool(cwd, { operations: makeWriteOps(cwd, dir) })],
-		["edit", createEditTool(localCwd), (cwd, dir) => createEditTool(cwd, { operations: makeEditOps(cwd, dir) })],
-		["grep", createGrepTool(localCwd), (cwd, dir) => createGrepTool(cwd, { operations: makeGrepOps(cwd, dir) })],
-		["find", createFindTool(localCwd), (cwd, dir) => createFindTool(cwd, { operations: makeFindOps(cwd, dir) })],
-		["ls", createLsTool(localCwd), (cwd, dir) => createLsTool(cwd, { operations: makeLsOps(cwd, dir) })],
+	const TOOL_OVERRIDES: ReadonlyArray<readonly [string, any, (cwd: string, noNet?: boolean) => any]> = [
+		["bash", createBashTool(localCwd), (cwd, noNet) => createBashTool(cwd, { operations: makeBashOps(cwd, noNet!) })],
+		["read", createReadTool(localCwd), (cwd) => createReadTool(cwd, { operations: makeReadOps(cwd) })],
+		["write", createWriteTool(localCwd), (cwd) => createWriteTool(cwd, { operations: makeWriteOps(cwd) })],
+		["edit", createEditTool(localCwd), (cwd) => createEditTool(cwd, { operations: makeEditOps(cwd) })],
+		["grep", createGrepTool(localCwd), (cwd) => createGrepTool(cwd, { operations: makeGrepOps(cwd) })],
+		["find", createFindTool(localCwd), (cwd) => createFindTool(cwd, { operations: makeFindOps(cwd) })],
+		["ls", createLsTool(localCwd), (cwd) => createLsTool(cwd, { operations: makeLsOps(cwd) })],
 	];
 
 	// Populated by the session_start loop; used by the `sandbox` status command.
@@ -806,34 +755,19 @@ export default function (pi: ExtensionAPI) {
 		try {
 			await assertWorkspaceIsBounded(localCwd);
 			await assertExtensionNotInWorkspace(localCwd, SELF_FILE);
-			// Key the persistent /tmp on pi's session id so a continued
-			// `pi -c <file>` finds the same files; different sessions
-			// get different ids, so /tmp never mixes across sessions.
-			const sessionId = ctx.sessionManager.getSessionId();
-			if (!sessionId) {
-				// XXX: pi's SessionManager ctor always sets this; empty
-				// here would mean a pi API change.
-				throw new Error("ctx.sessionManager.getSessionId() is empty");
-			}
-			const setup = await writeSetupScript(sessionId);
-			setupPath = setup.path;
-			setupDir = setup.dir;
-			// Eagerly create the per-session persistent /tmp backing dir so
-			// the file tools can write to /tmp before the first bash call.
-			// (The bash setup script also creates it on first invocation.)
-			await mkdir(join(setupDir, "tmp"), { recursive: true });
 			noNetwork = Boolean(pi.getFlag("airgap"));
 			runSandboxTests = Boolean(pi.getFlag("sandbox-test"));
+			sandboxReady = true;
 			const activeTools = new Set(pi.getActiveTools());
 
 			for (const [name, base, build] of TOOL_OVERRIDES) {
 				if (!activeTools.has(name)) continue;
-				const sandboxed = build(localCwd, setupDir, noNetwork);
+				const sandboxed = name === "bash" ? build(localCwd, noNetwork) : build(localCwd);
 				pi.registerTool({
 					...base,
 					label: `${name} (sandboxed)`,
 					async execute(...args: any[]) {
-						if (!setupDir) throw new Error(`ns-sandbox: ${name} (sandboxed) called but sandbox is not initialised`);
+						if (!sandboxReady) throw new Error(`ns-sandbox: ${name} (sandboxed) called but sandbox is not initialised`);
 						return sandboxed.execute(...args);
 					},
 				});
@@ -846,7 +780,7 @@ export default function (pi: ExtensionAPI) {
 			);
 			if (runSandboxTests) {
 				// runSandboxTestSuite calls process.exit on its own; control does not return.
-				await runSandboxTestSuite(localCwd, setupPath!, setupDir!, noNetwork, ctx);
+				await runSandboxTestSuite(localCwd, noNetwork, ctx);
 			}
 		} catch (err) {
 			const reason = err instanceof Error ? err.message : String(err);
@@ -861,23 +795,20 @@ export default function (pi: ExtensionAPI) {
 	});
 
 	pi.on("session_shutdown", async () => {
-		setupPath = undefined;
-		setupDir = undefined;
+		sandboxReady = false;
 	});
 
 	// `!` shell command hook. Always sandbox: opting into this extension
-	// is the consent signal, not inclusion of "bash" in --tools. Without
-	// this, `--tools read,grep,find,ls` leaves the file tools seeing the
-	// fake tmp while a `!` shell command sees the host's real /tmp.
-	// Until session_start completes (setupDir unset) this is a no-op.
+	// is the consent signal, not inclusion of "bash" in --tools.
+	// Until session_start completes (sandboxReady false) this is a no-op.
 	pi.on("user_bash", (_event, _ctx) => {
-		if (!setupDir) return undefined;
-		return { operations: makeBashOps(localCwd, setupDir, noNetwork) };
+		if (!sandboxReady) return undefined;
+		return { operations: makeBashOps(localCwd, noNetwork) };
 	});
 
 	// Update the working-directory hint in the system prompt.
 	pi.on("before_agent_start", async (event) => {
-		if (!setupDir) return undefined;
+		if (!sandboxReady) return undefined;
 		const hostLine = `Current working directory: ${localCwd}`;
 		const guestLine = `Current working directory: ${localCwd} (ns-sandbox: Linux user-namespace; the same path is visible inside bash with nosuid,nodev; /usr and /etc are read-only; other host paths are hidden)`;
 		const systemPrompt = event.systemPrompt.includes(hostLine)
@@ -889,11 +820,11 @@ export default function (pi: ExtensionAPI) {
 	pi.registerCommand("sandbox", {
 		description: "Show ns-sandbox status",
 		handler: async (_args, ctx) => {
-			const lines = setupDir
+			const lines = sandboxReady
 				? [
 						"ns-sandbox: active",
 						`Sandbox cwd: ${localCwd} (same as host cwd)`,
-						`Setup script: ${setupPath ?? "(unknown)"}`,
+						`Setup script: ${SETUP_SCRIPT_HOST_PATH}`,
 						`Sandboxed overrides: ${sandboxedTools.join(", ") || "(none active)"}`,
 						`Network: ${noNetwork ? "disabled (--net)" : "host (inherited)"}`,
 						"User `!` commands are sandboxed.",
@@ -925,6 +856,5 @@ export {
 	resolveInsideWorkspace,
 	runOneSandboxTest,
 	runSandboxTestSuite,
-	writeSetupScript,
 };
 export type { SandboxTest, SandboxTestResult };
