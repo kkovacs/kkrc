@@ -134,6 +134,7 @@ import { constants } from "node:fs";
 import { access, mkdir, mkdtemp, readdir, readFile, realpath, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, dirname, isAbsolute, join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import {
 	type BashOperations,
@@ -201,6 +202,13 @@ const UNSHARE_BASE_FLAGS = [
 // load; the pi process's UID/GID does not change for its lifetime.
 const HOST_UID = process.getuid();
 const HOST_GID = process.getgid();
+
+// Absolute host path of this extension's source file. Captured at
+// module load via import.meta.url (the file is loaded as ESM). Used
+// in session_start to refuse to enable the sandbox when the
+// extension file is inside the jail directory: the model would then
+// be able to read and edit it, defeating the sandbox.
+const SELF_FILE = fileURLToPath(import.meta.url);
 
 // Shell script that runs inside the new namespace. It receives five
 // arguments: $1 the per-call tmpfs mount point, $2 the host path to
@@ -540,6 +548,21 @@ async function assertWorkspaceIsBounded(localCwd: string): Promise<void> {
 		throw new Error(
 			`ns-sandbox: refusing to enable — workspace is $HOME (${home}). This would expose ~/.ssh, ~/.gnupg, browser profiles, etc. ` +
 			`Run pi from a project subdirectory.`,
+		);
+	}
+}
+
+// Refuse to enable when the extension's own source file is inside
+// the workspace. The bind-mount is the workspace; the LLM has full
+// read/write to anything in it, including the extension's source.
+// Once the LLM can edit sandbox.ts it can rewrite this check, the
+// bind-mount source, or the test assertions, defeating the sandbox.
+// Move the extension out of any project you intend to jail.
+async function assertExtensionNotInWorkspace(localCwd: string, selfFile: string): Promise<void> {
+	if (isInsideWorkspace(localCwd, selfFile)) {
+		throw new Error(
+			`this extension file (${selfFile}) is inside the sandboxed workspace (${localCwd}). ` +
+			`The model can edit it and bypass the sandbox. Move the extension out of the project, or invoke pi from a different directory.`,
 		);
 	}
 }
@@ -955,6 +978,7 @@ export default function (pi: ExtensionAPI) {
 		}
 		try {
 			await assertWorkspaceIsBounded(localCwd);
+			await assertExtensionNotInWorkspace(localCwd, SELF_FILE);
 			const setup = await writeSetupScript();
 			setupPath = setup.path;
 			setupDir = setup.dir;
