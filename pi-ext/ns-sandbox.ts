@@ -311,15 +311,16 @@ async function probeSetpriv(): Promise<{ ok: boolean; reason?: string }> {
 // a fresh id, so two parallel sessions on the same workspace don't
 // share /tmp. Reused (mkdir -p) rather than mkdtemp: a previous
 // process's setupDir is the whole point of the persistence.
-// /tmp is reaped on reboot for sessions that are never resumed.
+// /run/user/<uid>/ is tmpfs; cleaned by systemd-logind on logout,
+// reaped on reboot.
 async function writeSetupScript(sessionId: string): Promise<{ dir: string; path: string }> {
-	// /tmp (not os.tmpdir()) because setupDir is both the setup
-	// script location and the per-call NEWTMP mount point. If
-	// localCwd were /tmp, the workspace bind-mount would expose
-	// setupDir to the LLM. (assertWorkspaceIsBounded refuses /tmp;
-	// the per-call rewrite in runSandboxCommand is the deeper
-	// defense.)
-	const dir = `/tmp/pi-ns-sandbox-${sessionId}`;
+	// /run/user/<uid>/ (not /tmp) because /run is never bound into
+	// the sandbox namespace (see SETUP_SCRIPT). The model has no
+	// path to it, so setupDir — setup script, per-call NEWTMP, and
+	// per-session /tmp backing — is physically unreachable from
+	// bash. Requires systemd-logind (or equivalent) to have
+	// populated /run/user/<uid>/; hard-fails otherwise.
+	const dir = `/run/user/${HOST_UID}/pi-ns-sandbox-${sessionId}`;
 	await mkdir(dir, { recursive: true });
 	const path = join(dir, SETUP_SCRIPT_NAME);
 	await writeFile(path, SETUP_SCRIPT, { mode: 0o700 });
@@ -347,14 +348,15 @@ async function assertWorkspaceIsBounded(localCwd: string): Promise<void> {
 		);
 	}
 	if (resolvedCwd === tmp) {
-		// setupDir and the per-call NEWTMP mount point both live under
-		// /tmp (hardcoded in writeSetupScript). Binding /tmp as the
-		// workspace would expose both to the LLM: it could tamper with
-		// the setup script and pre-plant files in NEWTMP that survive
-		// pivot_root into dirs not later rbind'd over (/opt, /home,
-		// /var, /root, ...).
+		// setupDir moved to /run/user/<uid>/, so binding /tmp as the
+		// workspace no longer exposes sandbox internals. What it DOES
+		// do: the per-call /tmp bind is skipped (case in SETUP_SCRIPT)
+		// to avoid shadowing the workspace, so the namespace's /tmp is
+		// the host's /tmp — no per-session persistence, other users'
+		// files visible.
 		throw new Error(
-			`ns-sandbox: refusing to enable — workspace is /tmp (${tmp}). This sandbox's setup script and per-call mount point live under /tmp; binding /tmp as the workspace would expose them to the model. ` +
+			`ns-sandbox: refusing to enable — workspace is /tmp (${tmp}). ` +
+			`The per-call /tmp bind is skipped when the workspace is /tmp, so the model sees the host's /tmp directly. ` +
 			`Run pi from a project subdirectory.`,
 		);
 	}
