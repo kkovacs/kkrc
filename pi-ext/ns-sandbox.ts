@@ -64,9 +64,11 @@ const UNSHARE_BASE_FLAGS = [
 	"private",
 ];
 
-// Real host UID/GID. Used by the setup script's nested unshare to
-// map the user command back to the host identity (so `ls -l` shows
-// the real owner, not namespace root).
+// Real host UID/GID. Passed to the setup script for potential
+// future use. The inner namespace uses --map-root-user (uid 0)
+// with an empty CapBnd for confinement; `ls -l` still shows the
+// real owner because the user-ns UID chain resolves
+// inner-uid-0 → outer-uid-0 → host-uid.
 const HOST_UID = process.getuid();
 const HOST_GID = process.getgid();
 
@@ -157,19 +159,17 @@ if [ "\$(wc -c </proc/self/environ)" -gt 1024 ]; then
 	exit 1
 fi
 # Drop into a nested user namespace for the user command.
-# --map-user to a non-zero UID strips the kernel-granted caps
-# (which only apply at UID 0), so the user command has no caps
-# and cannot unshare/mount/pivot_root/setns/use SUID helpers.
+# --map-root-user grants full caps (including CAP_SETPCAP) in the
+# new namespace. setpriv --bounding-set=-all empties CapBnd before
+# exec'ing bash. CapBnd is inherited by every child and into any
+# further nested user namespace, so \`unshare -r\` yields zero
+# capabilities \u2014 the uid_map write is rejected.
 # --no-new-privs runs first (where we still have caps) so it
 # doesn't strip them, and is inherited by every exec below.
-# --bounding-set is intentionally not used: applying it requires
-# CAP_SETPCAP, which we'd lose in the outer or never have in the
-# inner. Cap-stripping from the UID mapping + no-new-privs
-# already covers what --bounding-set would add.
 exec /usr/bin/setpriv --no-new-privs \
 	/usr/bin/unshare -U \
-	--map-user="$HOST_UID" \
-	--map-group="$HOST_GID" \
+	--map-root-user \
+	/usr/bin/setpriv --bounding-set=-all \
 	/usr/bin/env -i \
 	HOME=/tmp \
 	SANDBOX=ns-sandbox \
