@@ -1,74 +1,22 @@
 /**
- * ns-sandbox Extension - Linux user-namespace sandbox for built-in tools.
+ * ns-sandbox: Linux user-namespace sandbox for pi's built-in tools.
  *
- * Host pi; the file tools (read, write, edit, grep, find, ls) are
- * constrained to the current working directory, and bash runs in a
- * Linux user-namespace so the model can only modify the workspace
- * even though it can see /usr, /etc, /dev, /proc, /tmp. Bash runs
- * inside a fresh user + mount + PID + IPC namespace built with
- * `unshare`, `pivot_root`, and a tmpfs root. The host cwd is
- * bind-mounted at its actual host path (so `cd /home/user/project1`
- * just works) with nosuid, nodev. /usr and /etc are bind-mounted
- * read-only from the host (so binaries and /etc/passwd are visible,
- * but not writable). The host's /run is not rbind'd: every daemon
- * socket under it (docker.sock, snapd.socket, libvirt-sock,
- * podman.sock, /run/systemd/resolve/io.systemd.Resolve,
- * /run/user/<uid>/{bus,wayland-0,pipewire-0}, ...) is unreachable.
- * A small set of resolv.conf candidate files is bound in under
- * /run/systemd/resolve/, /run/, and /run/resolvconf/ so DNS works
- * on systemd-resolved hosts: the rbind of /etc below brings the
- * /etc/resolv.conf symlink along, and that symlink resolves through
- * NEWTMP/run/... to the regular file we just bound in. Nothing else
- * under /run is reachable. Everything else from the host (other
- * paths under /home, /var, /opt, /root, ssh keys, ...) is invisible.
+ * File tools are confined to the workspace. Bash runs in a fresh
+ * user+mount+pid+ipc namespace (tmpfs root, pivot_root) with the
+ * host cwd bind-mounted at its real path (rw,nosuid,nodev). /usr
+ * and /etc are rbind'd ro. /run is NOT rbind'd; only a small set
+ * of resolv.conf candidates is bound in so DNS still works via
+ * the /etc/resolv.conf symlink.
  *
- * No install. Requires:
- *   - Linux
- *   - `unshare` on PATH (util-linux, preinstalled on every distro)
- *   - `setpriv` on PATH (util-linux, same package as `unshare`; only
- *     used to set --no-new-privs on the exec chain leading to the
- *     user command)
- *   - Unprivileged user namespaces enabled
- *     (default on Debian/Ubuntu/Fedora/Arch; some hardened distros disable)
+ * Requires: Linux, util-linux ≥ 2.36 (unshare + setpriv), and
+ * unprivileged user namespaces enabled.
  *
- * Failure mode (HARD requirement):
- *   This extension either provides sandboxed tools or it does not run.
- *   There is no fallback, emulation, or silent routing to pi's built-in
- *   unsandboxed tools. If the sandbox cannot enable — a host assumption
- *   above is violated, the setup script cannot be written, or any
- *   other initialization step fails — the extension prints the reason
- *   to stderr, notifies the UI, and calls process.exit(1) (it does
- *   NOT throw, because the runner would catch that and fall back to
- *   the built-in tools). The user must either fix the host assumption
- *   or remove the ns-sandbox extension from their pi command. A soft
- *   fallback to unsandboxed tools is explicitly out of scope: opting
- *   in to the sandbox means the agent does not run unsandboxed by
- *   accident.
+ * Fail-closed. If the sandbox cannot enable, the extension exits
+ * the process — no fallback to unsandboxed tools. The extension
+ * file and /tmp workspaces are refused at session_start to stop
+ * the model tampering with the sandbox.
  *
- * Usage:
- *   The extension file must live outside the project you intend
- *   to jail. Loading it from inside the workspace is refused at
- *   session_start, because the bind-mount then exposes the
- *   extension source to the model — the model could edit
- *   ns-sandbox.ts and bypass the sandbox. The same applies to
- *   the setup script: it lives under /tmp, so `localCwd` must not
- *   be /tmp (also refused).
- *
- *   # Load with -e from pi's examples dir (the canonical source
- *   # location in the pi repository):
- *   pi -e ~/.pi/examples/extensions/ns-sandbox.ts
- *   pi -e ~/.pi/examples/extensions/ns-sandbox.ts --airgap   # also drop network access
- *
- * Behaviour notes:
- *   - File tools validate that paths resolve inside the workspace and
- *     fail closed on anything else.
- *   - Bash is spawned once per call via `unshare ... bash setup.sh`.
- *     The setup script does the pivot_root; commands are sent via stdin
- *     to avoid shell-quoting issues.
- *   - Network access is inherited from the host. The user can `npm install`,
- *     `git clone`, etc. To isolate the network, pass `--airgap` (this
- *     appends `--net` to the unshare flags at spawn time).
- *   - The default `!` user-bash path is also routed through the sandbox.
+ *   pi -e ~/.pi/examples/extensions/ns-sandbox.ts [--airgap]
  */
 
 import { spawn } from "node:child_process";
@@ -96,33 +44,14 @@ import {
 
 const SETUP_SCRIPT_NAME = "pi-ns-sandbox-setup.sh";
 
-// Flags passed to `unshare` for every bash call. --map-root-user makes
-// the setup script run as namespace root, which is required because
-// the `mount` binary in util-linux does its own `getuid() == 0` check
-// before calling mount(2), and so do `mknod`, `pivot_root`, etc. The
-// user command itself does NOT run in this outer namespace — the
-// setup script's last step is `unshare -U --map-user=$REAL_UID
-// --map-group=$REAL_GID` to enter a nested user namespace where the
-// calling process is mapped to the real host UID, and
-// `setpriv --no-new-privs` runs immediately before that to disable
-// SUID/file-cap elevation across the rest of the exec chain. This
-// keeps the "ls -l shows the model's own uid" UX that a 1:1 outer
-// mapping would give, without making the setup steps fail their
-// UID checks. SANDBOX=ns-sandbox is set in the env whitelist
-// as a marker for processes that want to know they are sandboxed;
-// USER is deliberately not set (the process is unprivileged) to
-// avoid lying to tools that read USER for behavior. --propagation
-// private keeps the new tmpfs root from leaking back to the host's
-// mount tree. --ipc
-// isolates SysV IPC, POSIX message queues, and abstract Unix sockets
-// from the host. --cgroup isolates the cgroup namespace so the model
-// cannot read host cgroup hierarchy. --net is appended per-session
-// when the user passes --airgap. Requires util-linux ≥ 2.36 (2020)
-// for --map-root-user; preinstalled on every current distro.
-// --mount-proc is intentionally NOT in this list. The setup script mounts
-// /proc itself at NEWTMP/proc after entering the new PID namespace, which
-// is what the model actually sees post-pivot_root. The --mount-proc flag
-// would only mount /proc at the *old* root, which is discarded at pivot.
+// Flags passed to `unshare` for every bash call. --map-root-user
+// is required because mount(2) checks getuid()==0 before doing the
+// syscall; the user command later drops into a nested unshare with
+// --map-user=$HOST_UID to run as the host identity.
+// --propagation=private keeps the tmpfs root from leaking to the
+// host. --net is appended per-session when --airgap is passed.
+// --mount-proc is intentionally absent: the setup script mounts
+// /proc at NEWTMP/proc after pivot_root into the new root.
 const UNSHARE_BASE_FLAGS = [
 	"--user",
 	"--map-root-user",
@@ -135,66 +64,31 @@ const UNSHARE_BASE_FLAGS = [
 	"private",
 ];
 
-// Real host UID/GID of the pi process. Used only as arguments to the
-// setup script, which creates a nested user namespace mapping them
-// back in before exec'ing the user command. process.getuid/getgid
-// return the real (not effective) identity and are present on every
-// Node build; they never throw on Linux. Captured once at module
-// load; the pi process's UID/GID does not change for its lifetime.
+// Real host UID/GID. Used by the setup script's nested unshare to
+// map the user command back to the host identity (so `ls -l` shows
+// the real owner, not namespace root).
 const HOST_UID = process.getuid();
 const HOST_GID = process.getgid();
 
-// Absolute host path of this extension's source file. Captured at
-// module load via import.meta.url (the file is loaded as ESM). Used
-// in session_start to refuse to enable the sandbox when the
-// extension file is inside the jail directory: the model would then
-// be able to read and edit it, defeating the sandbox.
+// Extension source path; used to refuse enabling when the
+// extension file is inside the jail (the model would then be
+// able to edit it).
 const SELF_FILE = fileURLToPath(import.meta.url);
 
-// Shell script that runs inside the new namespace. It receives five
-// arguments: $1 the per-call tmpfs mount point, $2 the host path to
-// bind-mount (fixed at extension load, not from the model), $3 the
-// bash command's working directory (model-controlled, used only
-// post-pivot_root), and $4/$5 the real host UID/GID (passed to the
-// final `unshare -U --map-user=...` so the model is mapped to its
-// real host identity inside the nested user namespace, instead of
-// running as the outer-namespace root). The script runs as
-// namespace root for the setup phase (so the `mount` binary's
-// `getuid() == 0` check passes), builds a new tmpfs root,
-// bind-mounts the workspace at its actual host path
-// (rw,nosuid,nodev) so absolute paths from the LLM keep working,
-// read-only-binds the host's /usr (+ /bin /sbin /lib /lib64 as
-// symlinks on merged-usr systems) and /etc, mounts a minimal /dev
-// and /proc, pivot_roots into the new root, then execs into a
-// nested user namespace for the user command.
-//
-// /tmp inside the namespace is bind-mounted to "${setupDir}/tmp" on
-// the host, which is created eagerly by `session_start` (and also
-// re-created here on first invocation as a safety net). That host
-// dir is shared across every call in the same session, so files
-// written to /tmp inside one call survive to the next.
-// session_shutdown's rm -rf of setupDir cleans it up.
+// Setup script. $1 tmpfs mount point, $2 host path to bind-mount
+// (fixed at load, not model-controlled), $3 model-controlled cwd
+// (used post-pivot_root only), $4/$5 real host UID/GID. Builds a
+// tmpfs root, rbind's /usr+/etc ro, mounts /dev and /proc, then
+// pivot_root and exec's `setpriv --no-new-privs` -> nested
+// unshare -U --map-user=$HOST_UID -> env -i -> bash.
 const SETUP_SCRIPT = `#!/bin/bash
 set -e
 NEWTMP="$1"
-# $2 is the bind-mount source: the host path that gets bind-mounted into
-# the namespace. It is fixed at extension load (localCwd) and never
-# derived from the model's cwd, so the model cannot ask us to bind-mount
-# an arbitrary host path (e.g. ~/.ssh) into the namespace.
+# $2 host path bind-mounted (fixed at load, not model-controlled).
+# $3 bash command cwd (model-controlled, used post-pivot_root).
+# $4/$5 real host UID/GID (mapping for the nested unshare).
 BIND_SOURCE="$2"
-# $3 is the bash command's working directory inside the namespace. It
-# may be any path the model can reach through the namespace's mount
-# tree; it is used only after pivot_root, so any shell-injection impact
-# is bounded by the mount namespace.
 BASH_CWD="$3"
-# $4 and $5 are the real host UID and GID of the pi process. They are
-# used only by the final \`unshare -U --map-user=$HOST_UID
-# --map-group=$HOST_GID\`, which creates a nested user namespace
-# mapping the calling process to that real host identity so the user
-# command runs as the real UID/GID (preserving the \`ls -l\` ownership
-# UX) instead of as the outer-namespace root. The earlier
-# \`setpriv --no-new-privs\` does not change identity; it just sets
-# PR_SET_NO_NEW_PRIVS across the rest of the exec chain.
 HOST_UID="$4"
 HOST_GID="$5"
 COMMAND=$(cat)
@@ -228,23 +122,14 @@ for entry in bin sbin lib lib64; do
     ln -s "$target" "$NEWTMP/$entry"
   fi
 done
-# /run is intentionally NOT rbind-mounted. Binding the whole /run subtree
-# would surface docker.sock, podman/podman.sock, snapd.socket, libvirt-sock,
-# systemd/private, /run/user/<uid>/{bus,wayland-0,pipewire-0}, and systemd-
-# resolved's io.systemd.Resolve D-Bus socket — all inward-facing escalation
-# vectors the model has no business talking to.
-#
-# DNS still works because the only /etc path that reaches /run in practice
-# is /etc/resolv.conf, a symlink to a regular file (typically
-# /run/systemd/resolve/stub-resolv.conf on systemd-resolved hosts). The
-# rbind of /etc below brings the symlink along; inside the namespace the
-# symlink resolves through NEWTMP/run/... to the regular file we just
-# bound in here. Nothing else under /run is reachable.
-#
-# We bring in only the known candidate files (regular files only; the
-# [-f $target] test filters out sockets, devices, and symlinks). Adding
-# a new entry here is how to support a distro that puts resolv.conf
-# somewhere we don't list.
+# /run is NOT rbind'd: it would surface docker.sock, snapd, libvirt,
+# systemd-resolved's D-Bus socket, /run/user/<uid>/{bus,wayland-0,
+# pipewire-0}, and ssh-agent — all escalation vectors. DNS still
+# works because /etc/resolv.conf is a symlink to a regular file
+# inside /run, which the rbind of /etc brings along; the symlink
+# resolves through NEWTMP/run/... to the file we just bound in.
+# Only known resolv.conf candidates are bound in (regular files
+# only); add new entries here to support more distros.
 for target in \
 	/run/systemd/resolve/stub-resolv.conf \
 	/run/systemd/resolve/resolv.conf \
@@ -274,51 +159,23 @@ pivot_root "$NEWTMP" "$NEWTMP/.old"
 cd "$BASH_CWD"
 umount -l /.old 2>/dev/null || true
 rmdir /.old 2>/dev/null || true
-# Sanity check: the process is about to drop caps and become the user's
-# bash. The model can read /proc/1/environ, so the env in this process's
-# memory *is* what the model sees. \`env -i\` below replaces it with a
-# whitelisted set; this assertion fails fast if that link is ever broken
-# (e.g. someone adds an \`env\` step that re-injects parent env). Keep
-# the two in sync.
+# Sanity check: the model can read /proc/1/environ, so the env
+# in this process's memory is what it sees. \`env -i\` below
+# replaces it with a whitelist; this fails fast if they drift.
 if [ "\$(wc -c </proc/self/environ)" -gt 1024 ]; then
 	echo "ns-sandbox setup: refusing to exec user command; inherited env too large (\$(wc -c </proc/self/environ) bytes). env -i is the only thing keeping /proc/1/environ from leaking the parent's API keys." >&2
 	exit 1
 fi
-# Drop into a nested user namespace for the user command. The outer
-# namespace (where this script has been running as root) is never
-# re-entered — the user command inherits the inner namespace's view,
-# and the inner is what we secure.
-#
-# \`unshare -U --map-user=$HOST_UID --map-group=$HOST_GID\` creates a
-# nested user namespace whose only mapping is the real host UID/GID.
-# Because the mapping is to a non-zero UID, the kernel strips the
-# process's effective/permitted/inheritable capability sets on entry
-# to the inner (the "namespace owner has all caps" grant only applies
-# at UID 0). The user command therefore runs as a true unprivileged
-# user: no CAP_SYS_ADMIN, so it cannot \`unshare\` itself deeper, mount,
-# remount, pivot_root, or setns(2) into another namespace; no caps
-# at all, so it cannot use SUID helpers, file-cap binaries, or
-# \`fusermount\` even if the host user is in the \`fuse\` group.
-# \`ls -l\` shows the model's real UID against the files it owns on
-# the host.
-#
-# \`setpriv --no-new-privs\` runs first, in the outer namespace where
-# we still have caps. PR_SET_NO_NEW_PRIVS does not require any
-# capability, so it doesn't strip them, and no-new-privs is then
-# inherited by the \`unshare\` process, the \`env\` process, and finally
-# bash and the user command. This blocks file-cap and SUID elevation
-# paths inside the inner.
-#
-# We deliberately do NOT pass \`--bounding-set\` here. The bounding
-# set is normally applied alongside --no-new-privs as a second
-# cap-restricting layer, but it can only be applied where we hold
-# CAP_SETPCAP — the outer (where we have it) loses CAP_SYS_ADMIN
-# when the bounding set is applied, and the inner (where we are
-# UID $HOST_UID) has no caps at all. Either order breaks one of the
-# two. With the model stripped of caps by the --map-user mapping
-# and protected by no-new-privs, the bounding set is redundant; the
-# only thing it would add is hardening against a kernel bug, and
-# the same hardening is provided by the cap-stripping itself.
+# Drop into a nested user namespace for the user command.
+# --map-user to a non-zero UID strips the kernel-granted caps
+# (which only apply at UID 0), so the user command has no caps
+# and cannot unshare/mount/pivot_root/setns/use SUID helpers.
+# --no-new-privs runs first (where we still have caps) so it
+# doesn't strip them, and is inherited by every exec below.
+# --bounding-set is intentionally not used: applying it requires
+# CAP_SETPCAP, which we'd lose in the outer or never have in the
+# inner. Cap-stripping from the UID mapping + no-new-privs
+# already covers what --bounding-set would add.
 exec /usr/bin/setpriv --no-new-privs \
 	/usr/bin/unshare -U \
 	--map-user="$HOST_UID" \
@@ -343,14 +200,12 @@ const TMP_ROOT = "/tmp";
 
 // Resolve a path against the workspace or the per-session persistent
 // /tmp, following symlinks at every existing component. The lexical
-// check is necessary but not sufficient: a path string can pass the
-// lexical test while pointing at a symlink that escapes (e.g.
-// `ln -s ~/.ssh/id_rsa /tmp/key` from inside the sandboxed bash). We
-// walk up the longest existing prefix, realpath it, re-join the
+// check is necessary but not sufficient: a symlink can pass it while
+// pointing outside (e.g. `ln -s ~/.ssh/id_rsa /tmp/key` from bash).
+// We walk up the longest existing prefix, realpath it, re-join the
 // remaining suffix, and re-check the canonical form is under one of
-// the two roots. For a target that does not exist yet (e.g. a file
-// being created), the deepest existing ancestor is canonicalized and
-// the new suffix appended.
+// the two roots. For a non-existent target, the deepest existing
+// ancestor is canonicalized and the new suffix appended.
 async function resolveInsideWorkspace(workspace: string, setupDir: string, target: string): Promise<string> {
 	const persistentTmp = join(setupDir, "tmp");
 	const lexicallyAllowed =
@@ -358,9 +213,8 @@ async function resolveInsideWorkspace(workspace: string, setupDir: string, targe
 	if (!lexicallyAllowed) {
 		throw new Error(`Refused: path is outside the sandbox workspace: ${target}`);
 	}
-	// /tmp/... is rewritten to setupDir/tmp/... so the file tools share the
-	// same backing dir that bash's namespace /tmp is bind-mounted from. The
-	// model sees /tmp/foo; the file tools operate on setupDir/tmp/foo.
+	// /tmp/... → setupDir/tmp/...; the model sees /tmp/foo, the file
+	// tools operate on setupDir/tmp/foo.
 	const translated =
 		target === TMP_ROOT ? join(setupDir, "tmp") :
 		target.startsWith(`${TMP_ROOT}/`) ? join(setupDir, "tmp", target.slice(TMP_ROOT.length + 1)) :
@@ -405,10 +259,8 @@ function assertLinux(): { ok: boolean; reason?: string } {
 
 async function probeUnshare(): Promise<{ ok: boolean; reason?: string }> {
 	return new Promise((resolveProbe) => {
-		// Probe with the same flag style the sandbox actually uses. If
-		// --map-root-user is not supported (util-linux < 2.36) the probe
-		// fails, and the user sees a clear reason to upgrade rather than
-		// a confusing runtime failure mid-session.
+		// Probe with the real flag set. util-linux < 2.36 lacks
+		// --map-root-user and the user gets a clear reason to upgrade.
 		const child = spawn(
 			"unshare",
 			["--user", "--map-root-user", "--mount", "/bin/true"],
@@ -429,19 +281,10 @@ async function probeUnshare(): Promise<{ ok: boolean; reason?: string }> {
 	});
 }
 
-// Check that `setpriv` is available with the option the sandbox uses.
-// setpriv is from util-linux (same package as unshare on every
-// distribution), so the unshare probe usually implies it is there,
-// but we verify separately so a missing setpriv gets a precise diagnostic
-// rather than a generic "permission denied" from inside the namespace.
-//
-// We probe with `--help` rather than --no-new-privs because the
-// real call must run inside the unshared namespace (it has to be
-// applied to the process that becomes the user command), and the
-// --help invocation confirms only that the binary is present and
-// runnable. A wrong-version setpriv (older than 2.31 / 2017) that
-// supports --help but not --no-new-privs would pass this probe and
-// then surface as a setpriv error printed to the bash tool's output.
+// Probe with --help only. The real --no-new-privs call must run
+// inside the unshared namespace, so we cannot exercise it here.
+// A setpriv older than 2.31/2017 will pass this and fail later
+// at exec time with a visible setpriv error.
 async function probeSetpriv(): Promise<{ ok: boolean; reason?: string }> {
 	return new Promise((resolveProbe) => {
 		const child = spawn("setpriv", ["--help"], { stdio: "ignore" });
@@ -462,27 +305,22 @@ async function probeSetpriv(): Promise<{ ok: boolean; reason?: string }> {
 }
 
 async function writeSetupScript(): Promise<{ dir: string; path: string }> {
-	// Hardcoded /tmp (not os.tmpdir()) because setupDir is the host
-	// location of the setup script and the per-call NEWTMP mount
-	// point. If localCwd were /tmp, the bind-mount would expose
-	// setupDir to the LLM, letting it tamper with the setup script or
-	// pre-plant files in NEWTMP. assertWorkspaceIsBounded refuses /tmp
-	// for the same reason — the two are complementary. Per-call
-	// rewrite in runSandboxCommand is the deeper defense in depth.
+	// /tmp (not os.tmpdir()) because setupDir is both the setup
+	// script location and the per-call NEWTMP mount point. If
+	// localCwd were /tmp, the workspace bind-mount would expose
+	// setupDir to the LLM. (assertWorkspaceIsBounded refuses /tmp;
+	// the per-call rewrite in runSandboxCommand is the deeper
+	// defense.)
 	const dir = await mkdtemp("/tmp/pi-ns-sandbox-XXXXXX");
 	const path = join(dir, SETUP_SCRIPT_NAME);
 	await writeFile(path, SETUP_SCRIPT, { mode: 0o700 });
 	return { dir, path };
 }
 
-// Refuse to enable the sandbox when the chosen workspace is so broad
-// that "the workspace is the cwd" stops being a useful confinement.
-// The bind-mount source is localCwd; if that's `/` or the user's
-// $HOME, the model gets to read and write essentially everything on
-// the host (e.g. ~/.ssh, ~/.gnupg, /etc, /var). The user has to opt
-// in to a narrower directory by `cd`'ing before invoking pi. We
-// fail closed (same posture as the rest of the extension) rather
-// than warn-and-continue.
+// Refuse to enable when the workspace is so broad that the
+// "workspace is the cwd" confinement becomes meaningless. The
+// bind-mount source is localCwd, so /, $HOME, or /tmp would
+// give the model access to ~/.ssh, /etc, etc.
 async function assertWorkspaceIsBounded(localCwd: string): Promise<void> {
 	const home = process.env.HOME ? await realpath(process.env.HOME).catch(() => process.env.HOME) : undefined;
 	const tmp = await realpath("/tmp").catch(() => "/tmp");
@@ -513,12 +351,9 @@ async function assertWorkspaceIsBounded(localCwd: string): Promise<void> {
 	}
 }
 
-// Refuse to enable when the extension's own source file is inside
-// the workspace. The bind-mount is the workspace; the LLM has full
-// read/write to anything in it, including the extension's source.
-// Once the LLM can edit sandbox.ts it can rewrite this check, the
-// bind-mount source, or the test assertions, defeating the sandbox.
-// Move the extension out of any project you intend to jail.
+// Refuse to enable when the extension's source file is inside
+// the workspace: the model would have read/write to it and could
+// rewrite this check or the bind-mount source.
 async function assertExtensionNotInWorkspace(localCwd: string, selfFile: string): Promise<void> {
 	if (isInsideWorkspace(localCwd, selfFile)) {
 		throw new Error(
@@ -533,15 +368,14 @@ interface SandboxTestResult {
 	pass: boolean;
 	skipped: boolean;
 	detail?: string;
-	// Length-captured (truncated to 200 chars + "…") output of the test command,
-	// for inclusion in the table; full output for a failing test goes in `detail`.
+	// Captured command output; truncated to 200 chars for the table.
+	// On failure the full output goes in `detail`.
 	stdout: string;
 	stderr: string;
 }
 
-// Spawn one test command through the same unshare+setup flow the
-// agent's bash tool uses, capture stdout/stderr/exit, and assert
-// against the test's expectation. Per-test timeout defaults to 10s.
+// Spawn one test through the same unshare+setup flow the agent's
+// bash tool uses; assert against `test.expect`. Default 10s timeout.
 async function runOneSandboxTest(
 	setupDir: string,
 	bindSource: string,
@@ -582,10 +416,8 @@ async function runOneSandboxTest(
 	}
 }
 
-// Run the full self-test suite. Used at the shipped version too: a user
-// can pass `--sandbox-test` to pi to verify their Linux has everything
-// the sandbox needs. Reports results to stdout and the pi UI, then
-// exits the process with 0 on success or 1 on any failure.
+// Run the self-test suite. Triggered by `pi --sandbox-test`.
+// Reports to stdout and UI, then process.exit(0|1).
 async function runSandboxTestSuite(
 	localCwd: string,
 	setupPath: string,
@@ -623,10 +455,9 @@ async function runSandboxTestSuite(
 	process.exit(0);
 }
 
-// Shared spawn/kill/capture loop used by both the bash tool (`makeBashOps.exec`)
-// and the self-test suite (`runOneSandboxTest`). Output is either streamed
-// via `onChunk` (production path) or captured into the `capture` buffers
-// (test path). The two are mutually exclusive in practice.
+// Spawn/kill/capture loop shared by the bash tool and the
+// self-test suite. Output is either streamed via `onChunk` or
+// captured into `capture` buffers; the two are mutually exclusive.
 interface SandboxRunOptions {
 	command: string;
 	bashCwd: string;
@@ -650,36 +481,25 @@ async function runSandboxCommand(
 		throw new Error("aborted");
 	}
 	if (!opts.bashCwd) {
-		// Refuse to fall back to process.cwd(): the bind-mount source must
-		// be the trusted localCwd captured at extension load, not whatever
-		// directory the parent process happens to be in. The bash tool
-		// always passes a cwd, so this is a fail-fast guard, not a UX path.
+		// Fail-fast guard. The bash tool always passes a cwd; the
+		// bind-mount source is localCwd (extension load), not cwd.
 		throw new Error("ns-sandbox: bash tool called without a cwd");
 	}
-	// bindSource is the host path that gets bind-mounted into the namespace;
-	// it is fixed at extension load (localCwd) and never taken from the model,
-	// so the model cannot escape the sandbox by asking us to bind-mount a
-	// different host path. The model's cwd becomes the bash command's
-	// working directory inside the namespace (post-pivot_root), so the model
-	// can navigate to any path it likes, but everything it can reach is
-	// already inside the namespace.
+	// bindSource is the host path bind-mounted into the namespace;
+	// fixed at extension load, never model-controlled. The model's
+	// cwd is the bash command's working dir post-pivot_root.
 	const flags = noNetwork ? [...UNSHARE_BASE_FLAGS, "--net"] : UNSHARE_BASE_FLAGS;
-	// Defense in depth: rewrite the setup script on every call. Even
-	// if a future bug ever lets the LLM reach setupDir (e.g. /tmp
-	// refused-check is bypassed, or a symlink/HOME-relative path
-	// resolves into setupDir), the script is atomically replaced
-	// before exec, so any tamper is overwritten. The unlink-then-write
-	// also defeats symlink/FIFO/hardlink substitution and perm
-	// changes: Node's `writeFile({ mode })` only sets the mode at file
-	// creation, not on overwrite, and a symlink at setupPath would
-	// otherwise follow and write into the linked-to file.
+	// Defense in depth: rewrite the setup script on every call. If
+	// the LLM ever reaches setupDir, any tamper is overwritten before
+	// exec. The rm-then-write defeats symlink/FIFO substitution and
+	// the "writeFile only sets mode on create" perm-change attack.
 	const setupPath = join(setupDir, SETUP_SCRIPT_NAME);
 	await rm(setupPath, { force: true });
 	await writeFile(setupPath, SETUP_SCRIPT, { mode: 0o700 });
 	const runDir = await mkdtemp(join(setupDir, opts.capture ? "test-XXXXXX" : "run-XXXXXX"));
-	// rm() after the process settles handles EBUSY (tmpfs still mounted) and
-	// any stray files left behind by a failed setup; the session_shutdown
-	// `rm -rf setupDir` is the outer safety net.
+	// Clean up runDir after the process settles. Handles EBUSY
+	// (tmpfs still mounted) and failed-setup stragglers; the
+	// session_shutdown rm of setupDir is the outer net.
 	try {
 		return await new Promise<SandboxRunResult>((resolveRun, rejectRun) => {
 			const child = spawn(
@@ -703,9 +523,6 @@ async function runSandboxCommand(
 					killChild(child);
 				}, opts.timeoutSeconds * 1000);
 			}
-			// Output routing: capture buffers are written by stream
-			// (stdout vs stderr) to keep them separable; otherwise the
-			// caller's onChunk receives both interleaved.
 			child.stdout?.on("data", (d: Buffer) => {
 				if (opts.capture) opts.capture.stdout += d.toString();
 				else if (opts.onChunk) opts.onChunk(d);
@@ -770,9 +587,8 @@ function makeWriteOps(workspace: string, setupDir: string): WriteOperations {
 	return {
 		writeFile: async (absolutePath, content) => {
 			const safe = await resolveInsideWorkspace(workspace, setupDir, absolutePath);
-			// Ensure the parent directory exists. fs.writeFile doesn't
-			// create intermediate dirs, and the model shouldn't have to
-			// mkdir before writing to /tmp/whatever.
+			// fs.writeFile doesn't create intermediate dirs; the model
+			// shouldn't have to mkdir before writing to /tmp/whatever.
 			await mkdir(dirname(safe), { recursive: true });
 			await writeFile(safe, content, "utf-8");
 		},
@@ -827,16 +643,14 @@ function makeFindOps(workspace: string, setupDir: string): FindOperations {
 	return {
 		exists: (p) => existsOp(workspace, setupDir, p),
 		glob: async (pattern, cwd, options) => {
-			// `cwd` is the model-supplied search dir (the workspace, or a
-			// /tmp/... virtual path); `safeRoot` is the real on-disk location
-			// the file tools resolve it to. Walk `safeRoot` but return paths
-			// rooted at `cwd` so the find tool's `path.relative(cwd, p)`
-			// postprocessing renders them as the model expects — otherwise
-			// it falls back to `path.relative` and leaks `setupDir`.
+			// `cwd` is what the model sees (workspace or /tmp/...);
+			// `safeRoot` is the real on-disk location. Walk safeRoot,
+			// return paths rooted at cwd — otherwise the find tool's
+			// `relative(cwd, p)` postproc leaks setupDir.
 			const safeRoot = await resolveInsideWorkspace(workspace, setupDir, cwd);
-			// Skip the find tool's default ignore set at the directory level
-			// (cheaper than per-file match) and refuse to follow symlinks —
-			// `stat` follows them and a target outside the workspace would
+			// Skip the default ignore set at the directory level (cheaper
+			// than per-file match) and refuse to follow symlinks — lstat
+			// already does, and a target outside the workspace would
 			// silently expand the search.
 			const skipNames = new Set(["node_modules", ".git"]);
 			const results: string[] = [];
@@ -878,15 +692,6 @@ function makeLsOps(workspace: string, setupDir: string): LsOperations {
 	};
 }
 
-// Self-test suite. Run when the user passes `--sandbox-test` to pi. Each
-// test is a full-scope unshare+setup+command invocation — the same code
-// path the real agent's bash tool uses — so a passing test is strong
-// evidence the agent will also work on this host. Used at the shipped
-// version too: a user can run `pi -e ./sandbox.ts --sandbox-test` to
-// verify their Linux has everything the sandbox needs (unshare with
-// --map-root-user, setpriv --no-new-privs, the inner unshare with
-// --map-user/--map-group, /etc+resolv.conf reachable, /run/docker.sock
-// and ~/.ssh correctly hidden, network/TLS, etc.).
 interface SandboxTest {
 	name: string;
 	cmd: string;
@@ -986,12 +791,6 @@ export default function (pi: ExtensionAPI) {
 			// is lost during shutdown.
 			console.error(message);
 			ctx.ui.notify(message, "error");
-			// The extension runner catches errors from session_start and
-			// continues the agent with built-in tools. We refuse to
-			// participate in that fallback: force-exit the process so
-			// the user cannot run an unsandboxed agent after opting in
-			// to the sandbox. process.exit(1) terminates synchronously;
-			// a follow-up throw would be unreachable dead code.
 			process.exit(1);
 		}
 		try {
@@ -1035,8 +834,9 @@ export default function (pi: ExtensionAPI) {
 			const message = `ns-sandbox: cannot enable — ${reason}`;
 			console.error(message);
 			ctx.ui.notify(message, "error");
-			// See the preflight-failed branch above: process.exit is what
-			// actually exits; a follow-up throw would be unreachable.
+			// process.exit(1) — not a throw. The runner would catch a
+			// throw and fall back to the built-in unsandboxed tools,
+			// which is exactly the failure mode we refuse to allow.
 			process.exit(1);
 		}
 	});
