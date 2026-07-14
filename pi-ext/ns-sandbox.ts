@@ -304,14 +304,23 @@ async function probeSetpriv(): Promise<{ ok: boolean; reason?: string }> {
 	});
 }
 
-async function writeSetupScript(): Promise<{ dir: string; path: string }> {
+// Stable per pi session: the session id (UUID v7 from
+// ctx.sessionManager.getSessionId()) is identical across `pi -c <file>`
+// invocations of the same session, so the dir — and therefore the
+// model's /tmp — survives the process boundary. A fresh pi session has
+// a fresh id, so two parallel sessions on the same workspace don't
+// share /tmp. Reused (mkdir -p) rather than mkdtemp: a previous
+// process's setupDir is the whole point of the persistence.
+// /tmp is reaped on reboot for sessions that are never resumed.
+async function writeSetupScript(sessionId: string): Promise<{ dir: string; path: string }> {
 	// /tmp (not os.tmpdir()) because setupDir is both the setup
 	// script location and the per-call NEWTMP mount point. If
 	// localCwd were /tmp, the workspace bind-mount would expose
 	// setupDir to the LLM. (assertWorkspaceIsBounded refuses /tmp;
 	// the per-call rewrite in runSandboxCommand is the deeper
 	// defense.)
-	const dir = await mkdtemp("/tmp/pi-ns-sandbox-XXXXXX");
+	const dir = `/tmp/pi-ns-sandbox-${sessionId}`;
+	await mkdir(dir, { recursive: true });
 	const path = join(dir, SETUP_SCRIPT_NAME);
 	await writeFile(path, SETUP_SCRIPT, { mode: 0o700 });
 	return { dir, path };
@@ -757,7 +766,6 @@ export default function (pi: ExtensionAPI) {
 
 	const localCwd = process.cwd();
 	// Deferred to session_start because pi.getActiveTools() throws before the runtime is bound.
-	let activeTools: Set<string> | undefined;
 	let noNetwork = false;
 	let runSandboxTests = false;
 
@@ -796,7 +804,16 @@ export default function (pi: ExtensionAPI) {
 		try {
 			await assertWorkspaceIsBounded(localCwd);
 			await assertExtensionNotInWorkspace(localCwd, SELF_FILE);
-			const setup = await writeSetupScript();
+			// Key the persistent /tmp on pi's session id so a continued
+			// `pi -c <file>` finds the same files; different sessions
+			// get different ids, so /tmp never mixes across sessions.
+			const sessionId = ctx.sessionManager.getSessionId();
+			if (!sessionId) {
+				// XXX: pi's SessionManager ctor always sets this; empty
+				// here would mean a pi API change.
+				throw new Error("ctx.sessionManager.getSessionId() is empty");
+			}
+			const setup = await writeSetupScript(sessionId);
 			setupPath = setup.path;
 			setupDir = setup.dir;
 			// Eagerly create the per-session persistent /tmp backing dir so
@@ -805,7 +822,7 @@ export default function (pi: ExtensionAPI) {
 			await mkdir(join(setupDir, "tmp"), { recursive: true });
 			noNetwork = Boolean(pi.getFlag("airgap"));
 			runSandboxTests = Boolean(pi.getFlag("sandbox-test"));
-			activeTools = new Set(pi.getActiveTools());
+			const activeTools = new Set(pi.getActiveTools());
 
 			for (const [name, base, build] of TOOL_OVERRIDES) {
 				if (!activeTools.has(name)) continue;
@@ -843,22 +860,16 @@ export default function (pi: ExtensionAPI) {
 
 	pi.on("session_shutdown", async () => {
 		setupPath = undefined;
-		if (setupDir) {
-			try {
-				await rm(setupDir, { recursive: true, force: true });
-			} catch {
-				// tmp will clean it eventually; ignore.
-			}
-			setupDir = undefined;
-		}
+		setupDir = undefined;
 	});
 
-	// `!` shell command hook. Only sandbox if bash is active, so that
-	// disabling bash in the tool set also disables `!` sandboxing.
-	// The active set is captured in session_start (after the runtime is
-	// bound); until then this hook is a no-op.
+	// `!` shell command hook. Always sandbox: opting into this extension
+	// is the consent signal, not inclusion of "bash" in --tools. Without
+	// this, `--tools read,grep,find,ls` leaves the file tools seeing the
+	// fake tmp while a `!` shell command sees the host's real /tmp.
+	// Until session_start completes (setupDir unset) this is a no-op.
 	pi.on("user_bash", (_event, _ctx) => {
-		if (!activeTools?.has("bash") || !setupDir) return undefined;
+		if (!setupDir) return undefined;
 		return { operations: makeBashOps(localCwd, setupDir, noNetwork) };
 	});
 
