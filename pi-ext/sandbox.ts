@@ -132,7 +132,6 @@
 import { spawn } from "node:child_process";
 import { constants } from "node:fs";
 import { access, mkdir, mkdtemp, readdir, readFile, realpath, rm, stat, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import { basename, dirname, isAbsolute, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -521,7 +520,14 @@ async function probeSetpriv(): Promise<{ ok: boolean; reason?: string }> {
 }
 
 async function writeSetupScript(): Promise<{ dir: string; path: string }> {
-	const dir = await mkdtemp(join(tmpdir(), "pi-ns-sandbox-"));
+	// Hardcoded /tmp (not os.tmpdir()) because setupDir is the host
+	// location of the setup script and the per-call NEWTMP mount
+	// point. If localCwd were /tmp, the bind-mount would expose
+	// setupDir to the LLM, letting it tamper with the setup script or
+	// pre-plant files in NEWTMP. assertWorkspaceIsBounded refuses /tmp
+	// for the same reason — the two are complementary. Per-call
+	// rewrite in runSandboxCommand is the deeper defense in depth.
+	const dir = await mkdtemp("/tmp/pi-ns-sandbox-XXXXXX");
 	const path = join(dir, SETUP_SCRIPT_NAME);
 	await writeFile(path, SETUP_SCRIPT, { mode: 0o700 });
 	return { dir, path };
@@ -537,6 +543,7 @@ async function writeSetupScript(): Promise<{ dir: string; path: string }> {
 // than warn-and-continue.
 async function assertWorkspaceIsBounded(localCwd: string): Promise<void> {
 	const home = process.env.HOME ? await realpath(process.env.HOME).catch(() => process.env.HOME) : undefined;
+	const tmp = await realpath("/tmp").catch(() => "/tmp");
 	const resolvedCwd = await realpath(localCwd).catch(() => localCwd);
 	if (resolvedCwd === "/") {
 		throw new Error(
@@ -547,6 +554,18 @@ async function assertWorkspaceIsBounded(localCwd: string): Promise<void> {
 	if (home && resolvedCwd === home) {
 		throw new Error(
 			`ns-sandbox: refusing to enable — workspace is $HOME (${home}). This would expose ~/.ssh, ~/.gnupg, browser profiles, etc. ` +
+			`Run pi from a project subdirectory.`,
+		);
+	}
+	if (resolvedCwd === tmp) {
+		// setupDir and the per-call NEWTMP mount point both live under
+		// /tmp (hardcoded in writeSetupScript). Binding /tmp as the
+		// workspace would expose both to the LLM: it could tamper with
+		// the setup script and pre-plant files in NEWTMP that survive
+		// pivot_root into dirs not later rbind'd over (/opt, /home,
+		// /var, /root, ...).
+		throw new Error(
+			`ns-sandbox: refusing to enable — workspace is /tmp (${tmp}). This sandbox's setup script and per-call mount point live under /tmp; binding /tmp as the workspace would expose them to the model. ` +
 			`Run pi from a project subdirectory.`,
 		);
 	}
@@ -703,6 +722,18 @@ async function runSandboxCommand(
 	// can navigate to any path it likes, but everything it can reach is
 	// already inside the namespace.
 	const flags = noNetwork ? [...UNSHARE_BASE_FLAGS, "--net"] : UNSHARE_BASE_FLAGS;
+	// Defense in depth: rewrite the setup script on every call. Even
+	// if a future bug ever lets the LLM reach setupDir (e.g. /tmp
+	// refused-check is bypassed, or a symlink/HOME-relative path
+	// resolves into setupDir), the script is atomically replaced
+	// before exec, so any tamper is overwritten. The unlink-then-write
+	// also defeats symlink/FIFO/hardlink substitution and perm
+	// changes: Node's `writeFile({ mode })` only sets the mode at file
+	// creation, not on overwrite, and a symlink at setupPath would
+	// otherwise follow and write into the linked-to file.
+	const setupPath = join(setupDir, SETUP_SCRIPT_NAME);
+	await rm(setupPath, { force: true });
+	await writeFile(setupPath, SETUP_SCRIPT, { mode: 0o700 });
 	const runDir = await mkdtemp(join(setupDir, opts.capture ? "test-XXXXXX" : "run-XXXXXX"));
 	// rm() after the process settles handles EBUSY (tmpfs still mounted) and
 	// any stray files left behind by a failed setup; the session_shutdown
