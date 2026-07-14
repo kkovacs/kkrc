@@ -31,16 +31,6 @@
  *   - Unprivileged user namespaces enabled
  *     (default on Debian/Ubuntu/Fedora/Arch; some hardened distros disable)
  *
- * Host assumption for the sandbox to hold. If this is false, the model
- * can DoS other processes on the host:
- *   - The host may have delegated cgroup controllers (memory, pids, ...)
- *     to this user. If so, the model can write to its own cgroup from
- *     inside the namespace. --cgroup in UNSHARE_BASE_FLAGS limits this
- *     to the model's own cgroup view, so the blast radius is the
- *     processes in whatever cgroup the user was in at session start
- *     (usually just the user's own session). To eliminate the risk
- *     entirely, remove the user's delegated controllers.
- *
  * Failure mode (HARD requirement):
  *   This extension either provides sandboxed tools or it does not run.
  *   There is no fallback, emulation, or silent routing to pi's built-in
@@ -56,10 +46,18 @@
  *   accident.
  *
  * Usage:
- *   cd /path/to/project
- *   pi -e ./ns-sandbox
- *   pi -e ./ns-sandbox --airgap              # also drop network access
- *   (omit the extension entirely to skip the sandbox)
+ *   The extension file must live outside the project you intend
+ *   to jail. Loading it from inside the workspace is refused at
+ *   session_start, because the bind-mount then exposes the
+ *   extension source to the model — the model could edit
+ *   ns-sandbox.ts and bypass the sandbox. The same applies to
+ *   the setup script: it lives under /tmp, so `localCwd` must not
+ *   be /tmp (also refused).
+ *
+ *   # Load with -e from pi's examples dir (the canonical source
+ *   # location in the pi repository):
+ *   pi -e ~/.pi/examples/extensions/ns-sandbox.ts
+ *   pi -e ~/.pi/examples/extensions/ns-sandbox.ts --airgap   # also drop network access
  *
  * Behaviour notes:
  *   - File tools validate that paths resolve inside the workspace and
@@ -71,68 +69,12 @@
  *     `git clone`, etc. To isolate the network, pass `--airgap` (this
  *     appends `--net` to the unshare flags at spawn time).
  *   - The default `!` user-bash path is also routed through the sandbox.
- *
- * Security notes:
- *   - The bind-mount source is fixed at extension load (`localCwd`) and
- *     is never taken from the model's bash `cwd`. The model's `cwd` is
- *     used as the in-namespace bash working directory after `pivot_root`
- *     only, where any shell-injection impact is bounded by the mount
- *     namespace.
- *   - Two-stage user namespace. The outer `unshare --user --map-root-user
- *     --mount ...` runs the setup script as namespace root. This is
- *     required because the `mount` binary in util-linux does its own
- *     `getuid() == 0` pre-syscall check (and so do `mknod`,
- *     `pivot_root`, etc.); inside a 1:1-mapped namespace the setup
- *     would fail with "must be superuser to use mount" before any
- *     pivot_root could run. The user command does NOT execute in this
- *     outer namespace. At the end of the setup script we
- *     `unshare -U --map-user=$REAL_UID --map-group=$REAL_GID` into a
- *     nested user namespace where the calling process's UID is mapped
- *     to $REAL_UID. Because the mapping is to a non-zero UID, the
- *     kernel strips capabilities on entry to the inner — see the
- *     "model runs as a true unprivileged user" bullet below. The model
- *     ends up as its own UID, so `ls -l` inside the sandbox shows its
- *     own UID against the files it owns on the host — same UX as a 1:1
- *     outer mapping — without any setup-time tool having to bypass the
- *     `mount` binary's UID check.
- *   - The model runs as a true unprivileged user inside the inner
- *     namespace. The `--map-user=$REAL_UID` mapping places it at
- *     UID $REAL_UID (not 0), and the kernel strips all capabilities
- *     from a non-root process on entry to a fresh user namespace;
- *     the "namespace owner has all caps" grant only applies at
- *     UID 0. So the user command has no CAP_SYS_ADMIN (cannot
- *     `unshare` itself deeper, cannot mount/remount/pivot_root,
- *     cannot setns(2) into another namespace), no capability at
- *     all in fact, and cannot elevate via SUID, file caps, or
- *     `fusermount`. `--no-new-privs` (set on the outer setpriv,
- *     inherited through the unshare + exec chain) blocks file-cap
- *     and SUID elevation as a second layer. We do NOT clamp
- *     the bounding set explicitly: the cap-stripping by the
- *     --map-user mapping already removes everything we'd want the
- *     clamp to remove, and trying to apply the clamp in the outer
- *     (where we have CAP_SETPCAP) would strip CAP_SYS_ADMIN that
- *     the subsequent `unshare` needs, while trying to apply it in
- *     the inner (where the model is unprivileged) would fail for
- *     lack of CAP_SETPCAP.
- *   - The workspace and /tmp are mounted exec-capable (no `noexec`).
- *     This is intentional: a `noexec` mount would break common
- *     workflows (running build outputs, `node_modules/.bin`,
- *     downloaded scripts). The trade-off is that a binary dropped
- *     into the workspace by the model can be run directly. The
- *     cap-stripping in the inner namespace ensures such a binary
- *     cannot itself gain capabilities to do anything beyond what
- *     the model already has. See `sandbox-audit-2.md` for the full
- *     noexec trade-off.
- *   - `/dev/tty` is intentionally not created inside the namespace. It
- *     would resolve to the host's controlling terminal.
- *   - See `sandbox-audit-2.md` for the full threat model, including
- *     the userns-owned remount gap and the noexec trade-off.
  */
 
 import { spawn } from "node:child_process";
 import { constants } from "node:fs";
-import { access, mkdir, mkdtemp, readdir, readFile, realpath, rm, stat, writeFile } from "node:fs/promises";
-import { basename, dirname, isAbsolute, join, relative } from "node:path";
+import { access, lstat, mkdir, mkdtemp, readdir, readFile, realpath, rm, stat, writeFile } from "node:fs/promises";
+import { basename, dirname, isAbsolute, join, posix, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import {
@@ -868,12 +810,57 @@ async function existsOp(workspace: string, setupDir: string, absolutePath: strin
 	}
 }
 
+// Match a relative path against a find-tool glob pattern. Mirrors fd's
+// behaviour: a pattern with no '/' matches basenames; a pattern with '/'
+// matches the full relative path, with an implicit '**/' prefix so a
+// leading "src/" still matches under any subdir.
+function matchesToolGlob(relativePath: string, pattern: string): boolean {
+	const normalized = pattern.split(sep).join("/");
+	if (normalized.includes("/")) {
+		return posix.matchesGlob(relativePath, normalized) ||
+			posix.matchesGlob(relativePath, `**/${normalized}`);
+	}
+	return posix.matchesGlob(posix.basename(relativePath), normalized);
+}
+
 function makeFindOps(workspace: string, setupDir: string): FindOperations {
 	return {
 		exists: (p) => existsOp(workspace, setupDir, p),
-		// Unused: the find tool's runtime checks `customOps?.glob` and falls
-		// back to fd when it's not provided. We return [] to satisfy the type.
-		glob: () => [],
+		glob: async (pattern, cwd, options) => {
+			// `cwd` is the model-supplied search dir (the workspace, or a
+			// /tmp/... virtual path); `safeRoot` is the real on-disk location
+			// the file tools resolve it to. Walk `safeRoot` but return paths
+			// rooted at `cwd` so the find tool's `path.relative(cwd, p)`
+			// postprocessing renders them as the model expects — otherwise
+			// it falls back to `path.relative` and leaks `setupDir`.
+			const safeRoot = await resolveInsideWorkspace(workspace, setupDir, cwd);
+			// Skip the find tool's default ignore set at the directory level
+			// (cheaper than per-file match) and refuse to follow symlinks —
+			// `stat` follows them and a target outside the workspace would
+			// silently expand the search.
+			const skipNames = new Set(["node_modules", ".git"]);
+			const results: string[] = [];
+			const visit = async (dir: string): Promise<void> => {
+				if (results.length >= options.limit) return;
+				let entries: string[];
+				try { entries = await readdir(dir); } catch { return; }
+				for (const name of entries) {
+					if (results.length >= options.limit) return;
+					const full = join(dir, name);
+					let st;
+					try { st = await lstat(full); } catch { continue; }
+					if (st.isSymbolicLink()) continue;
+					if (st.isDirectory()) {
+						if (skipNames.has(name)) continue;
+						await visit(full);
+					} else if (st.isFile() && matchesToolGlob(relative(safeRoot, full), pattern)) {
+						results.push(join(cwd, relative(safeRoot, full)));
+					}
+				}
+			};
+			await visit(safeRoot);
+			return results;
+		},
 	};
 }
 
@@ -1119,6 +1106,7 @@ export {
 	makeLsOps,
 	makeReadOps,
 	makeWriteOps,
+	matchesToolGlob,
 	probeSetpriv,
 	probeUnshare,
 	resolveInsideWorkspace,
