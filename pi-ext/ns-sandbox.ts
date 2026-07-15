@@ -1,20 +1,23 @@
 /**
  * ns-sandbox: Linux user-namespace sandbox for pi's built-in tools.
  *
- * File tools are confined to the workspace. Bash runs in a fresh
- * user+mount+pid+ipc namespace (tmpfs root, pivot_root) with the
- * host cwd bind-mounted at its real path (rw,nosuid,nodev). /usr
- * and /etc are rbind'd ro. /run is NOT rbind'd; only a small set
- * of resolv.conf candidates is bound in so DNS still works via
- * the /etc/resolv.conf symlink.
+ * File tools are confined to the workspace (cwd) and /tmp.
+ *
+ * Bash runs in a fresh user+mount+pid+ipc namespace (tmpfs root, pivot_root)
+ * with the host cwd bind-mounted at its real path (rw,nosuid,nodev). /usr and
+ * /etc are rbind'd ro, /tmp rw. /run is NOT rbind'd; only a small set of
+ * resolv.conf candidates is bound in so DNS still works via the
+ * /etc/resolv.conf symlink.
+ *
+ * The optional --airgap disables network access for bash.
  *
  * Requires: Linux, util-linux ≥ 2.36 (unshare + setpriv), and
  * unprivileged user namespaces enabled.
  *
- * Fail-closed. If the sandbox cannot enable, the extension exits
- * the process — no fallback to unsandboxed tools. The extension
- * file and /tmp workspaces are refused at session_start to stop
- * the model tampering with the sandbox.
+ * Fail-closed. If the sandbox cannot enable, the extension exits the process —
+ * no fallback to unsandboxed tools. The extension file inside cwd and /tmp
+ * workspaces are refused at session_start to stop the model tampering with the
+ * sandbox.
  *
  *   pi -e ~/.pi/examples/extensions/ns-sandbox.ts [--airgap]
  */
