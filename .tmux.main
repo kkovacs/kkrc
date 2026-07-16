@@ -519,16 +519,17 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject update docs snippet ........." "8" "pipe-pane -I 'cat ~/.kkrc/inject-ai-docs-update.md'" \
 "git commit with AI message ........." "9" "send-keys 'git diff --cached | ' ; inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"Please craft a git commit message from this. Just the text, no markdown code markers.\\\" | git commit -F -\" enter" \
 "" \
-"" \
 "Download (o)pencode................." "o" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~/.local/bin/ opencode' enter" \
 "config reset ......................." "O" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\", \\\"permission\\\": { \\\"external_directory\\\": { \\\"/tmp/**\\\": \\\"allow\\\" } } }\" >#{opencode_config}' enter" \
-"config ponytail ...................." "n" "send-keys ' tmp=\$(mktemp); jq \".plugin = [\\\"@dietrichgebert/ponytail\\\"]\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
-"config MCP Chrome CDP..............." "c" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
-"config LLM on :8080 ................" "l" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:8080/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
+"install ponytail ..................." "" "send-keys ' tmp=\$(mktemp); jq \".plugin = [\\\"@dietrichgebert/ponytail\\\"]\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
+"install MCP Chrome CDP ............." "" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
+"config \"any\" LLM on :8080 .........." "" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:8080/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
 "Clean up opencode ................" "c-o" "send-keys ' rm -rf ~/{.config,.local/state,.local/share,.cache}/opencode ~/.bun ; rm -rf ~/.local/bin/opencode ' enter" \
 "" \
 "Download (p)i ......................" "p" "send-keys ' mkdir -p ~/.pi ~/.local/bin ; curl -L https://github.com/badlogic/pi-mono/releases/latest/download/pi-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv --strip-components=1 -C ~/.pi/; ln -s ~/.pi/pi ~/.local/bin/pi' enter" \
-"pi install ponytail ................" "P" "send-keys ' pi install git:github.com/DietrichGebert/ponytail' enter" \
+"Download ns-sandbox.ts ............." "" "send-keys ' curl -fsSLo ns-sandbox.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/ns-sandbox.ts ' enter" \
+"Download local-llm.ts .............." "" "send-keys ' mkdir -p ~/.pi/agent/extensions && curl -fsSLo ~/.pi/agent/extensions/local-llm.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/local-llm.ts ' enter" \
+"pi install ponytail ................" "" "send-keys ' pi install git:github.com/DietrichGebert/ponytail' enter" \
 "Clean up pi ......................" "c-p" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi' enter" \
 "" \
 "Download (C)laude code ............." "C" "send-keys ' curl -fsSL https://claude.ai/install.sh | bash' enter" \
@@ -547,6 +548,7 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$GEMINI_API_KEY .................." "g" "send-keys ' stty -echo' enter ' export GEMINI_API_KEY=#{GEMINI_API_KEY} GOOGLE_GENERATIVE_AI_API_KEY=#{GEMINI_API_KEY}; stty echo' enter" \
 "Inject \$GITHUB_TOKEN ...................." "G" "send-keys ' stty -echo' enter ' export GITHUB_TOKEN=#{GITHUB_TOKEN}; stty echo' enter" \
 "Inject \$HTTPS_PROXY ....................." "p" "send-keys ' stty -echo' enter ' export HTTPS_PROXY=\"#{HTTPS_PROXY}\" HTTP_PROXY=\"#{HTTPS_PROXY}\"; stty echo' enter" \
+"Inject \$HUGGINGFACE_API_KEY ............." "h" "send-keys ' stty -echo' enter ' export HUGGINGFACE_API_KEY=#{HUGGINGFACE_API_KEY}; stty echo' enter" \
 "Inject \$MISTRAL_API_KEY ................." "m" "send-keys ' stty -echo' enter ' export MISTRAL_API_KEY=#{MISTRAL_API_KEY}; stty echo' enter" \
 "Inject \$NVIDIA_API_KEY .................." "n" "send-keys ' stty -echo' enter ' export NVIDIA_API_KEY=#{NVIDIA_API_KEY}; stty echo' enter" \
 "Inject \$OLLAMA_API_KEY .................." "l" "send-keys ' stty -echo' enter ' export OLLAMA_API_KEY=#{OLLAMA_API_KEY}; stty echo' enter" \
