@@ -131,7 +131,7 @@ function gf(){ git fetch --all -v "$@"; }
 function gp(){ git pull --ff-only -v "$@"; }
 export -f ts gl gs gf gp
 # W: "git add + commit" changed files (not untracked).
-function W() { gs ; git add -u ; git commit -m wip ; } ; export -f W
+function W() { git add -u ; git commit -m wip ; gs ; } ; export -f W
 # gap: "git pull + add + push": sync, to be used with a notes directory
 function gap() { gs ; gp ; git add -A ; git commit -m wip ; git push ; } ; export -f gap
 # gat: "git at": diff a file with itself at a given ref
