@@ -132,6 +132,8 @@ function gp(){ git pull --ff-only -v "$@"; }
 export -f ts gl gs gf gp
 # gap: "git pull + add + push": sync, to be used with a notes directory
 function gap() { gs ; gp ; git add -A ; git commit -m wip ; git push ; } ; export -f gap
+# gac: "git add + commit" changed files (not untracked).
+function gac() { gs ; git add -u ; git commit -m wip ; } ; export -f gac
 # gat: "git at": diff a file with itself at a given ref
 function gat() { vimdiff "$1" <(git show "${2:-HEAD^}":"$1" ) ; }
 alias gclean="git reset --hard && git clean -f -d -x"
@@ -332,8 +334,10 @@ function sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 
 # Isolated pi agent (attachments and prompt only). See inject-ai-subagent.md
 function pi0() { pi -ne -ns -nt -nc "$@" ; } ; export -f pi0
-# read-only pi agent (read/grep/find/ls tools only).
+# Read-only pi agent (read/grep/find/ls tools only).
 function pir() { pi -ne -ns --tools read,grep,find,ls "$@" ; } ; export -f pir
+# Sandboxed pi agent
+function pis() { pi -e ~/.kkrc/pi-ext/ns-sandbox.ts "$@" ; } ; export -f pis
 
 # Controversial, but it's in the XDG Base Directory Specification. IMHO it's the lesser evil.
 # See: https://specifications.freedesktop.org/basedir/latest/
