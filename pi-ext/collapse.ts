@@ -2,10 +2,11 @@
  * /collapse — Manual compaction command
  *
  * Serializes the current session branch into a compact text format and
- * writes a compaction entry. Zero LLM cost.
+ * writes a compaction entry directly. Zero LLM cost.
  *
- * Uses the built-in compaction flow (session_before_compact hook + ctx.compact())
- * so the compaction summary appears in the TUI chat, just like /compact.
+ * Unlike the built-in /compact, this does not involve the LLM — it is a
+ * deterministic text transform that strips thinking blocks, tool results,
+ * and collapses file/batch tool calls to one-liners.
  *
  * Usage: /collapse
  */
@@ -96,21 +97,7 @@ function compactAll(branch: any[]): string {
   return parts.join("\n");
 }
 
-// Pending collapse state — set by /collapse, consumed by session_before_compact hook
-let pendingCollapse: {
-  summary: string;
-  firstKeptEntryId: string;
-  tokensBefore: number;
-} | null = null;
-
 export default function (pi: ExtensionAPI) {
-  pi.on("session_before_compact", async () => {
-    if (!pendingCollapse) return;
-    const result = pendingCollapse;
-    pendingCollapse = null;
-    return { compaction: result };
-  });
-
   pi.registerCommand("collapse", {
     description: "Compact the session by stripping reasoning and tool calls (zero LLM)",
     handler: async (_args, ctx) => {
@@ -127,26 +114,28 @@ export default function (pi: ExtensionAPI) {
       }
 
       const tokens = ctx.getContextUsage()?.tokens ?? 0;
-      const leafId = ctx.sessionManager.getLeafId();
-      if (!leafId) {
-        ctx.ui.notify("Cannot determine leaf position", "error");
-        return;
-      }
 
-      pendingCollapse = { summary, firstKeptEntryId: leafId, tokensBefore: tokens };
+      // Write the compaction entry directly into the session.
+      // Bypasses the built-in ctx.compact() which rejects sessions
+      // that are too small (prepareCompaction returns undefined).
+      // Pass empty firstKeptEntryId so nothing pre-compaction is kept
+      // verbatim — the summary captures everything.
+      const sm = ctx.sessionManager as any;
+      sm.appendCompaction(
+        summary,
+        "",         // firstKeptEntryId: keep nothing before the compaction
+        tokens,
+        undefined,  // no details
+        true,       // fromHook
+      );
 
-      ctx.compact({
-        onComplete: (result) => {
-          ctx.ui.notify(
-            `/collapse: ${result.summary.length.toLocaleString()} chars (${result.tokensBefore.toLocaleString()} tokens)`,
-            "success",
-          );
-        },
-        onError: (error) => {
-          pendingCollapse = null;
-          ctx.ui.notify(`/collapse failed: ${error.message}`, "error");
-        },
-      });
+      ctx.ui.notify(
+        `/collapse: ${summary.length.toLocaleString()} chars (${tokens.toLocaleString()} tokens)`,
+        "success",
+      );
+
+      // Reload to rebuild the TUI chat so the compaction entry is displayed.
+      await ctx.reload();
     },
   });
 }
