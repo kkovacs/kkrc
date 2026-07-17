@@ -503,7 +503,7 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject (A)I bash function .........." "A" "send-keys \" function AI() {\" ; inject_ai_snippet \; send-keys \" \\\"\\\${2:-#{INJECT_AI_MODEL}}\\\" \\\"\\\$1\\\"; }; export -f AI\" enter" \
 "" \
 "Inject work-style snippet .........." "0" "pipe-pane -I 'cat ~/.kkrc/inject-ai-kk.md'" \
-"Inject ponytail review snippet ....." "1" "pipe-pane -I 'cat ~/.kkrc/inject-ai-ponytail.md'" \
+"Inject pi session handover ........." "1" "pipe-pane -I 'cat ~/.kkrc/inject-ai-handover.md'" \
 "Inject bun-(w)ebview snippet ......." "w" "pipe-pane -I 'cat ~/.kkrc/inject-ai-bun-webview.md'" \
 "Inject pi-(s)ubagent snippet ......." "s" "pipe-pane -I 'cat ~/.kkrc/inject-ai-subagent.md'" \
 "Inject (t)mux snippet .............." "t" "pipe-pane -I 'cat ~/.kkrc/inject-ai-tmux.md'" \
@@ -514,7 +514,8 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject (m)arkdownit snippet ........" "m" "pipe-pane -I 'cat ~/.kkrc/inject-ai-office.md'" \
 "Inject (g)odoc snippet ............." "g" "pipe-pane -I 'cat ~/.kkrc/inject-ai-godoc.md'" \
 "Inject (i)mages via openrouter ....." "i" "pipe-pane -I 'cat ~/.kkrc/inject-ai-image-openrouter.md'" \
-"Inject work summary snippet ........" "6" "pipe-pane -I 'cat ~/.kkrc/inject-ai-summary.md'" \
+"Inject work summary snippet ........" "5" "pipe-pane -I 'cat ~/.kkrc/inject-ai-summary.md'" \
+"Inject ponytail review snippet ....." "6" "pipe-pane -I 'cat ~/.kkrc/inject-ai-ponytail.md'" \
 "Inject code review snippet ........." "7" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
 "Inject update docs snippet ........." "8" "pipe-pane -I 'cat ~/.kkrc/inject-ai-docs-update.md'" \
 "git commit with AI message ........." "9" "send-keys 'git diff --cached | ' ; inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"Please craft a git commit message from this. Just the text, no markdown code markers.\\\" | git commit -F -\" enter" \
