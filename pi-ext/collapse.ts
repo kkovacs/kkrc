@@ -8,6 +8,9 @@
  * deterministic text transform that strips thinking blocks, tool results,
  * and collapses file/batch tool calls to one-liners.
  *
+ * After appending the compaction, navigates away and back to force a context
+ * rebuild (updating agent.state.messages so the LLM sees the compacted context).
+ *
  * Usage: /collapse
  */
 
@@ -17,7 +20,7 @@ const RW = new Set(["read", "write", "edit"]);
 
 interface CompactResult {
   text: string;
-  isToolOnly: boolean; // assistant message with tool calls and no text
+  isToolOnly: boolean;
 }
 
 function compact(msg: Record<string, unknown>): CompactResult {
@@ -31,7 +34,7 @@ function compact(msg: Record<string, unknown>): CompactResult {
           : Array.isArray(content)
             ? (content as any[]).filter((b) => b?.type === "text").map((b) => b.text)
             : [];
-      return { text: texts.length ? `# User\n\n${texts.join("")}\n` : "", isToolOnly: false };
+      return { text: texts.length ? "# User\n\n" + texts.join("") + "\n" : "", isToolOnly: false };
     }
 
     case "assistant": {
@@ -44,26 +47,26 @@ function compact(msg: Record<string, unknown>): CompactResult {
           acc.push(c.text);
         } else if (c.type === "toolCall") {
           hasToolCall = true;
-          if (RW.has(c.name)) acc.push(`[${c.name}] ${c.arguments?.path ?? ""}`);
+          if (RW.has(c.name)) acc.push("[" + c.name + "] " + (c.arguments?.path ?? ""));
           else if (c.name === "bash") {
             const cmd = String(c.arguments?.command ?? "");
-            let bashLine = `[bash] ${cmd.split("\n")[0]}${cmd.includes("\n") ? " ..." : ""}`;
-            if (c.arguments?.outfile) bashLine += `\nOutput: ${c.arguments.outfile}`;
+            let bashLine = "[bash] " + cmd.split("\n")[0] + (cmd.includes("\n") ? " ..." : "");
+            if (c.arguments?.outfile) bashLine += "\nOutput: " + c.arguments.outfile;
             acc.push(bashLine);
-          } else acc.push(`[${c.name}]`);
+          } else acc.push("[" + c.name + "]");
         }
         return acc;
       }, []);
       if (!lines.length) return { text: "", isToolOnly: false };
       const isToolOnly = !hasText && hasToolCall;
-      if (hasText) return { text: `# Assistant\n\n${lines.join("\n")}\n`, isToolOnly };
-      return { text: `${lines.join("\n")}\n`, isToolOnly };
+      if (hasText) return { text: "# Assistant\n\n" + lines.join("\n") + "\n", isToolOnly };
+      return { text: lines.join("\n") + "\n", isToolOnly };
     }
 
     case "bashExecution": {
-      let r = `# User\n\n[bash] ${command ?? ""}\n`;
-      if (fullOutputPath) r += `[output: ${fullOutputPath}]\n`;
-      else if (output) r += `${String(output)}\n`;
+      let r = "# User\n\n[bash] " + (command ?? "") + "\n";
+      if (fullOutputPath) r += "[output: " + fullOutputPath + "]\n";
+      else if (output) r += String(output) + "\n";
       return { text: r, isToolOnly: false };
     }
 
@@ -81,7 +84,7 @@ function compactAll(branch: any[]): string {
       const result = compact(e.message);
       if (result.text) {
         if (result.isToolOnly && !prevWasToolOnly) {
-          parts.push(`# Assistant\n\n${result.text}`);
+          parts.push("# Assistant\n\n" + result.text);
         } else if (result.isToolOnly && prevWasToolOnly) {
           parts[parts.length - 1] += result.text;
         } else {
@@ -101,12 +104,21 @@ export default function (pi: ExtensionAPI) {
   pi.registerCommand("collapse", {
     description: "Compact the session by stripping reasoning and tool calls (zero LLM)",
     handler: async (_args, ctx) => {
-      const branch = ctx.sessionManager.getBranch() as any[];
+      const sm = ctx.sessionManager as any;
+      const branch = sm.getBranch() as any[];
       if (branch.length === 0) {
         ctx.ui.notify("No entries to compact", "error");
         return;
       }
 
+      // Already compacted?
+      const lastEntry = branch[branch.length - 1];
+      if (lastEntry?.type === "compaction") {
+        ctx.ui.notify("Already compacted", "error");
+        return;
+      }
+
+      // Generate the deterministic summary
       const summary = compactAll(branch);
       if (!summary.trim()) {
         ctx.ui.notify("Nothing to compact (no serializable messages)", "error");
@@ -115,27 +127,34 @@ export default function (pi: ExtensionAPI) {
 
       const tokens = ctx.getContextUsage()?.tokens ?? 0;
 
-      // Write the compaction entry directly into the session.
-      // Bypasses the built-in ctx.compact() which rejects sessions
-      // that are too small (prepareCompaction returns undefined).
-      // Pass empty firstKeptEntryId so nothing pre-compaction is kept
-      // verbatim — the summary captures everything.
-      const sm = ctx.sessionManager as any;
-      sm.appendCompaction(
-        summary,
-        "",         // firstKeptEntryId: keep nothing before the compaction
-        tokens,
-        undefined,  // no details
-        true,       // fromHook
-      );
+      // Append the compaction entry
+      sm.appendCompaction(summary, "", tokens, undefined, true);
+
+      // XXX: agent.state.messages is NOT updated by sm.appendCompaction() alone.
+      // Without updating it, the agent still sends all the old uncompacted messages
+      // to the LLM on the next prompt, keeping the cache hit at ~99%.
+      // The built-in /compact does this internally (agent-session.ts:1857-1859), but
+      // since we bypass it with direct sm.appendCompaction(), we need another way.
+      //
+      // navigateTree updates agent.state.messages as a side effect (line 3004-3005).
+      // Navigating away to the parent then back to the compaction entry forces this
+      // rebuild: first to the pre-compaction state, then to the compacted context.
+      const compactionId = sm.getLeafId();
+      const parentId = sm.getEntry(compactionId)?.parentId;
+
+      if (parentId) {
+        await ctx.navigateTree(parentId, { summarize: false });
+        await ctx.navigateTree(compactionId, { summarize: false });
+      }
 
       ctx.ui.notify(
-        `/collapse: ${summary.length.toLocaleString()} chars (${tokens.toLocaleString()} tokens)`,
+        "/collapse: " +
+          summary.length.toLocaleString() +
+          " chars (" +
+          tokens.toLocaleString() +
+          " tokens)",
         "success",
       );
-
-      // Reload to rebuild the TUI chat so the compaction entry is displayed.
-      await ctx.reload();
     },
   });
 }
