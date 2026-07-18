@@ -1,17 +1,17 @@
 /**
- * /collapse — Manual compaction command
+ * /concise — Manual compaction command
  *
  * Serializes the current session branch into a compact text format and
  * writes a compaction entry directly. Zero LLM cost.
  *
  * Unlike the built-in /compact, this does not involve the LLM — it is a
  * deterministic text transform that strips thinking blocks, tool results,
- * and collapses file/batch tool calls to one-liners.
+ * and concises file/batch tool calls to one-liners.
  *
  * After appending the compaction, navigates away and back to force a context
  * rebuild (updating agent.state.messages so the LLM sees the compacted context).
  *
- * Usage: /collapse
+ * Usage: /concise
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -50,7 +50,7 @@ function compact(msg: Record<string, unknown>): CompactResult {
           if (RW.has(c.name)) acc.push("[" + c.name + "] " + (c.arguments?.path ?? ""));
           else if (c.name === "bash") {
             const cmd = String(c.arguments?.command ?? "");
-            let bashLine = "[bash] " + cmd.split("\n")[0] + (cmd.includes("\n") ? " ..." : "");
+            let bashLine = "[bash] " + cmd.split("\n")[0] + (cmd.includes("\n") ? " …" : "");
             if (c.arguments?.outfile) bashLine += "\nOutput: " + c.arguments.outfile;
             acc.push(bashLine);
           } else acc.push("[" + c.name + "]");
@@ -101,7 +101,7 @@ function compactAll(branch: any[]): string {
 }
 
 export default function (pi: ExtensionAPI) {
-  pi.registerCommand("collapse", {
+  pi.registerCommand("concise", {
     description: "Compact the session by stripping reasoning and tool calls (zero LLM)",
     handler: async (_args, ctx) => {
       const sm = ctx.sessionManager as any;
@@ -148,7 +148,7 @@ export default function (pi: ExtensionAPI) {
       }
 
       ctx.ui.notify(
-        "/collapse: " +
+        "/concise: " +
           summary.length.toLocaleString() +
           " chars (" +
           tokens.toLocaleString() +
