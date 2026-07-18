@@ -1,9 +1,10 @@
 /**
- * /clean — Start a fresh session seeded with compacted context
+ * /clean — Start a fresh session with compacted context in the editor
  *
- * Serializes the current session branch into compact text and forks to a
- * brand-new session with that text as the opening message. The original
- * session is untouched. Zero LLM cost.
+ * Serializes the current session branch into compact text, forks to a
+ * brand-new session, and drops the compact text into the editor (unsent)
+ * so you can edit it before sending. The original session is untouched.
+ * Zero LLM cost.
  *
  * Usage: /clean
  */
@@ -12,65 +13,7 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 const RW = new Set(["read", "write", "edit"]);
 
-interface CompactResult {
-  text: string;
-  isToolOnly: boolean;
-}
-
-function compact(msg: Record<string, unknown>): CompactResult {
-  const { role, content, toolName, command, output, fullOutputPath } = msg;
-
-  switch (role) {
-    case "user": {
-      const texts: string[] =
-        typeof content === "string"
-          ? [content]
-          : Array.isArray(content)
-            ? (content as any[]).filter((b) => b?.type === "text").map((b) => b.text)
-            : [];
-      return { text: texts.length ? "# User\n\n" + texts.join("") + "\n" : "", isToolOnly: false };
-    }
-
-    case "assistant": {
-      if (!Array.isArray(content)) return { text: "", isToolOnly: false };
-      let hasText = false;
-      let hasToolCall = false;
-      const lines = (content as any[]).reduce<string[]>((acc, c) => {
-        if (c.type === "text") {
-          hasText = true;
-          acc.push(c.text);
-        } else if (c.type === "toolCall") {
-          hasToolCall = true;
-          if (RW.has(c.name)) acc.push("[" + c.name + "] " + (c.arguments?.path ?? ""));
-          else if (c.name === "bash") {
-            const cmd = String(c.arguments?.command ?? "");
-            let bashLine = "[bash] " + cmd.split("\n")[0] + (cmd.includes("\n") ? " …" : "");
-            if (c.arguments?.outfile) bashLine += "\nOutput: " + c.arguments.outfile;
-            acc.push(bashLine);
-          } else acc.push("[" + c.name + "]");
-        }
-        return acc;
-      }, []);
-      if (!lines.length) return { text: "", isToolOnly: false };
-      const isToolOnly = !hasText && hasToolCall;
-      if (hasText) return { text: "# Assistant\n\n" + lines.join("\n") + "\n", isToolOnly };
-      return { text: lines.join("\n") + "\n", isToolOnly };
-    }
-
-    case "bashExecution": {
-      let r = "# User\n\n[bash] " + (command ?? "") + "\n";
-      if (fullOutputPath) r += "[output: " + fullOutputPath + "]\n";
-      else if (output) r += String(output) + "\n";
-      return { text: r, isToolOnly: false };
-    }
-
-    default:
-      return { text: "", isToolOnly: false };
-  }
-}
-
-/** Measure raw character count of a single message (before compaction). */
-function measureOriginal(msg: Record<string, unknown>): number {
+function compact(msg: Record<string, unknown>): { text: string; isToolOnly: boolean; originalLength: number } {
   const { role, content, command, output, fullOutputPath } = msg;
 
   switch (role) {
@@ -81,46 +24,69 @@ function measureOriginal(msg: Record<string, unknown>): number {
           : Array.isArray(content)
             ? (content as any[]).filter((b) => b?.type === "text").map((b) => b.text)
             : [];
-      return texts.join("").length;
+      const text = texts.join("");
+      return { text: texts.length ? "# User\n\n" + text + "\n" : "", isToolOnly: false, originalLength: text.length };
     }
 
     case "assistant": {
-      if (!Array.isArray(content)) return 0;
-      return (content as any[]).reduce((acc, c) => {
+      if (!Array.isArray(content)) return { text: "", isToolOnly: false, originalLength: 0 };
+      let hasText = false;
+      let hasToolCall = false;
+      let originalLength = 0;
+      const lines: string[] = [];
+      for (const c of content as any[]) {
         if (c.type === "text" && typeof c.text === "string") {
-          return acc + c.text.length;
+          hasText = true;
+          originalLength += c.text.length;
+          lines.push(c.text);
+        } else if (c.type === "toolCall") {
+          hasToolCall = true;
+          originalLength += (c.name?.length ?? 0) + JSON.stringify(c.arguments ?? {}).length;
+          if (RW.has(c.name)) lines.push("[" + c.name + "] " + (c.arguments?.path ?? ""));
+          else if (c.name === "bash") {
+            const cmd = String(c.arguments?.command ?? "");
+            let bashLine = "[bash] " + cmd.split("\n")[0] + (cmd.includes("\n") ? " …" : "");
+            if (c.arguments?.outfile) bashLine += "\nOutput: " + c.arguments.outfile;
+            lines.push(bashLine);
+          } else lines.push("[" + c.name + "]");
         }
-        if (c.type === "toolCall") {
-          return acc + (c.name?.length ?? 0) + JSON.stringify(c.arguments ?? {}).length;
-        }
-        return acc;
-      }, 0);
+      }
+      if (!lines.length) return { text: "", isToolOnly: false, originalLength };
+      const isToolOnly = !hasText && hasToolCall;
+      const body = lines.join("\n") + "\n";
+      const text = isToolOnly ? body : "# Assistant\n\n" + body;
+      return { text, isToolOnly, originalLength };
     }
 
     case "bashExecution": {
-      let len = String(command ?? "").length;
-      if (fullOutputPath) len += String(fullOutputPath).length;
-      else if (output) len += String(output).length;
-      return len;
+      const r = "# User\n\n[bash] " + (command ?? "") + "\n" +
+        (fullOutputPath ? "[output: " + fullOutputPath + "]\n" : output ? String(output) + "\n" : "");
+      const originalLength = String(command ?? "").length +
+        (fullOutputPath ? String(fullOutputPath).length : output ? String(output).length : 0);
+      return { text: r, isToolOnly: false, originalLength };
     }
 
     default:
-      return 0;
+      return { text: "", isToolOnly: false, originalLength: 0 };
   }
 }
 
 /** Serialize all entries in a branch to compact text. */
-function compactAll(branch: any[]): string {
+function compactAll(branch: any[]): { text: string; originalChars: number } {
   const parts: string[] = [];
   let prevWasToolOnly = false;
+  let originalChars = 0;
   for (const e of branch) {
     if (e.type === "message" && e.message) {
       const result = compact(e.message);
+      originalChars += result.originalLength;
       if (result.text) {
-        if (result.isToolOnly && !prevWasToolOnly) {
-          parts.push("# Assistant\n\n" + result.text);
-        } else if (result.isToolOnly && prevWasToolOnly) {
-          parts[parts.length - 1] += result.text;
+        if (result.isToolOnly) {
+          if (prevWasToolOnly) {
+            parts[parts.length - 1] += result.text;
+          } else {
+            parts.push("# Assistant\n\n" + result.text);
+          }
         } else {
           parts.push(result.text);
         }
@@ -128,28 +94,16 @@ function compactAll(branch: any[]): string {
       }
     } else if (e.type === "compaction" && e.summary) {
       parts.push(e.summary);
+      originalChars += e.summary.length;
       prevWasToolOnly = false;
     }
   }
-  return parts.join("\n");
-}
-
-/** Measure total raw character count of a branch (before compaction). */
-function measureAll(branch: any[]): number {
-  let total = 0;
-  for (const e of branch) {
-    if (e.type === "message" && e.message) {
-      total += measureOriginal(e.message);
-    } else if (e.type === "compaction" && e.summary) {
-      total += e.summary.length;
-    }
-  }
-  return total;
+  return { text: parts.join("\n"), originalChars };
 }
 
 export default function (pi: ExtensionAPI) {
   pi.registerCommand("clean", {
-    description: "Start a fresh session seeded with compacted context (zero LLM)",
+    description: "Start a fresh session with compacted context in the editor (zero LLM)",
     handler: async (_args, ctx) => {
       const sm = ctx.sessionManager as any;
       const branch = sm.getBranch() as any[];
@@ -158,35 +112,25 @@ export default function (pi: ExtensionAPI) {
         return;
       }
 
-      const summary = compactAll(branch);
-      if (!summary.trim()) {
+      const { text: rawSummary, originalChars } = compactAll(branch);
+      const summary = rawSummary.trim();
+      if (!summary) {
         ctx.ui.notify("Nothing to clean (no serializable messages)", "error");
         return;
       }
 
-      const tokens = ctx.getContextUsage()?.tokens ?? 0;
       const parentSession = sm.getSessionFile() as string | undefined;
       const sessionId = sm.getSessionId();
-      const originalChars = measureAll(branch);
-      const compactChars = summary.trim().length;
+      const compactChars = summary.length;
       const reduction = originalChars > 0 ? Math.round((1 - compactChars / originalChars) * 100) : 0;
 
-      const seededText =
-        "Here is a summary of our previous session " +
-        sessionId +
-        ". Let's continue on this:\n\n" +
-        summary.trim();
+      const seededText = `Here is a summary of our previous session ${sessionId}.\n\n${summary}\n\n# User - Let's continue on this:\n\n`;
 
-      // Fork to a fresh session with the compact text seeded as a user message.
+      // Fork to a fresh session and prefill the editor with the compact text.
       const result = await ctx.newSession({
         parentSession,
-        setup: async (sessionManager: any) => {
-          sessionManager.appendMessage({
-            role: "user",
-            content: seededText,
-          });
-        },
         withSession: async (freshCtx) => {
+          freshCtx.ui.setEditorText(seededText);
           freshCtx.ui.notify(
             `/clean: ${originalChars.toLocaleString()} → ${compactChars.toLocaleString()} chars (${reduction}% reduction)`,
             "success",
