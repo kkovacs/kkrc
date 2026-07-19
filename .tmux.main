@@ -522,16 +522,14 @@ bind -T menus "a" display-menu -T " AI... " \
 "" \
 "Download (o)pencode................." "o" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~/.local/bin/ opencode' enter" \
 "config reset ......................." "O" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\", \\\"permission\\\": { \\\"external_directory\\\": { \\\"/tmp/**\\\": \\\"allow\\\" } } }\" >#{opencode_config}' enter" \
-"install ponytail ..................." "" "send-keys ' tmp=\$(mktemp); jq \".plugin = [\\\"@dietrichgebert/ponytail\\\"]\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
 "install MCP Chrome CDP ............." "" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
 "config \"any\" LLM on :8080 .........." "" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:8080/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
 "Clean up opencode ................" "c-o" "send-keys ' rm -rf ~/{.config,.local/state,.local/share,.cache}/opencode ~/.bun ; rm -rf ~/.local/bin/opencode ' enter" \
 "" \
 "Download (p)i ......................" "p" "send-keys ' mkdir -p ~/.pi ~/.local/bin ; curl -L https://github.com/badlogic/pi-mono/releases/latest/download/pi-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv --strip-components=1 -C ~/.pi/; ln -s ~/.pi/pi ~/.local/bin/pi' enter" \
-"Install clean.ts ..................." "" "send-keys ' mkdir -p ~/.pi/agent/extensions && curl -fsSLo ~/.pi/agent/extensions/clean.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/clean.ts ' enter" \
+"Install clean.ts ..................." "c" "send-keys ' mkdir -p ~/.pi/agent/extensions && curl -fsSLo ~/.pi/agent/extensions/clean.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/clean.ts ' enter" \
 "Install local-llm.ts ..............." "" "send-keys ' mkdir -p ~/.pi/agent/extensions && curl -fsSLo ~/.pi/agent/extensions/local-llm.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/local-llm.ts ' enter" \
-"Download ./ns-sandbox.ts ..........." "" "send-keys ' curl -fsSLo ns-sandbox.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/ns-sandbox.ts ' enter" \
-"pi install ponytail ................" "" "send-keys ' pi install git:github.com/DietrichGebert/ponytail' enter" \
+"Download ./ns-sandbox.ts ..........." "S" "send-keys ' curl -fsSLo ns-sandbox.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/ns-sandbox.ts ' enter" \
 "Clean up pi ......................" "c-p" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi' enter" \
 "" \
 "Download (C)laude code ............." "C" "send-keys ' curl -fsSL https://claude.ai/install.sh | bash' enter" \
