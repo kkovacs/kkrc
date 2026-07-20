@@ -71,26 +71,25 @@ async function probe(
 
 // XXX: pi binds CLI flag values to the registry AFTER factories run, so
 // pi.getFlag() returns nothing at factory time. Parse from argv directly.
-function getLocalPortFromArgv(): number | undefined {
-  const { values } = parseArgs({ options: { "local-port": { type: "string" } }, strict: false });
-  const raw = values["local-port"];
-  if (typeof raw !== "string") return undefined;
-  const n = Number.parseInt(raw, 10);
-  return Number.isInteger(n) && n >= 1 && n <= 65535 ? n : undefined;
+function getLocalUrlFromArgv(): string | undefined {
+  const { values } = parseArgs({ options: { local: { type: "string" } }, strict: false });
+  const raw = values["local"];
+  if (typeof raw !== "string" || !raw) return undefined;
+  return raw;
 }
 
 export default async function (pi: ExtensionAPI) {
   // Register CLI flag (so it shows in --help and isn't reported as unknown).
   // The value itself is read from process.argv because pi.getFlag is not yet
   // bound at factory time.
-  pi.registerFlag("local-port", {
-    description: "Local LLM server port (default 8080, e.g. --local-port 9999)",
+  pi.registerFlag("local", {
+    description: "Local LLM server URL (default http://127.0.0.1:8080, e.g. --local http://localhost:9999)",
     type: "string",
   });
 
   const envUrl = process.env.PI_LOCAL_LLM_URL;
-  const flagPort = getLocalPortFromArgv();
-  const baseUrl = flagPort !== undefined ? `http://127.0.0.1:${flagPort}` : (envUrl ?? DEFAULT_URL).replace(/\/+$/, "");
+  const flagUrl = getLocalUrlFromArgv();
+  const baseUrl = (flagUrl ?? envUrl ?? DEFAULT_URL).replace(/\/+$/, "");
   const apiKey = process.env.LOCAL_API_KEY ?? "no-key";
 
   const result = await probe(baseUrl);
