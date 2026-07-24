@@ -12,7 +12,8 @@ Usage:
     ./models-dev.py -p opencode-go -i aud
     ./models-dev.py -m deepseek-v4-flash -M 0.3   # defaults to -p openrouter
     ./models-dev.py -m '.*gpt.*' -M 10
-    ./models-dev.py -p openrouter -P               # sort by output price
+    ./models-dev.py -p openrouter -O               # sort by output price
+    ./models-dev.py -p openrouter -I               # sort by input price
     ./models-dev.py -p openrouter -c               # context column, sorted desc by context
     ./models-dev.py -p openrouter -C               # cache r/w column
 """
@@ -187,7 +188,8 @@ def build_filtered_table(
     model_filter: str | None = None,
     input_filter: str | None = None,
     chart_max: float | None = None,
-    price_sort: bool = False,
+    in_price_sort: bool = False,
+    out_price_sort: bool = False,
     show_date: bool = False,
     date_sort: bool = False,
     show_cache: bool = False,
@@ -235,8 +237,10 @@ def build_filtered_table(
 
     if date_sort:
         rows.sort(key=lambda r: (r["age_days"] if r["age_days"] is not None else float("inf"), r["label"].lower(), r["provider"].lower()))
-    elif price_sort:
-        rows.sort(key=lambda r: (r["out_price"], r["label"].lower(), r["provider"].lower()))
+    elif in_price_sort:
+        rows.sort(key=lambda r: (r["in_price"], r["out_price"], r["label"].lower(), r["provider"].lower()))
+    elif out_price_sort:
+        rows.sort(key=lambda r: (r["out_price"], r["in_price"], r["label"].lower(), r["provider"].lower()))
     elif show_context:
         rows.sort(key=lambda r: (-r["context_limit"] if r["context_limit"] is not None else float("inf"), r["label"].lower(), r["provider"].lower()))
     else:
@@ -336,10 +340,16 @@ def main() -> int:
         help="Filter by input modality, e.g. txt, img, aud, vid, pdf (or text, image, etc.)",
     )
     parser.add_argument(
-        "-P",
-        "--price",
+        "-O",
+        "--out-price",
         action="store_true",
         help="Sort by output price ascending, then model, then provider",
+    )
+    parser.add_argument(
+        "-I",
+        "--in-price",
+        action="store_true",
+        help="Sort by input price ascending, then model, then provider",
     )
     parser.add_argument(
         "-d",
@@ -398,7 +408,8 @@ def main() -> int:
             model_filter=args.model,
             input_filter=args.input,
             chart_max=args.max,
-            price_sort=args.price,
+            in_price_sort=args.in_price,
+            out_price_sort=args.out_price,
             show_date=args.date,
             date_sort=args.date_sort,
             show_cache=args.cache,
