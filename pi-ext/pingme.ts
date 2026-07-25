@@ -14,12 +14,6 @@ export default function (pi: ExtensionAPI) {
     type: "string",
   });
 
-  const url = pi.getFlag("pingme") as string | undefined;
-  if (!url) {
-    //console.log("[pingme] No --pingme flag set — extension inactive.");
-    return;
-  }
-
   let agentStartTime: number | null = null;
 
   pi.on("agent_start", () => {
@@ -33,9 +27,12 @@ export default function (pi: ExtensionAPI) {
     agentStartTime = null;
 
     if (elapsed > 60_000) {
-      fetch(url).catch((err) => {
-        console.error("[pingme] fetch failed:", err.message);
-      });
+      const url = pi.getFlag("pingme") as string | undefined;
+      if (url) {
+        fetch(url).catch((err) => {
+          console.error("[pingme] fetch failed:", err.message);
+        });
+      }
     }
   });
 }
