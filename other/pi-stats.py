@@ -244,7 +244,7 @@ def collect_all(sessions_dir: Path) -> dict[str, Any]:
                 })
 
     messages.sort(key=lambda m: m["timestamp"] or datetime.min.replace(tzinfo=timezone.utc))
-    sessions.sort(key=lambda s: s["start_ts"] or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+    sessions.sort(key=lambda s: s["start_ts"] or datetime.min.replace(tzinfo=timezone.utc))
     user_ts.sort()
 
     return {
