@@ -6,11 +6,10 @@
 """
 Visual dashboard summary of pi agent sessions.
 
-Default mode shows hourly cost chart (all sessions aggregated) + model breakdown.
+Default mode shows session list + hourly cost chart + model breakdown.
 
 Usage:
-    uv run pi-sum.py                 # hourly bars + model breakdown
-    uv run pi-sum.py -l              # list recent sessions
+    uv run pi-sum.py                 # session list + hourly bars + model breakdown
     uv run pi-sum.py -n N            # Nth most expensive session (detail)
     uv run pi-sum.py -s <guid>        # specific session by GUID substring
     uv run pi-sum.py -n N -a         # show all turns (no 60-turn cap)
@@ -476,17 +475,17 @@ def render_model_breakdown(messages: list[dict],
     return "\n".join(lines)
 
 
-def render_session_list(sessions: list[dict], limit: int = 20) -> str:
-    """List recent sessions with component-stacked bars."""
+def render_session_list(sessions: list[dict]) -> str:
+    """List all sessions with component-stacked bars."""
     if not sessions:
         return "  No sessions with cost data found."
 
-    visible = sessions[:limit]
-    max_total = max(s["total"] for s in visible) if visible else 0.0
+    total = len(sessions)
+    max_total = max(s["total"] for s in sessions) if sessions else 0.0
 
     # Precompute time-range strings for header width
     time_strs: list[str] = []
-    for s in visible:
+    for s in sessions:
         start = _to_local(s["start_ts"])
         end = _to_local(s.get("end_ts"))
         if start and end:
@@ -501,14 +500,15 @@ def render_session_list(sessions: list[dict], limit: int = 20) -> str:
     TIME_W = max((len(s) for s in time_strs), default=4)
 
     GUID_W = 36  # UUID length
+    heading = f"  Recent sessions ({total})"
     lines = [
         "",
-        f"  Recent sessions (showing {min(limit, len(sessions))} of {len(sessions)})",
+        heading,
         f"  {'time':{TIME_W}}  {'guid':{GUID_W}}  {'bar':^{BAR_WIDTH}}  {_COST_COLS}  calls/turns",
         f"  {'─' * TIME_W}  {'─' * GUID_W}  {'─' * BAR_WIDTH}  {_COST_DASH}  {'─' * 11}",
     ]
 
-    for i, s in enumerate(visible):
+    for i, s in enumerate(sessions):
         comps = s["costs"]
         bar = component_bar(comps, max_total)
         cols = _cost_columns(comps)
@@ -516,9 +516,6 @@ def render_session_list(sessions: list[dict], limit: int = 20) -> str:
         if s.get("turns", 0) > 0:
             tail += f" · {s['turns']}t"
         lines.append(f"  {time_strs[i]:{TIME_W}}  {s['guid']:{GUID_W}}  {bar}  {cols}  {tail}")
-
-    lines.append("")
-    lines.append(_COMPONENT_LEGEND)
 
     return "\n".join(lines)
 
@@ -666,10 +663,6 @@ def main() -> int:
         description="Visual dashboard summary of pi agent sessions"
     )
     parser.add_argument(
-        "-l", "--list", action="store_true",
-        help="List recent sessions",
-    )
-    parser.add_argument(
         "-s", "--session", type=str,
         help="Analyze a specific session (path or GUID substring)",
     )
@@ -730,12 +723,6 @@ def main() -> int:
                                      guid=_session_guid(path)))
         return 0
 
-    # ── session list mode ──
-    if args.list:
-        data = collect_all(args.sessions_dir)
-        print(render_session_list(data["sessions"]))
-        return 0
-
     # ── collect all data (single pass) ──
     data = collect_all(args.sessions_dir)
     messages = data["messages"]
@@ -747,7 +734,9 @@ def main() -> int:
         print("  No sessions with cost data found.")
         return 1
 
-    # ── default: hourly chart + model breakdown ──
+    # ── default: session list + hourly chart + model breakdown ──
+    print(render_session_list(sessions))
+    print()
     print(render_header(messages, sessions, n_turns=n_turns))
 
     hour_groups = group_by_hour(messages)
