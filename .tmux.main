@@ -372,7 +372,6 @@ bind "c-r" display-menu -T " Inject... " \
 "Inject e(x)-screen config .........." "x" "pipe-pane -I 'cat ~/.kkrc/inject-screen.txt'" \
 "Inject e(X)-screen PROD warning ...." "X" "pipe-pane -I 'cat ~/.kkrc/inject-screen-red.txt'" \
 "cat os-release ....................." "o" "send-keys \" cat /etc/os-release; systemd-detect-virt\" enter" \
-"Inject fancy 'set -x' .............." "" "send-keys \"export PS4=\$'+\\\\tLine \\\$LINENO at \$(date -Iseconds): '\" enter" \
 "unset (Q)UOTING_STYLE .............." "Q" "send-keys \" unset QUOTING_STYLE\" enter" \
 "" \
 "Submenu (c-d)atabases ............" "c-d" "send-keys -K c-q ^ d" \
@@ -483,6 +482,7 @@ bind -T menus "n" display-menu -T " NodeJS... " \
 # Submenu: tools
 bind -T menus "t" display-menu -T " Tools / platforms... " \
 "mkdir foo & git init ..............." "g" "send-keys ' mkdir foo && cd foo && git init -b main && touch .gitignore && git add .gitignore && git -c user.email=\\\"$USER@$HOSTNAME\\\" -c user.name=\\\"$USER\\\" commit -m init && git status -sb' enter" \
+"Inject fancy 'set -x' .............." "x" "send-keys \"export PS4=\$'+\\\\t\$(date -Iseconds) L\\\$LINENO:\\\\t '\" enter" \
 "" \
 "Docker run chrome CDP .............." "c" "send-keys 'sudo docker run -u `id -u $USER` -it --rm --add-host host.docker.internal:host-gateway -p 9222:9222 chromedp/headless-shell:latest --no-sandbox --window-size=1280,720' enter" \
 "Params for (c)hrome devtools ......." "D" "send-keys ' --remote-debugging-port=9222 --user-data-dir=/tmp/cdp/ --no-first-run --no-default-browser-check --disable-signin-promo --disable-sync --disable-infobars \\\"chrome://inspect/#remote-debugging\\\" ; rm -rf /tmp/cdp' enter" \
