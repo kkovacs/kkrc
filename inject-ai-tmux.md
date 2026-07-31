@@ -7,12 +7,12 @@ Shared session `llm`, unless told otherwise. Always target `llm:NAME` (distinct 
 ```bash
 tmux has-session -t llm 2>/dev/null || tmux new-session -d -s llm # Bootstrap tmux session
 tmux list-windows -t llm -F '#{window_index}: #{window_name}' # list windows
-tmux new-window -t llm -S -n NAME # Idempotent
+tmux new-window -t llm -S -n NAME # Idempotent: create or select window
+tmux send-keys -t llm:NAME -R \; clear-history -t llm:NAME \; send-keys -t llm:NAME 'command here' Enter # Start the process, clears so capture-pane shows only this run
+tmux capture-pane -t llm:NAME -p # Verify running; check for errors; use -S - for full scrollback, -S -20 for last 20 lines
 tmux send-keys -t llm:NAME C-c # To stop running process. Always send ctrl+c in separate send-keys!
-tmux send-keys -t llm:NAME -R \; clear-history -t llm:NAME \; send-keys -t llm:NAME 'command here' Enter # Start the process, keep capture-pane lean
-tmux capture-pane -t llm:NAME -p # Verify running; check for errors; add `-S - | tail` for more scrollback
 tmux kill-window -t llm:NAME # Force kill, last resort; kills session if last window killed
-tmux wait-for -S NAME # Append to "command here; ..." then wait on `tmux wait-for NAME` for completion
+tmux wait-for -S NAME # Append to "command here; ..." then run `tmux wait-for NAME` to wait for completion signal
 ```
 
 Gotchas:
