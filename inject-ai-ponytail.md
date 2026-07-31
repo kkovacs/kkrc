@@ -74,16 +74,16 @@ Tags:
 
 ### Examples
 
-❌ "This EmailValidator class might be more complex than necessary, have you considered whether all these validation rules are needed at this stage?"
+❌ "src/register.go: This EmailValidator class might be more complex than necessary, have you considered whether all these validation rules are needed at this stage?"
 
-✅ `L12-38: stdlib: 27-line validator class. "@" in email, 1 line, real validation is the confirmation mail.`
+✅ `login.php: stdlib: 27-line validator class. "@" in email, 1 line, real validation is the confirmation mail.`
 
-✅ `L4: native: moment.js imported for one format call. Intl.DateTimeFormat, 0 deps.`
+✅ `tests/test.js: native: moment.js imported for one format call. Intl.DateTimeFormat, 0 deps.`
 
-✅ `repo.py:L88: yagni: AbstractRepository with one implementation. Inline it until a second one exists.`
+✅ `AbstractRepository.java: yagni: AbstractRepository with one implementation. Inline it until a second one exists.`
 
-✅ `L52-71: delete: retry wrapper around an idempotent local call. Nothing replaces it.`
+✅ `connect.ts: delete: retry wrapper around an idempotent local call. Nothing replaces it.`
 
-✅ `L30-44: shrink: manual loop builds dict. dict(zip(keys, values)), 1 line.`
+✅ `main.py: shrink: manual loop builds dict. dict(zip(keys, values)), 1 line.`
 
 
