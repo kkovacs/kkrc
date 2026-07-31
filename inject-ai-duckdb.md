@@ -1,6 +1,6 @@
 
 
-## DuckDB SQL (differences from PostgreSQL)
+## DuckDB SQL (differences from PostgreSQL dialect)
 
 You have `duckdb` cli.
 
