@@ -346,7 +346,7 @@ if [[ "$PATH" != *"/.local/bin"* ]]; then export PATH="$HOME/.local/bin:$PATH"; 
 # Sandboxed pi agent
 function pin() { pi -e ~/.kkrc/pi-ext/ns-sandbox.ts "$@" ; } ; export -f pin
 # Pi statistics from session files
-function pis() { ~/.kkrc/other/pi-stats.py "$@" }
+function pis() { ~/.kkrc/other/pi-stats.py "$@" ; }
 
 # Commands which are not required in remote inject
 alias tmux="tmux -2"
