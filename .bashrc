@@ -336,14 +336,17 @@ function sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 function pi0() { pi -ne -ns -nt -nc "$@" ; } ; export -f pi0
 # Read-only pi agent (read/grep/find/ls tools only).
 function pir() { pi -ne -ns --tools read,grep,find,ls "$@" ; } ; export -f pir
-# Sandboxed pi agent
-function pis() { pi -e ~/.kkrc/pi-ext/ns-sandbox.ts "$@" ; } ; export -f pis
 
 # Controversial, but it's in the XDG Base Directory Specification. IMHO it's the lesser evil.
 # See: https://specifications.freedesktop.org/basedir/latest/
 if [[ "$PATH" != *"/.local/bin"* ]]; then export PATH="$HOME/.local/bin:$PATH"; fi
 
 # END of part to be injected
+
+# Sandboxed pi agent
+function pin() { pi -e ~/.kkrc/pi-ext/ns-sandbox.ts "$@" ; } ; export -f pin
+# Pi statistics from session files
+function pis() { ~/.kkrc/other/pi-stats.py "$@" }
 
 # Commands which are not required in remote inject
 alias tmux="tmux -2"
