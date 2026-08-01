@@ -340,6 +340,8 @@ function pir() { pi -ne -ns --tools read,grep,find,ls "$@" ; } ; export -f pir
 # Controversial, but it's in the XDG Base Directory Specification. IMHO it's the lesser evil.
 # See: https://specifications.freedesktop.org/basedir/latest/
 if [[ "$PATH" != *"/.local/bin"* ]]; then export PATH="$HOME/.local/bin:$PATH"; fi
+# Also use linuxbrew if installed
+if [[ "$PATH" != *"/.linuxbrew/"* ]]; then export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin${PATH+:$PATH}"; fi
 
 # END of part to be injected
 
