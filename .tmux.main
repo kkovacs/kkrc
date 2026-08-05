@@ -542,6 +542,7 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$ELEVENLABS_API_KEY .............." "" "send-keys ' stty -echo' enter ' export ELEVENLABS_API_KEY=#{ELEVENLABS_API_KEY}; stty echo' enter" \
 "Inject \$EXA_API_KEY ....................." "x" "send-keys ' stty -echo' enter ' export EXA_API_KEY=#{EXA_API_KEY}; stty echo' enter" \
 "Inject \$GEMINI_API_KEY .................." "" "send-keys ' stty -echo' enter ' export GEMINI_API_KEY=#{GEMINI_API_KEY} GOOGLE_GENERATIVE_AI_API_KEY=#{GEMINI_API_KEY}; stty echo' enter" \
+"Inject \$CLOUDFLARE_… ...................." "" "send-keys ' stty -echo' enter ' export CLOUDFLARE_API_KEY=#{CLOUDFLARE_API_KEY} CLOUDFLARE_ACCOUNT_ID=#{CLOUDFLARE_ACCOUNT_ID} CLOUDFLARE_GATEWAY_ID=#{CLOUDFLARE_GATEWAY_ID}; stty echo' enter" \
 "Inject \$GITHUB_TOKEN ...................." "" "send-keys ' stty -echo' enter ' export GITHUB_TOKEN=#{GITHUB_TOKEN}; stty echo' enter" \
 "Inject \$HTTPS_PROXY ....................." "h" "send-keys ' stty -echo' enter ' export HTTPS_PROXY=\"#{HTTPS_PROXY}\" HTTP_PROXY=\"#{HTTPS_PROXY}\"; stty echo' enter" \
 "Inject \$HUGGINGFACE_API_KEY ............." "" "send-keys ' stty -echo' enter ' export HUGGINGFACE_API_KEY=#{HUGGINGFACE_API_KEY}; stty echo' enter" \
