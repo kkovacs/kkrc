@@ -14,10 +14,14 @@ mysoftlink .Xmodmap ~/.Xmodmap
 mysoftlink .tigrc ~/.tigrc
 mysoftlink .psqlrc ~/.psqlrc
 mysoftlink .inputrc ~/.inputrc
+mysoftlink .bunfig.toml ~/.bunfig.toml
+mysoftlink .npmrc ~/.npmrc
+mysoftlink .yarnrc.yml ~/.yarnrc.yml
 mysoftlink .ansible.cfg ~/.ansible.cfg
 mysoftlink .config/opencode ~/.config/opencode
 mysoftlink .config/Code ~/.config/Code
 mysoftlink .config/ghostty ~/.config/ghostty
+mysoftlink .config/uv ~/.config/uv
 
 # Damn you Microsoft for not being able to keep everything in one place
 if [[ "$OSTYPE" == "darwin"* ]]; then
