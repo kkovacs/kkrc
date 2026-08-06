@@ -376,7 +376,7 @@ bind "c-r" display-menu -T " Inject... " \
 "" \
 "Submenu (c-d)atabases ............" "c-d" "send-keys -K c-q ^ d" \
 "Submenu (c-e)nvironment .........." "c-e" "send-keys -K c-q ^ e" \
-"Submenu A(c-I) ..................." "c-i" "send-keys -K c-q ^ i" \
+"Submenu (c-A)I ..................." "c-a" "send-keys -K c-q ^ a" \
 "Submenu (c-g)o ..................." "c-g" "send-keys -K c-q ^ g" \
 "Submenu (c-p)hp .................." "c-p" "send-keys -K c-q ^ p" \
 "Submenu p(c-y)thon ..............." "c-y" "send-keys -K c-q ^ y" \
@@ -501,7 +501,7 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 
 # Submenu: AI
 opencode_config="\~/.config/opencode/opencode.json"
-bind -T menus "i" display-menu -T " AI... " \
+bind -T menus "a" display-menu -T " AI... " \
 "Inject (a)i shell+python snippet...." "a" "inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"BLUF only:\\\"\"" \
 "Inject (A)I bash function .........." "A" "send-keys \" function AI() {\" ; inject_ai_snippet \; send-keys \" \\\"\\\${2:-#{INJECT_AI_MODEL}}\\\" \\\"\\\$1\\\"; }; export -f AI\" enter" \
 "" \
@@ -555,7 +555,7 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$OPENCODE_API_KEY (x2)............" "o" "send-keys ' stty -echo' enter ' export OPENCODE_API_KEY=#{?#{@api_key_index},#{OPENCODE_API_KEY1},#{OPENCODE_API_KEY0}}; stty echo; echo K#{@api_key_index};' enter ; set -F @api_key_index '#{?#{@api_key_index},0,1}'" \
 "Inject \$OPENROUTER_API_KEY .............." "O" "send-keys ' stty -echo' enter ' export OPENROUTER_API_KEY=#{OPENROUTER_API_KEY}; stty echo' enter" \
 "Inject \$RECRAFT_API_KEY ................." "" "send-keys ' stty -echo' enter ' export RECRAFT_API_KEY=#{RECRAFT_API_KEY}; stty echo' enter" \
-"Inject \$AI_GATEWAY_API_KEY (Vercel) ....." "v" "send-keys ' stty -echo' enter ' export AI_GATEWAY_API_KEY=#{AI_GATEWAY_API_KEY}; stty echo' enter" \
+"Inject \$AI_GATEWAY_API_KEY (Vercel) ....." "" "send-keys ' stty -echo' enter ' export AI_GATEWAY_API_KEY=#{AI_GATEWAY_API_KEY}; stty echo' enter" \
 "Inject \$XAI_API_KEY ....................." "" "send-keys ' stty -echo' enter ' export XAI_API_KEY=#{XAI_API_KEY}; stty echo' enter" \
 "Poor man's Claude (OpenCode Go+minimax)"    "" "send-keys ' stty -echo' enter ' export ANTHROPIC_DEFAULT_OPUS_MODEL=minimax-m3 ANTHROPIC_DEFAULT_SONNET_MODEL=minimax-m3 ANTHROPIC_DEFAULT_HAIKU_MODEL=minimax-m3 CLAUDE_CODE_SUBAGENT_MODEL=minimax-m3 ANTHROPIC_BASE_URL=\"https://opencode.ai/zen/go/\" ANTHROPIC_AUTH_TOKEN=\"\" ANTHROPIC_API_KEY=\"#{OPENCODE_API_KEY}\"; stty echo' enter" \
 "Rich man's Claude (OpenRouter+opus,sonnet)" "" "send-keys ' stty -echo' enter ' export ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" ANTHROPIC_AUTH_TOKEN=\"#{OPENROUTER_API_KEY}\" ANTHROPIC_API_KEY=\"\"; stty echo' enter" \
