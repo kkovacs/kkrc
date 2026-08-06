@@ -435,20 +435,27 @@ def render_model_breakdown(messages: list[dict],
     # Sort by cost descending
     sorted_models = sorted(model_groups.items(), key=lambda kv: msg_total(kv[1]), reverse=True)
 
+    # Compute max label width dynamically so long model+provider names don't break alignment
+    all_labels: list[str] = []
+    for model, msgs in sorted_models:
+        provider = msgs[0]["provider"] if msgs else "?"
+        all_labels.append(f"{model} ({provider})")
+    label_w = max((len(l) for l in all_labels), default=35)
+    label_w = max(label_w, len("model"), len("(total)"))
+
     lines = [
         "",
-        f"  {'model':35}  {'bar':^{BAR_WIDTH}}  {_COST_COLS}  calls/turns/sessions",
-        f"  {'─' * 35}  {'─' * BAR_WIDTH}  {_COST_DASH}  {'─' * 22}",
+        f"  {'model':{label_w}}  {'bar':^{BAR_WIDTH}}  {_COST_COLS}  calls/turns/sessions",
+        f"  {'─' * label_w}  {'─' * BAR_WIDTH}  {_COST_DASH}  {'─' * 22}",
     ]
 
-    for model, msgs in sorted_models:
+    for idx, (model, msgs) in enumerate(sorted_models):
         mt = msg_total(msgs)
         n_calls = len(msgs)
-        provider = msgs[0]["provider"] if msgs else "?"
         comps = msg_cost_components(msgs)
         bar = component_bar(comps, max_total)
         cols = _cost_columns(comps)
-        label = f"{model} ({provider})"
+        label = all_labels[idx]
         n_sess = _n_sessions(msgs)
         n_turns = model_turns.get(model, 0)
         tail = f"{n_calls}c"
@@ -456,7 +463,7 @@ def render_model_breakdown(messages: list[dict],
             tail += f" · {n_turns}t"
         if n_sess > 0:
             tail += f" · {n_sess}s"
-        lines.append(f"  {label:<35}  {bar}  {cols}  {tail}")
+        lines.append(f"  {label:{label_w}}  {bar}  {cols}  {tail}")
 
     # Total line (aggregate of all models)
     if total > 0:
@@ -470,7 +477,7 @@ def render_model_breakdown(messages: list[dict],
             tail_all += f" · {n_turns_all}t"
         if n_sess_all > 0:
             tail_all += f" · {n_sess_all}s"
-        lines.append(f"  {'(total)':<35}  {bar_all}  {cols_all}  {tail_all}")
+        lines.append(f"  {'(total)':{label_w}}  {bar_all}  {cols_all}  {tail_all}")
 
     return "\n".join(lines)
 
