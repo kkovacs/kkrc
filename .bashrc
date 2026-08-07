@@ -339,7 +339,7 @@ function pir() { pi -ne -ns --tools read,grep,find,ls "$@" ; } ; export -f pir
 
 # ~/.local/bin is in the XDG Base Directory Specification: https://specifications.freedesktop.org/basedir/latest/
 # Use linuxbrew if installed. Pi installs rg and fd even on older systems, why not use them.
-for p in "$HOME/.local/bin" /home/linuxbrew/.linuxbrew/{bin,sbin} "$HOME/.pi/agent/bin"; do [[ ":$PATH:" == *":$p:"* ]] || PATH="${PATH+$PATH:}$p" ; done
+for p in "$HOME/.local/bin" /home/linuxbrew/.linuxbrew/{bin,sbin} "$HOME/.bun/bin" "$HOME/.pi/agent/bin"; do [[ ":$PATH:" == *":$p:"* ]] || PATH="${PATH+$PATH:}$p"; done
 
 # END of part to be injected
 
