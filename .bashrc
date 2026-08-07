@@ -337,11 +337,9 @@ function pi0() { pi -ne -ns -nt -nc "$@" ; } ; export -f pi0
 # Read-only pi agent (read/grep/find/ls tools only).
 function pir() { pi -ne -ns --tools read,grep,find,ls "$@" ; } ; export -f pir
 
-# Controversial, but it's in the XDG Base Directory Specification. IMHO it's the lesser evil.
-# See: https://specifications.freedesktop.org/basedir/latest/
-if [[ "$PATH" != *"/.local/bin"* ]]; then export PATH="$HOME/.local/bin:$PATH"; fi
-# Also use linuxbrew if installed
-if [[ "$PATH" != *"/.linuxbrew/"* ]]; then export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin${PATH+:$PATH}"; fi
+# ~/.local/bin is in the XDG Base Directory Specification: https://specifications.freedesktop.org/basedir/latest/
+# Use linuxbrew if installed. Pi installs rg and fd even on older systems, why not use them.
+for p in "$HOME/.local/bin" /home/linuxbrew/.linuxbrew/{bin,sbin} "$HOME/.pi/agent/bin"; do [[ ":$PATH:" == *":$p:"* ]] || PATH="${PATH+$PATH:}$p" ; done
 
 # END of part to be injected
 
