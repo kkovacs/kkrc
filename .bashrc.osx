@@ -15,69 +15,8 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 function cl() { container list ; }
 function c() { container system start && container run --rm -it --ssh -m 2G -v ~/wrk:/wrk alpine "$@" ; }
 
-# This is my preferred way of working with Ubuntu multipass on OS X.
-function vm()
-{
-	local name dir
-	# Subcommands
-	case "$1" in
-		"ls" | "list" | "")
-			multipass list
-			;;
-		"stop")
-			while [ $# -gt 1 ]; do
-				shift
-				multipass stop "$1"
-			done
-			multipass list
-			;;
-		"rm" | "kill")
-			while [ $# -gt 1 ]; do
-				shift
-				multipass stop "$1"
-				multipass delete -v -p "$1"
-			done
-			multipass list
-			;;
-		"ip")
-			multipass info "$2" | grep '^IPv4' | awk '{print $2}'
-			;;
-		"ssh")
-			name="${2}"
-			shift; shift;
-			# NOTE: Using "ubuntu" user, because multipass's "mount" uses it.
-			# NOTE: Agent forwarding ON by default
-			ssh -A ubuntu@$(vm ip "${name}") "$@"
-			;;
-		*)
-			# Start a new VM
-			name="${1}"
-			dir="${2:-$HOME/wrk}"
-			shift; shift;
-			# Allow privileged mounts
-			# XXX Not enough to prevent "Operation not permitted" :(
-			#multipass set local.privileged-mounts=Yes
-			# Sorry for identation, it's necessary because of the HEREDOC
-			eval "cat <<EOF
-$(<~/.kkrc/other/cloud-config.multipass.yml)
-EOF" | multipass launch --disk 10G --memory 3G --cloud-init - -v -n "${name}" "$@" 26.04
-			# Check if mount was already set up or not
-			if multipass info "$name" | grep "Mounts: *--"; then
-				# XXX Mounts (either type) are not working for "OS X protected" dirs (Downloads, Documents, Desktop, etc)
-				# NOTE: Strangely, non-native is actually 2x as fast
-				# A) Native mount
-				#multipass stop "$name" # Stop/start needed for native mount
-				#multipass mount --type native "$dir" "$name:/persist"
-				#multipass start "$name" # Stop/start needed for native mount
-				# B) Non-native mount
-				multipass mount "$dir" "$name:/persist"
-			fi
-			tmux rename-window "${name}"
-			#multipass shell "${name}"
-			vm ssh "${name}"
-			;;
-	esac
-}
+# This is my preferred way of working with Ubuntu on OS X.
+function vm() { container run -v "$PWD":"$PWD" -m 4g -c 4 --ssh --rm -it ubuntu bash -c "cd $PWD; exec bash" ; }
 
 # Get/set DNS on OS X
 function dns()

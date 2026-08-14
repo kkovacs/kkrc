@@ -14,10 +14,6 @@ HISTCONTROL=ignoreboth
 
 # OS X specifics, before
 if [[ "$OSTYPE" == "darwin"* ]]; then
-	# Force load bash-completion on OS X
-	# We need to do this BEFORE the generic part, or else `compopt` is unknown
-	# shellcheck disable=SC1091
-	. "/opt/homebrew/etc/profile.d/bash_completion.sh" 2>/dev/null
 	# If we have `brew install coreutils`, then use the linux-compatible `ls`
 	# NOTE: Have this before defining `lll`, so that uses gls too
 	[ -f /opt/homebrew/bin/gls ] && alias ls="gls --color"
