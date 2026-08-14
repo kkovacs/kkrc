@@ -219,6 +219,9 @@ bind n next-window
 bind N previous-window
 # Jump to window with bell
 bind c-x next-window -a
+# Make sure these are undefined here (used in .tmux.conf)
+unbind -n C-Space
+unbind -n C-BSpace
 
 # Do not auto-copy on mouse drag end
 unbind -T copy-mode-vi MouseDragEnd1Pane
