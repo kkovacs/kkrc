@@ -160,7 +160,7 @@ function gg() { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :
 function s() { tmux attach-session || tmux new-session \; set prefix2 c-a ; }
 
 # Avoid mandatory reconfiguration of git with user/email for hotfixes. File permission matching git does by itself since 2022 (was here earlier)
-function git() { command git -c user.email="${USER:-$LOGNAME}@$HOSTNAME" -c user.name="${USER:-$LOGNAME}" "$@" ; } ; export -f git
+function git() { command git -c user.email="${USER:-$(id -un)}@${HOSTNAME:-$(uname -n)}" -c user.name="${USER:-$(id -un)}" "$@" ; } ; export -f git
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
 function M() { mount "$@" | grep '^\/dev\/' ; }
 function D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none\|^overlay\|^shm\|^efivarfs' ; }
