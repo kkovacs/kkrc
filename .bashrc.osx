@@ -13,10 +13,7 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 
 # Apple containers, see: https://github.com/apple/container
 function cl() { container list ; }
-function c() { container system start && container run --rm -it --ssh -m 2G -v ~/wrk:/wrk alpine "$@" ; }
-
-# This is my preferred way of working with Ubuntu on OS X.
-function vm() { container run -v "$PWD":"$PWD" -m 4g -c 4 --ssh --rm -it ubuntu bash -c "cd $PWD; exec bash" ; }
+function vm() { container run -v "$PWD":"$PWD" -m 4g --ssh --rm -it ubuntu bash -c "cd $PWD; exec bash" ; }
 
 # Get/set DNS on OS X
 function dns()
