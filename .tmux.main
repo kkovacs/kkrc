@@ -504,9 +504,7 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "" \
 "Download (p)i ......................" "p" "send-keys ' mkdir -p ~/.pi ~/.local/bin ; curl -L https://github.com/badlogic/pi-mono/releases/latest/download/pi-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv --strip-components=1 -C ~/.pi/; ln -s ~/.pi/pi ~/.local/bin/pi' enter" \
 "Bun install pi ..................." "c-p" "send-keys ' bun install --minimum-release-age=1 -g @earendil-works/pi-coding-agent' enter" \
-"Install (C)lean.ts ................." "C" "send-keys ' mkdir -p ~/.pi/agent/extensions && curl -fsSLo ~/.pi/agent/extensions/clean.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/clean.ts ' enter" \
-"Install (P)ingme.ts ................" "P" "send-keys ' mkdir -p ~/.pi/agent/extensions && curl -fsSLo ~/.pi/agent/extensions/pingme.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/pingme.ts ' enter" \
-"Install (L)ocal-llm.ts ............." "L" "send-keys ' mkdir -p ~/.pi/agent/extensions && curl -fsSLo ~/.pi/agent/extensions/local-llm.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/local-llm.ts ' enter" \
+"Transfer pi-ext/ ..................." "e" "send-keys ' mkdir -p ~/.pi/agent/extensions && (base64 -d | tar zxv -C ~/.pi/agent/extensions/) <<\"EOF\"' enter ; pipe-pane -I 'COPYFILE_DISABLE=1 tar cf - --no-xattrs -C ~/.kkrc/pi-ext/ . | gzip -c | base64 -w0 && echo EOF'" \
 "Clean up pi ........................" "" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi' enter" \
 "" \
 "Download (o)pencode................." "o" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~/.local/bin/ opencode' enter" \
