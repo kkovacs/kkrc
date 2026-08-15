@@ -507,7 +507,6 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "Install (C)lean.ts ................." "C" "send-keys ' mkdir -p ~/.pi/agent/extensions && curl -fsSLo ~/.pi/agent/extensions/clean.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/clean.ts ' enter" \
 "Install (P)ingme.ts ................" "P" "send-keys ' mkdir -p ~/.pi/agent/extensions && curl -fsSLo ~/.pi/agent/extensions/pingme.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/pingme.ts ' enter" \
 "Install (L)ocal-llm.ts ............." "L" "send-keys ' mkdir -p ~/.pi/agent/extensions && curl -fsSLo ~/.pi/agent/extensions/local-llm.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/local-llm.ts ' enter" \
-"Download ./ns-(S)andbox.ts ........." "S" "send-keys ' curl -fsSLo ns-sandbox.ts https://github.com/kkovacs/kkrc/raw/refs/heads/master/pi-ext/ns-sandbox.ts ' enter" \
 "Clean up pi ........................" "" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi' enter" \
 "" \
 "Download (o)pencode................." "o" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~/.local/bin/ opencode' enter" \

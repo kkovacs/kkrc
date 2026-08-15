@@ -339,8 +339,6 @@ for p in "$HOME/.local/bin" /home/linuxbrew/.linuxbrew/{bin,sbin} "$HOME/.bun/bi
 
 # END of part to be injected
 
-# Sandboxed pi agent
-function pin() { pi -e ~/.kkrc/pi-ext/ns-sandbox.ts "$@" ; } ; export -f pin
 # Pi statistics from session files
 function pis() { ~/.kkrc/other/pi-stats.py "$@" ; }
 
