@@ -27,7 +27,7 @@ if [[ $ID_LIKE == "debian" ]]; then
 	# Update packages (wait if needed)
 	until $SUDO apt-get update; do sleep 1; done
 	# Install packages (wait if needed)
-	until $SUDO NEEDRESTART_MODE=a apt-get install -y bash-completion curl dnsutils git htop less less man psmisc rsync screen socat tig unattended-upgrades unzip vim-nox wget zip; do sleep 1; done;
+	until NEEDRESTART_MODE=a $SUDO apt-get install -y bash-completion curl dnsutils git htop less less man psmisc rsync screen socat tig unattended-upgrades unzip vim-nox wget zip; do sleep 1; done;
 elif [[ $ID_LIKE == *"fedora"* ]]; then # Covers Fedora, RedHat, CentOS, Alma Linux, Oracle Linux
 	$SUDO yum install -y epel-release && $SUDO yum install -y bash-completion bind-utils curl git htop less psmisc rsync screen socat tig unzip util-linux vim wget zip
 elif [[ $ID_LIKE == *"suse"* ]]; then
