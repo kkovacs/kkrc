@@ -6,6 +6,9 @@
 
 # Safety
 set -e
+if [ "$EUID" -ne 0 ]; then
+    SUDO=sudo
+fi
 
 # Could be an OS X?
 if [[ ! -f /etc/os-release && "$(uname -s)" == "Darwin" ]]; then
@@ -22,15 +25,15 @@ fi
 # See which Linux
 if [[ $ID_LIKE == "debian" ]]; then
 	# Update packages (wait if needed)
-	until sudo apt-get update; do sleep 1; done
+	until $SUDO apt-get update; do sleep 1; done
 	# Install packages (wait if needed)
-	until sudo NEEDRESTART_MODE=a apt-get install -y bash-completion curl dnsutils git htop less less man psmisc rsync screen socat tig unattended-upgrades unzip vim-nox wget zip; do sleep 1; done;
+	until $SUDO NEEDRESTART_MODE=a apt-get install -y bash-completion curl dnsutils git htop less less man psmisc rsync screen socat tig unattended-upgrades unzip vim-nox wget zip; do sleep 1; done;
 elif [[ $ID_LIKE == *"fedora"* ]]; then # Covers Fedora, RedHat, CentOS, Alma Linux, Oracle Linux
-	sudo yum install -y epel-release && sudo yum install -y bash-completion bind-utils curl git htop less psmisc rsync screen socat tig unzip util-linux vim wget zip
+	$SUDO yum install -y epel-release && $SUDO yum install -y bash-completion bind-utils curl git htop less psmisc rsync screen socat tig unzip util-linux vim wget zip
 elif [[ $ID_LIKE == *"suse"* ]]; then
-	sudo zypper install -y bash-completion bind-utils curl git htop less psmisc rsync screen socat tig unzip util-linux vim wget zip
+	$SUDO zypper install -y bash-completion bind-utils curl git htop less psmisc rsync screen socat tig unzip util-linux vim wget zip
 elif [[ $ID == "alpine" ]]; then
-	sudo apk add bash-completion bind-tools curl git htop less psmisc rsync screen socat tig unzip vim wget zip
+	$SUDO apk add bash-completion bind-tools curl git htop less psmisc rsync screen socat tig unzip vim wget zip
 else
 	echo "Unknown OS - can't setup!"
 	exit 1
