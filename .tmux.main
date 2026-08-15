@@ -403,6 +403,7 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "Agressive apt (u)pgrade ............" "u" "send-keys 'sudo \$EAT apt update && sudo \$EAT NEEDRESTART_MODE=a apt upgrade -y'" \
 "" \
 "Inject bwrap sandox (v)m............" "v" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap.txt'" \
+"Inject docker sandbox (V)m ........." "V" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-docker.txt'" \
 "" \
 "Modify (A)uthorized_keys ..........." "A" setup_ssh_key \
 "Drop .tmux.conf ...................." "s" "send-keys ' cat >~/.tmux.conf <<\"EOF\"' enter ; load-buffer -b staticsendbuf ~/.kkrc/.tmux.conf ; paste-buffer -d -b staticsendbuf ; send-keys 'EOF' enter" \
