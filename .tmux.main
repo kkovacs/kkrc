@@ -402,6 +402,8 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "apk add basics ....................." "K" "send-keys ' apk add bash bash-completion curl git htop less psmisc rsync screen shadow socat sudo tig unzip vim wget zip && chsh --shell /bin/bash && exec bash' enter" \
 "Agressive apt (u)pgrade ............" "u" "send-keys 'sudo \$EAT apt update && sudo \$EAT NEEDRESTART_MODE=a apt upgrade -y'" \
 "" \
+"Inject bwrap sandox (v)m............" "v" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap.txt'" \
+"" \
 "Modify (A)uthorized_keys ..........." "A" setup_ssh_key \
 "Drop .tmux.conf ...................." "s" "send-keys ' cat >~/.tmux.conf <<\"EOF\"' enter ; load-buffer -b staticsendbuf ~/.kkrc/.tmux.conf ; paste-buffer -d -b staticsendbuf ; send-keys 'EOF' enter" \
 "Drop .screenrc ....................." "x" "send-keys ' cat >~/.screenrc <<\"EOF\"' enter ; load-buffer -b staticsendbuf ~/.kkrc/.screenrc ; paste-buffer -d -b staticsendbuf ; send-keys 'EOF' enter" \
