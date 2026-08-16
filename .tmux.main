@@ -589,6 +589,9 @@ bind -T menus "z" display-menu -T " Zmodem... " \
 "Poor man's \"xxd\" with hexdump ...." "h" "send-keys \"hexdump -v -e '\\\"%08.8_ax:\\\"' -e '16/1 \\\" %02x\\\"' -e '\\\"  \\\" 16/1 \\\"%_p\\\" \\\"\\\\n\\\"' " \
 "Poor man's \"xxd\" with od ........." "o" 'send-keys "od -v -A x -t x1z "' \
 "" \
+"tar+gzip+base64 ingress .........." "i" "send-keys \" (base64 -di | tar zxv)\" enter" \
+"tar+gzip+base64 egress ..........." "e" "send-keys ' COPYFILE_DISABLE=1 tar cf - --no-xattrs . | gzip -c | base64 -w0'" \
+"" \
 "Bytestream with hexdump .........." "b" "send-keys \"hexdump -v -e '32/1 \\\" %02x\\\" \\\"\\\\n\\\"' \"" \
 "Bytestream reverse ..............." "r" "send-keys 'while read -r -d \" \" x; do [ -n \"\$x\" ] && printf \"\\x\${x}\"; done'"
 
