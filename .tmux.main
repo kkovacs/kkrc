@@ -357,6 +357,9 @@ set -s command-alias[134] setup_python_uv="send-keys ' mkdir -p ~/.local/bin ; c
 set -s command-alias[124] setup_brew="send-keys ' NONINTERACTIVE=1 /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"' enter"
 # IMPORTANT: Uses the INJECT_AI_... env vars. Use some throw-away key because it gets exposed easily, for example an OpenRouter key restricted to $5/month.
 set -Fs command-alias[117] inject_ai_snippet="send-keys \" python3 -c \\\"import sys,json,urllib.request,os;u='#{INJECT_AI_URL}';h={'Authorization':'Bearer #{INJECT_AI_KEY}','Content-Type':'application/json'};d=json.dumps({'model':sys.argv[1],'messages':[{'role':'system','content':sys.argv[2]},{'role':'user','content':sys.stdin.read()or sys.argv[2]}]}).encode();o=urllib.request.build_opener(urllib.request.ProxyHandler());print(json.loads(o.open(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])\\\""
+set -s command-alias[112] setup_opencode="send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~/.local/bin/ opencode' enter"
+set -s command-alias[136] setup_pi="send-keys ' mkdir -p ~/.pi ~/.local/bin ; curl -L https://github.com/badlogic/pi-mono/releases/latest/download/pi-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv --strip-components=1 -C ~/.pi/; ln -s ~/.pi/pi ~/.local/bin/pi' enter"
+set -s command-alias[137] setup_pi_bun="send-keys ' bun install --minimum-release-age=1 -g @earendil-works/pi-coding-agent' enter"
 
 # PLEASE DONT USE: "j", "k", "q" IN ANY MENU!
 
@@ -414,7 +417,10 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "Setup PROD (w)arn .................." "w" "send-keys ' printf \"\\033[00;31mPRODUCTION SERVER\\033[00m\" | sudo tee /etc/debian_chroot ; . ~/.bashrc' enter" \
 "Remove PROD (W)arn ................." "W" "send-keys ' sudo rm /etc/debian_chroot; unset debian_chroot' enter" \
 "" \
-"sudo (t)ouch /snapshotme ..........." "t" "send-keys ' sudo touch /snapshotme; echo -n Commencing in ~\$(( 60 - \$( date +%-S ) )) secs; while [[ -f /snapshotme ]]; do echo -n .; sleep 1; done; echo' enter"
+"sudo (t)ouch /snapshotme ..........." "t" "send-keys ' sudo touch /snapshotme; echo -n Commencing in ~\$(( 60 - \$( date +%-S ) )) secs; while [[ -f /snapshotme ]]; do echo -n .; sleep 1; done; echo' enter" \
+"" \
+"uv+bun+pi .........................." "1" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_bun ; setup_python_uv ; setup_pi ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"uv+bun+opencode ...................." "2" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_bun ; setup_python_uv ; setup_opencode ; send-keys 'EOF' enter '. ~/.bashrc' enter"
 
 # Submenu: databases
 bind -T menus "d" display-menu -T " DB... " \
@@ -503,12 +509,12 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "Download (p)rettyping .............." "" "send-keys ' mkdir -p ~/.local/bin ; curl -Lo ~/.local/bin/prettyping https://raw.githubusercontent.com/denilsonsa/prettyping/master/prettyping && chmod 755 ~/.local/bin/prettyping' enter 'prettyping 1.1.1.1' enter" \
 "Install ~/(z)ig ...................." "" "send-keys ' mkdir -p ~/.local/zig && curl -L https://ziglang.org/download/0.16.0/zig-\$(uname -m)-linux-0.16.0.tar.xz | tar Jxv --strip-components=1 -C ~/.local/zig ; ln -s ~/.local/zig/zig ~/.local/bin/zig' enter" \
 "" \
-"Download (p)i ......................" "p" "send-keys ' mkdir -p ~/.pi ~/.local/bin ; curl -L https://github.com/badlogic/pi-mono/releases/latest/download/pi-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv --strip-components=1 -C ~/.pi/; ln -s ~/.pi/pi ~/.local/bin/pi' enter" \
-"Bun install pi ..................." "c-p" "send-keys ' bun install --minimum-release-age=1 -g @earendil-works/pi-coding-agent' enter" \
+"Download (p)i ......................" "p" setup_pi \
+"Bun install pi ..................." "c-p" setup_pi_bun \
 "Transfer pi-ext/ ..................." "e" "send-keys ' mkdir -p ~/.pi/agent/extensions && (base64 -d | tar zxv -C ~/.pi/agent/extensions/) <<\"EOF\"' enter ; pipe-pane -I 'COPYFILE_DISABLE=1 tar cf - --no-xattrs -C ~/.kkrc/pi-ext/ . | gzip -c | base64 -w0 && echo EOF'" \
 "Clean up pi ........................" "" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi' enter" \
 "" \
-"Download (o)pencode................." "o" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~/.local/bin/ opencode' enter" \
+"Download (o)pencode................." "o" setup_opencode \
 "config reset ......................." "O" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\", \\\"permission\\\": { \\\"external_directory\\\": { \\\"/tmp/**\\\": \\\"allow\\\" } } }\" >#{opencode_config}' enter" \
 "install MCP Chrome CDP ............." "" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
 "config \"any\" LLM on :8080 .........." "" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:8080/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
