@@ -10,10 +10,11 @@ Default mode shows session list + hourly cost chart + model breakdown.
 
 Usage:
     uv run pi-sum.py                 # session list + hourly bars + model breakdown
-    uv run pi-sum.py -n N            # Nth most expensive session (detail)
-    uv run pi-sum.py -s <guid>        # specific session by GUID substring
-    uv run pi-sum.py -n N -a         # show all turns (no 60-turn cap)
-    uv run pi-sum.py -n N -c         # cumulative costs in session detail
+    uv run pi-sum.py N               # Nth most expensive session (detail)
+    uv run pi-sum.py <guid>          # specific session by GUID substring
+    uv run pi-sum.py <path>          # session by file path
+    uv run pi-sum.py N -a            # show all turns (no 60-step cap)
+    uv run pi-sum.py N -c            # cumulative costs in session detail
 """
 
 from __future__ import annotations
@@ -38,6 +39,7 @@ COMPONENTS = [
 ]
 
 BAR_WIDTH = 40
+MAX_TURNS_DEFAULT = 60
 
 # ─── ANSI helpers ──────────────────────────────────────────────
 
@@ -670,12 +672,8 @@ def main() -> int:
         description="Visual dashboard summary of pi agent sessions"
     )
     parser.add_argument(
-        "-s", "--session", type=str,
-        help="Analyze a specific session (path or GUID substring)",
-    )
-    parser.add_argument(
-        "-n", "--nth", type=int, default=0, metavar="N",
-        help="Analyze Nth most expensive session",
+        "target", nargs="?", default=None,
+        help="N (nth most expensive), GUID substring, or session file path",
     )
     parser.add_argument(
         "-a", "--all-turns", action="store_true",
@@ -686,52 +684,63 @@ def main() -> int:
         help="Show cumulative costs in session detail",
     )
     parser.add_argument(
-        "--sessions-dir", type=Path, default=SESSIONS_DIR,
+        "--session-dir", type=Path, default=SESSIONS_DIR,
         help="Custom sessions directory",
     )
     args = parser.parse_args()
 
-    # ── session detail mode (-s or -n) ──
-    if args.session or args.nth > 0:
-        if args.session:
-            path = Path(args.session)
-            if path.exists():
-                pass  # explicit path
-            else:
-                # Try GUID substring lookup
-                matches = _find_by_guid(args.sessions_dir, args.session)
-                if len(matches) == 0:
-                    print(f"Error: no session found for '{args.session}'", file=sys.stderr)
-                    return 1
-                if len(matches) > 1:
-                    print(f"Error: '{args.session}' matches {len(matches)} sessions; be more specific:", file=sys.stderr)
-                    for m in matches:
-                        print(f"  {_session_guid(m)}", file=sys.stderr)
-                    return 1
-                path = matches[0]
-        else:
-            data = collect_all(args.sessions_dir)
+    # ── classify target ──
+    # None       → dashboard
+    # digit str  → nth most expensive
+    # path-like  → session file
+    # else       → GUID substring
+    if args.target is not None:
+        if args.target.isdigit():
+            nth = int(args.target)
+            if nth < 1:
+                print(f"Error: {nth} out of range (must be >= 1)", file=sys.stderr)
+                return 1
+            data = collect_all(args.session_dir)
             sessions = data["sessions"]
-            # -n picks Nth most expensive, so re-sort by cost descending
             sessions.sort(key=lambda s: s["total"], reverse=True)
             if not sessions:
                 print("No sessions with cost data found.", file=sys.stderr)
                 return 1
-            if args.nth < 1 or args.nth > len(sessions):
-                print(f"Error: -n {args.nth} out of range (1..{len(sessions)})", file=sys.stderr)
+            if nth > len(sessions):
+                print(f"Error: {nth} out of range (1..{len(sessions)})", file=sys.stderr)
                 return 1
-            path = sessions[args.nth - 1]["path"]
+            path = sessions[nth - 1]["path"]
+        else:
+            p = Path(args.target)
+            if "/" in args.target or p.exists():
+                # file path
+                if not p.exists():
+                    print(f"Error: file not found: {args.target}", file=sys.stderr)
+                    return 1
+                path = p
+            else:
+                # GUID substring
+                matches = _find_by_guid(args.session_dir, args.target)
+                if len(matches) == 0:
+                    print(f"Error: no session found for '{args.target}'", file=sys.stderr)
+                    return 1
+                if len(matches) > 1:
+                    print(f"Error: '{args.target}' matches {len(matches)} sessions; be more specific:", file=sys.stderr)
+                    for m in matches:
+                        print(f"  {_session_guid(m)}", file=sys.stderr)
+                    return 1
+                path = matches[0]
 
         turns = parse_turns(path)
-        max_turns = None if args.all_turns else 60
+        max_turns = None if args.all_turns else MAX_TURNS_DEFAULT
         cumulative = args.cumulative
         print(f"Session: {path}")
         print(render_session_detail(turns, max_turns=max_turns, cumulative=cumulative,
                                      guid=_session_guid(path)))
         return 0
 
-    # ── collect all data (single pass) ──
-    data = collect_all(args.sessions_dir)
+    # ── dashboard mode ──
+    data = collect_all(args.session_dir)
     messages = data["messages"]
     sessions = data["sessions"]
     user_ts = data["user_ts"]
