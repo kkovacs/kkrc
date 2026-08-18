@@ -13,6 +13,7 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 
 # Apple containers, see: https://github.com/apple/container
 function cl() { container list ; }
+# XXX We are not adding `--user "$(id -u):$(id -g)"` because... no sudo inside. :-/ Fortunately file permissions work out this way too.
 function vm() { container run -v "$PWD":"$PWD" -m 4g --ssh --rm -it ubuntu bash -c "cd $PWD; exec bash" ; }
 
 # Get/set DNS on OS X
