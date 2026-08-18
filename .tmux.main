@@ -304,7 +304,7 @@ bind c-e pipe-pane -I 'cat ~/.kkrc/inject-ash.txt'
 # Add ssh public key to authorized_keys. Create dir if necessary, take care of permissions
 set -s command-alias[101] setup_ssh_key="send-keys \" (umask 077; mkdir ~/.ssh 2>/dev/null; echo >>~/.ssh/authorized_keys '\" \; load-buffer -b staticsendbuf ~/.ssh/id_ed25519.pub \; paste-buffer -d -s '' -b staticsendbuf \; send-keys \"')\" enter"
 # Install must-have packages on the remote system (Debian & derivatives)
-BASIC="bash-completion curl dnsutils git gron htop jq less man psmisc rsync screen socat tig unattended-upgrades unzip vim-nox wget tmux"
+BASIC="sudo bash-completion curl dnsutils git gron htop jq less man psmisc rsync screen socat tig unattended-upgrades unzip vim-nox wget tmux"
 set -s command-alias[104] setup_basics_eatmydata="send-keys ' \$([ \"\$EUID\" -eq 0 ] || echo sudo) bash -c \"until apt-get update; do sleep 1; done; [ -f /usr/bin/eatmydata ] || until NEEDRESTART_MODE=a apt-get install -y eatmydata; do sleep 1; done; export EAT=eatmydata; until DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a eatmydata apt-get install -y less $BASIC; do sleep 1; done; \" ;' #enter"
 # Install .kkrc
 set -s command-alias[105] setup_kkrc="send-keys \" git clone --depth 1 https://github.com/kkovacs/kkrc/ ~/.kkrc; ~/.kkrc/install.sh; . ~/.bashrc\" enter"
@@ -384,6 +384,7 @@ bind "c-r" display-menu -T " Inject... " \
 "Submenu (c-d)atabases ............" "c-d" "send-keys -K c-q ^ d" \
 "Submenu (c-e)nvironment .........." "c-e" "send-keys -K c-q ^ e" \
 "Submenu (c-A)I ..................." "c-a" "send-keys -K c-q ^ a" \
+"Submenu (c-s)andbox .............." "c-s" "send-keys -K c-q ^ s" \
 "Submenu (c-g)o ..................." "c-g" "send-keys -K c-q ^ g" \
 "Submenu (c-p)hp .................." "c-p" "send-keys -K c-q ^ p" \
 "Submenu p(c-y)thon ..............." "c-y" "send-keys -K c-q ^ y" \
@@ -404,9 +405,6 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "yum basics ........................." "y" setup_centos \
 "apk add basics ....................." "K" "send-keys ' apk add bash bash-completion curl git htop less psmisc rsync screen shadow socat sudo tig unzip vim wget zip && chsh --shell /bin/bash && exec bash' enter" \
 "Agressive apt (u)pgrade ............" "u" "send-keys 'sudo \$EAT apt update && sudo \$EAT NEEDRESTART_MODE=a apt upgrade -y'" \
-"" \
-"Inject bwrap sandox (v)m............" "v" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap.txt'" \
-"Inject docker sandbox (V)m ........." "V" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-docker.txt'" \
 "" \
 "Modify (A)uthorized_keys ..........." "A" setup_ssh_key \
 "Drop .tmux.conf ...................." "s" "send-keys ' cat >~/.tmux.conf <<\"EOF\"' enter ; load-buffer -b staticsendbuf ~/.kkrc/.tmux.conf ; paste-buffer -d -b staticsendbuf ; send-keys 'EOF' enter" \
@@ -576,6 +574,12 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject proxy http:888(8)................." "8" 'send-keys " export {http,https}_proxy=http://127.0.0.1:8888 {HTTP,HTTPS}_PROXY=http://127.0.0.1:8888" enter' \
 "Inject proxy http:808(0)................." "0" 'send-keys " export {http,https}_proxy=http://127.0.0.1:8080 {HTTP,HTTPS}_PROXY=http://127.0.0.1:8080" enter' \
 "Unset proxies ..........................." "-" 'send-keys " unset {http,https,all}_proxy {HTTP,HTTPS,ALL}_PROXY WSL_PAC_URL" enter'
+
+# Submenu: sandbox
+bind -T menus "s" display-menu -T " Sandbox... " \
+"Inject bwrap sandox 26.04 .........." "6" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-26.txt'" \
+"Inject bwrap sandox 24.04 .........." "4" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-24.txt'" \
+"Inject docker sandbox vm ..........." "d" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-docker.txt'"
 
 # Submenu: vim
 bind -T menus "v" display-menu -T " vim... " \
