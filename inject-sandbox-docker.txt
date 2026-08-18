@@ -1,1 +1,1 @@
-docker run -v "$PWD":"$PWD" -m 4g --rm -it ubuntu bash -c "cd $PWD; exec bash"
+docker run -v "$PWD":"$PWD" -m 4g --rm -it --user "$(id -u):$(id -g)" ubuntu bash -c "cd $PWD; exec bash"
