@@ -577,9 +577,10 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 
 # Submenu: sandbox
 bind -T menus "s" display-menu -T " Sandbox... " \
-"Inject bwrap sandox 26.04 .........." "6" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-26.txt'" \
-"Inject bwrap sandox 24.04 .........." "4" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-24.txt'" \
-"Inject docker sandbox vm ..........." "d" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-docker.txt'"
+"Start bwrap on 26.04 ..............." "6" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-26.txt'" \
+"Start bwrap on 24.04 ..............." "4" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-24.txt'" \
+"Start apple containers ............." "a" "send-keys 'container run -v \"\$PWD\":\"\$PWD\" -m 4g --ssh --rm -it ubuntu bash -c \"cd \$PWD; exec bash\" ;' enter" \
+"Start docker ......................." "d" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-docker.txt'"
 
 # Submenu: vim
 bind -T menus "v" display-menu -T " vim... " \
