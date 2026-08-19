@@ -518,6 +518,7 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "config \"any\" LLM on :8080 .........." "" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:8080/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
 "Clean up opencode .................." "" "send-keys ' rm -rf ~/{.config,.local/state,.local/share,.cache}/opencode ~/.bun ; rm -rf ~/.local/bin/opencode ' enter" \
 "" \
+"bun install opencode beta .........." "" "send-keys ' bun install -g --minimum-release-age 0 --trust @opencode-ai/cli@beta' enter" \
 "Download Vercel fx ................." "" "send-keys ' mkdir -p ~/.local/bin && curl -fsSL \"https://releases.fx.sh/\$(curl -fsSL https://releases.fx.sh/latest.txt)/fx-linux-\$(uname -m).tar.gz\" | tar -xz -C ~/.local/bin/ fx' enter" \
 "Install Claude Code ................" "" "send-keys ' curl -fsSL https://claude.ai/install.sh | bash' enter" \
 "Install Codex CLI .................." "" "send-keys ' curl -fsSL https://chatgpt.com/codex/install.sh | sh' enter"
