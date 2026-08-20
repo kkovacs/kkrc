@@ -402,6 +402,7 @@ bind "c-r" display-menu -T " Inject... " \
 bind -T menus "c-r" display-menu -T " Modify... " \
 "Setup kkrc ........................." "" setup_kkrc \
 "apt basics + setup kkrc............." "r" "send-keys ' time cat <<\"EOF\" | bash' enter '[ ! -f /usr/bin/tig ] && {' ; setup_basics_eatmydata ; send-keys ' } ; [ ! -d ~/.kkrc ] && {' ; setup_kkrc ; send-keys '}' enter 'EOF' enter '. ~/.bashrc' enter" \
+"apt basics ........................." "a" "send-keys ' time cat <<\"EOF\" | bash' enter '[ ! -f /usr/bin/tig ] && {' ; setup_basics_eatmydata ; send-keys ' } ' enter 'EOF' enter" \
 "yum basics ........................." "y" setup_centos \
 "apk add basics ....................." "K" "send-keys ' apk add bash bash-completion curl git htop less psmisc rsync screen shadow socat sudo tig unzip vim wget zip && chsh --shell /bin/bash && exec bash' enter" \
 "Agressive apt (u)pgrade ............" "u" "send-keys 'sudo \$EAT apt update && sudo \$EAT NEEDRESTART_MODE=a apt upgrade -y'" \
@@ -417,8 +418,8 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "" \
 "sudo (t)ouch /snapshotme ..........." "t" "send-keys ' sudo touch /snapshotme; echo -n Commencing in ~\$(( 60 - \$( date +%-S ) )) secs; while [[ -f /snapshotme ]]; do echo -n .; sleep 1; done; echo' enter" \
 "" \
-"uv+bun+pi .........................." "1" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_bun ; setup_python_uv ; setup_pi ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
-"uv+bun+opencode ...................." "2" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_bun ; setup_python_uv ; setup_opencode ; send-keys 'EOF' enter '. ~/.bashrc' enter"
+"kk+uv+bun+pi ......................." "1" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_kkrc ; setup_bun ; setup_python_uv ; setup_pi ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"kk+uv+bun+opencode ................." "2" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_kkrc ; setup_bun ; setup_python_uv ; setup_opencode ; send-keys 'EOF' enter '. ~/.bashrc' enter"
 
 # Submenu: databases
 bind -T menus "d" display-menu -T " DB... " \
@@ -450,10 +451,10 @@ bind -T menus "g" display-menu -T " GO... " \
 "Install goose ......................" "o" "send-keys ' go install github.com/pressly/goose/v3/cmd/goose@latest' enter" \
 "Install gosec ......................" "s" setup_gosec \
 "" \
-"go+vim ............................." "1" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_golang ; setup_vim_tagbar ; setup_vim_go ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
-"go+vim+psql ........................" "2" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_golang ; setup_postgres ; setup_vim_tagbar ; setup_vim_go ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
-"go+vim+psql+node ..................." "3" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_golang ; setup_node ; setup_postgres ; setup_vim_tagbar ; setup_vim_go ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
-"go+vim+docker ......................" "9" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_golang ; setup_docker ; setup_vim_tagbar ; setup_vim_go ; send-keys 'EOF' enter '. ~/.bashrc' enter"
+"kk+go+vim ........................." "1" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_kkrc ; setup_golang ; setup_vim_tagbar ; setup_vim_go ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"kk+go+vim+psql ...................." "2" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_kkrc ; setup_golang ; setup_postgres ; setup_vim_tagbar ; setup_vim_go ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"kk+go+vim+psql+node ..............." "3" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_kkrc ; setup_golang ; setup_node ; setup_postgres ; setup_vim_tagbar ; setup_vim_go ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"kk+go+vim+docker .................." "9" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_kkrc ; setup_golang ; setup_docker ; setup_vim_tagbar ; setup_vim_go ; send-keys 'EOF' enter '. ~/.bashrc' enter"
 
 # Submenu: PHP
 bind -T menus "p" display-menu -T " PHP... " \
@@ -466,11 +467,11 @@ bind -T menus "p" display-menu -T " PHP... " \
 "Install phpcs ......................" "" setup_phpcs \
 "Install phpstan ...................." "" setup_phpstan \
 "" \
-"php+node+mysql ....................." "1" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_php ; setup_node ; setup_mysql ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
-"php+node+psql ......................" "2" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_php ; setup_node ; setup_postgres ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
-"php+docker ........................." "3" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_php ; setup_node ; setup_docker ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
-"franken+staticphp+node ............." "8" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_frankenphp ; setup_static_php_cli ; setup_composer ; setup_node ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
-"franken+staticphp+bun .............." "9" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_basics_eatmydata ; setup_kkrc ; setup_frankenphp ; setup_static_php_cli ; setup_composer ; setup_bun; send-keys 'EOF' enter '. ~/.bashrc' enter"
+"kk+php+node+mysql .................." "1" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_kkrc ; setup_php ; setup_node ; setup_mysql ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"kk+php+node+psql ..................." "2" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_kkrc ; setup_php ; setup_node ; setup_postgres ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"kk+php+docker ......................" "3" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_kkrc ; setup_php ; setup_node ; setup_docker ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"kk+franken+staticphp+node .........." "8" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_kkrc ; setup_frankenphp ; setup_static_php_cli ; setup_composer ; setup_node ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
+"kk+franken+staticphp+bun ..........." "9" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_kkrc ; setup_frankenphp ; setup_static_php_cli ; setup_composer ; setup_bun; send-keys 'EOF' enter '. ~/.bashrc' enter"
 
 # Submenu: python
 bind -T menus "y" display-menu -T " Python... " \
@@ -583,7 +584,9 @@ bind -T menus "s" display-menu -T " Sandbox... " \
 "Start bwrap on 26.04 ..............." "6" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-26.txt'" \
 "Start bwrap on 24.04 ..............." "4" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-24.txt'" \
 "Start apple containers ............." "a" "send-keys 'container run -v \"\$PWD\":\"\$PWD\" -m 4g --ssh --rm -it ubuntu bash -c \"cd \$PWD; exec bash\"' enter" \
-"Start docker ......................." "d" "send-keys 'docker run -v \"\$PWD\":\"\$PWD\" -m 4g --rm -it ubuntu bash -c \"cd \$PWD; exec bash\"' enter"
+"Start docker ......................." "d" "send-keys 'docker run -v \"\$PWD\":\"\$PWD\" -m 4g --rm -it ubuntu bash -c \"cd \$PWD; exec bash\"' enter" \
+"" \
+"su - 1000 .........................." "1" "send-keys 'su - \"\$(id -nu 1000)\"' enter"
 
 # Submenu: vim
 bind -T menus "v" display-menu -T " vim... " \
