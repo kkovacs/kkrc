@@ -584,7 +584,7 @@ bind -T menus "s" display-menu -T " Sandbox... " \
 "Start bwrap on 26.04 ..............." "6" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-26.txt'" \
 "Start bwrap on 24.04 ..............." "4" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-24.txt'" \
 "Start apple containers ............." "a" "send-keys 'container run -v \"\$PWD\":\"\$PWD\" -m 4g --ssh --rm -it ubuntu bash -c \"cd \$PWD; exec bash\"' enter" \
-"Start docker ......................." "d" "send-keys 'docker run -v \"\$PWD\":\"\$PWD\" -m 4g --rm -it ubuntu bash -c \"cd \$PWD; exec bash\"' enter" \
+"Start docker ......................." "d" "send-keys 'docker run -e HOME=/tmp -v \"\$PWD\":\"\$PWD\" -m 4g --rm -it ubuntu bash -c \"cd \$PWD; exec bash\"' enter" \
 "" \
 "su - 1000 .........................." "1" "send-keys 'su - \"\$(id -nu 1000)\"' enter"
 
