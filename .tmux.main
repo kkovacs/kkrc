@@ -586,7 +586,7 @@ bind -T menus "s" display-menu -T " Sandbox... " \
 "Start apple containers ............." "a" "send-keys 'container run -e HOME=/tmp -v \"\$PWD\":\"\$PWD\" -m 4g --ssh --rm -it ubuntu bash -c \"cd \$PWD; HOME=/tmp exec bash\"' enter" \
 "Start docker ......................." "d" "send-keys 'docker run -e HOME=/tmp -v \"\$PWD\":\"\$PWD\" -m 4g --rm -it ubuntu bash -c \"cd \$PWD; HOME=/tmp exec bash\"' enter" \
 "" \
-"su - 1000 .........................." "1" "send-keys 'su - \"\$(id -nu 1000)\"' enter"
+"su - 1000 .........................." "1" "send-keys 'su - \"\$(id -nu 1000)\" -c \"HOME=/tmp exec bash -l\"' enter"
 
 # Submenu: vim
 bind -T menus "v" display-menu -T " vim... " \
