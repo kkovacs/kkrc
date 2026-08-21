@@ -11,10 +11,16 @@
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
+// pi truncates oversized bash output to this many bytes before sending it to
+// the LLM (packages/coding-agent/.../core/tools/truncate.ts: DEFAULT_MAX_BYTES = 50 * 1024).
+// Anything beyond this is spilled to a temp file (fullOutputPath) and is seen
+// separately as a later tool call, so we count only what reached the LLM.
+const DEFAULT_MAX_BYTES = 50 * 1024;
+
 const RW = new Set(["read", "write", "edit"]);
 
 function compact(msg: Record<string, unknown>): { text: string; isToolOnly: boolean; originalLength: number } {
-  const { role, content, command, output, fullOutputPath } = msg;
+  const { role, content, command, output, fullOutputPath, toolName, details } = msg;
 
   switch (role) {
     case "user": {
@@ -49,6 +55,10 @@ function compact(msg: Record<string, unknown>): { text: string; isToolOnly: bool
             if (c.arguments?.outfile) bashLine += "\nOutput: " + c.arguments.outfile;
             lines.push(bashLine);
           } else lines.push("[" + c.name + "]");
+        } else if (c.type === "thinking" && typeof c.thinking === "string") {
+          // Count thinking toward the original size, but don't dump it into
+          // the summary (it carries no information worth keeping).
+          originalLength += c.thinking.length;
         }
       }
       if (!lines.length) return { text: "", isToolOnly: false, originalLength };
@@ -59,11 +69,35 @@ function compact(msg: Record<string, unknown>): { text: string; isToolOnly: bool
     }
 
     case "bashExecution": {
+      // Output beyond DEFAULT_MAX_BYTES is spilled to a temp file
+      // (fullOutputPath) and only the truncated tail (~DEFAULT_MAX_BYTES)
+      // was ever transferred to the LLM. Count that; the full file is seen
+      // separately as a later tool call, so we don't double-count it.
+      const outputLength = fullOutputPath ? DEFAULT_MAX_BYTES : (output ? String(output).length : 0);
       const r = "# User\n\n[bash] " + (command ?? "") + "\n" +
         (fullOutputPath ? "[output: " + fullOutputPath + "]\n" : output ? String(output) + "\n" : "");
-      const originalLength = String(command ?? "").length +
-        (fullOutputPath ? String(fullOutputPath).length : output ? String(output).length : 0);
+      const originalLength = String(command ?? "").length + outputLength;
       return { text: r, isToolOnly: false, originalLength };
+    }
+
+    case "toolResult": {
+      // Non-bash tool results (read, write, edit, pingme, custom tools...).
+      // Previously fell through to default and were dropped entirely.
+      const blocks = Array.isArray(content) ? (content as any[]) : [];
+      const texts: string[] = [];
+      let originalLength = 0;
+      for (const b of blocks) {
+        if (b?.type === "text" && typeof b.text === "string") {
+          texts.push(b.text);
+          originalLength += b.text.length;
+        } else if (b?.type === "image" && typeof b.data === "string") {
+          originalLength += b.data.length;
+        }
+      }
+      if (details) originalLength += JSON.stringify(details).length;
+      const text = texts.join("");
+      const body = text ? "[" + (toolName ?? "tool") + " result] " + text + "\n" : "";
+      return { text: body ? "# User\n\n" + body : "", isToolOnly: false, originalLength };
     }
 
     default:
