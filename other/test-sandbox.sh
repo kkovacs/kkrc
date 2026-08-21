@@ -38,6 +38,7 @@ else
     SANDBOX="bwrap"
 fi
 echo "Detected: $SANDBOX (started as $(id -un))"
+SCRIPT="$(readlink -f "$0")"
 
 # =====================================================================
 # Phase 1 — root phase (docker/apple only)
@@ -94,7 +95,7 @@ if [ "$STARTED_AS_ROOT" -eq 1 ] && [ "$IS_APPLE" -eq 0 ]; then
     fi
     echo ""
     echo "=== Dropping to uid 1000 ($U1000) for Phase 2 ==="
-    exec su - "$U1000" -c "HOME=/tmp exec \"$0\" --phase2"
+    exec su - "$U1000" -c "HOME=/tmp exec \"$SCRIPT\" --phase2"
     # (the exec replaces this process; --phase2 is ignored, script re-detects as bwrap-like uid≠0)
 fi
 
