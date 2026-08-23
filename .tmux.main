@@ -384,6 +384,7 @@ bind "c-r" display-menu -T " Inject... " \
 "Submenu (c-d)atabases ............" "c-d" "send-keys -K c-q ^ d" \
 "Submenu (c-e)nvironment .........." "c-e" "send-keys -K c-q ^ e" \
 "Submenu (c-A)I ..................." "c-a" "send-keys -K c-q ^ a" \
+"Submenu (c-h)arnesses............." "c-h" "send-keys -K c-q ^ h" \
 "Submenu (c-s)andbox .............." "c-s" "send-keys -K c-q ^ s" \
 "Submenu (c-g)o ..................." "c-g" "send-keys -K c-q ^ g" \
 "Submenu (c-p)hp .................." "c-p" "send-keys -K c-q ^ p" \
@@ -506,30 +507,11 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "Install k(6) ......................." "6" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/grafana/k6/releases/download/v2.2.0/k6-v2.2.0-linux-\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1 --wildcards \"*/k6\"' enter" \
 "Install (S)hellcheck ..............." "S" setup_shellcheck \
 "Download (p)rettyping .............." "" "send-keys ' mkdir -p ~/.local/bin ; curl -Lo ~/.local/bin/prettyping https://raw.githubusercontent.com/denilsonsa/prettyping/master/prettyping && chmod 755 ~/.local/bin/prettyping' enter 'prettyping 1.1.1.1' enter" \
-"Install ~/(z)ig ...................." "" "send-keys ' mkdir -p ~/.local/zig && curl -L https://ziglang.org/download/0.16.0/zig-\$(uname -m)-linux-0.16.0.tar.xz | tar Jxv --strip-components=1 -C ~/.local/zig ; ln -s ~/.local/zig/zig ~/.local/bin/zig' enter" \
-"" \
-"Download (p)i ......................" "p" setup_pi \
-"Bun install pi ..................." "c-p" setup_pi_bun \
-"Transfer pi-ext/ ..................." "e" "send-keys ' mkdir -p ~/.pi/agent/extensions && (base64 -d | tar zxv -C ~/.pi/agent/extensions/) <<\"EOF\"' enter ; pipe-pane -I 'COPYFILE_DISABLE=1 tar cf - --no-xattrs -C ~/.kkrc/pi-ext/ . | gzip -c | base64 -w0 && echo EOF'" \
-"Clean up pi ........................" "" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi' enter" \
-"" \
-"Download (o)pencode................." "o" setup_opencode \
-"config reset ......................." "O" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\", \\\"permission\\\": { \\\"external_directory\\\": { \\\"/tmp/**\\\": \\\"allow\\\" } } }\" >#{opencode_config}' enter" \
-"install MCP Chrome CDP ............." "" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
-"config \"any\" LLM on :8080 .........." "" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:8080/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
-"Clean up opencode .................." "" "send-keys ' rm -rf ~/{.config,.local/state,.local/share,.cache}/opencode ~/.bun ; rm -rf ~/.local/bin/opencode ' enter" \
-"" \
-"bun install opencode beta .........." "" "send-keys ' bun install -g --minimum-release-age 0 --trust @opencode-ai/cli@beta' enter" \
-"Download Vercel fx ................." "" "send-keys ' mkdir -p ~/.local/bin && curl -fsSL \"https://releases.fx.sh/\$(curl -fsSL https://releases.fx.sh/latest.txt)/fx-linux-\$(uname -m).tar.gz\" | tar -xz -C ~/.local/bin/ fx' enter" \
-"Install Claude Code ................" "" "send-keys ' curl -fsSL https://claude.ai/install.sh | bash' enter" \
-"Install Codex CLI .................." "" "send-keys ' curl -fsSL https://chatgpt.com/codex/install.sh | sh' enter"
+"Install ~/(z)ig ...................." "" "send-keys ' mkdir -p ~/.local/zig && curl -L https://ziglang.org/download/0.16.0/zig-\$(uname -m)-linux-0.16.0.tar.xz | tar Jxv --strip-components=1 -C ~/.local/zig ; ln -s ~/.local/zig/zig ~/.local/bin/zig' enter"
 
 # Submenu: AI
 opencode_config="\~/.config/opencode/opencode.json"
 bind -T menus "a" display-menu -T " AI... " \
-"Inject (a)i shell+python snippet...." "a" "inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"BLUF only:\\\"\"" \
-"Inject (A)I bash function .........." "A" "send-keys \" function AI() {\" ; inject_ai_snippet \; send-keys \" \\\"\\\${2:-#{INJECT_AI_MODEL}}\\\" \\\"\\\$1\\\"; }; export -f AI\" enter" \
-"" \
 "Inject work-style snippet .........." "0" "pipe-pane -I 'cat ~/.kkrc/inject-ai-kk.md'" \
 "Inject brainstorm snippet .........." "1" "pipe-pane -I 'cat ~/.kkrc/inject-ai-brainstorm.md'" \
 "Inject handover-to-subagent ........" "2" "pipe-pane -I 'cat ~/.kkrc/inject-ai-handover.md'" \
@@ -546,6 +528,36 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject code review snippet ........." "7" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
 "Inject update docs snippet ........." "8" "pipe-pane -I 'cat ~/.kkrc/inject-ai-docs-update.md'" \
 "git commit with AI message ........." "9" "send-keys 'git diff --cached | ' ; inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"Please craft a git commit message from this. Just the text, no markdown code markers.\\\" | git commit -F -\" enter"
+
+# Submenu: AI harnesses
+bind -T menus "h" display-menu -T " Harnesses... " \
+"Inject (a)i shell+python snippet...." "a" "inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"BLUF only:\\\"\"" \
+"Inject (A)I bash function .........." "A" "send-keys \" function AI() {\" ; inject_ai_snippet \; send-keys \" \\\"\\\${2:-#{INJECT_AI_MODEL}}\\\" \\\"\\\$1\\\"; }; export -f AI\" enter" \
+"" \
+"Download (p)i ..........................." "p" setup_pi \
+"Bun install pi ........................" "c-p" setup_pi_bun \
+"Transfer pi-ext/ ........................" "e" "send-keys ' mkdir -p ~/.pi/agent/extensions && (base64 -d | tar zxv -C ~/.pi/agent/extensions/) <<\"EOF\"' enter ; pipe-pane -I 'COPYFILE_DISABLE=1 tar cf - --no-xattrs -C ~/.kkrc/pi-ext/ . | gzip -c | base64 -w0 && echo EOF'" \
+"Clean up pi ............................." "" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi' enter" \
+"" \
+"Download (o)pencode......................" "o" setup_opencode \
+"bun install opencode beta ..............." "" "send-keys ' bun install -g --minimum-release-age 0 --trust @opencode-ai/cli@beta' enter" \
+"config reset ............................" "O" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\", \\\"permission\\\": { \\\"external_directory\\\": { \\\"/tmp/**\\\": \\\"allow\\\" } } }\" >#{opencode_config}' enter" \
+"install MCP Chrome CDP .................." "" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
+"config \"any\" LLM on :8080 ..............." "" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:8080/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
+"Clean up opencode ......................." "" "send-keys ' rm -rf ~/{.config,.local/state,.local/share,.cache}/opencode ~/.bun ; rm -rf ~/.local/bin/opencode ' enter" \
+"" \
+"Download Vercel fx ......................" "" "send-keys ' mkdir -p ~/.local/bin && curl -fsSL \"https://releases.fx.sh/\$(curl -fsSL https://releases.fx.sh/latest.txt)/fx-linux-\$(uname -m).tar.gz\" | tar -xz -C ~/.local/bin/ fx' enter" \
+"Install Claude Code ....................." "" "send-keys ' curl -fsSL https://claude.ai/install.sh | bash' enter" \
+"Install Codex CLI ......................." "" "send-keys ' curl -fsSL https://chatgpt.com/codex/install.sh | sh' enter" \
+"" \
+"llama cli … ............................." "c" "send-keys \"llama cli -st --offline -p \\\"OCR\\\" --image \\\"\\\" -hf \"" \
+"llama server … .........................." "s" "send-keys 'llama server --webui-mcp-proxy --jinja --offline -hf '" \
+"gemma4:e2b Q4 (fast) ...................." "2" "send-keys 'unsloth/gemma-4-E2B-it-GGUF:UD-Q4_K_XL'" \
+"gemma4:e4b Q4 (good) ...................." "4" "send-keys 'unsloth/gemma-4-E4B-it-GGUF:UD-Q4_K_XL'" \
+"gemma4:12b Q3 (exit all, get coffee) .." "1" "send-keys 'unsloth/gemma-4-12b-it-GGUF:Q3_K_M'" \
+"qwen3.5:2b Q4 (fast) ...................." "w" "send-keys 'unsloth/Qwen3.5-2B-GGUF:Q4_K_M'" \
+"qwen3.5:4b Q4 (good) ...................." "W" "send-keys 'unsloth/Qwen3.5-4B-GGUF:Q4_K_M'" \
+"GLM-(O)CR ..............................." "o" "send-keys 'ggml-org/GLM-OCR-GGUF'"
 
 # Submenu: environment
 # Load age-encrypted environment variables in tmux session, so they can be injected.
