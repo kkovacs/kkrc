@@ -10,6 +10,10 @@
 //
 // Usage: pi -e tinycdp.ts [--cdp-url http://host:port] [--no-screenshot]
 //
+// You can test this with:
+// pi -p -e pi-ext/tinycdp.ts --tools cdp_navigate,cdp_evaluate --model opencode-go/mimo-v2.5 'Please navigate to kkovacs.eu, and output the name of the guy!'
+// The expected result is "Kristof Kovacs".
+//
 // You can start a docker-based Chrome with: sudo docker run -u `id -u user` -it --rm --add-host host.docker.internal:host-gateway -p 9222:9222 chromedp/headless-shell:latest --no-sandbox --disable-web-security --disable-site-isolation-trials --window-size=1280,720
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -20,7 +24,12 @@ import { Text } from "@earendil-works/pi-tui";
 
 export interface Conn {
     send: (method: string, params?: object) => Promise<any>;
-    waitLoad: (urlPart: string, timeoutMs?: number) => Promise<void>;
+    // resolve on the frame's load/network-idle lifecycle (immediately if it
+    // already fired); correlates by frame, not by URL string
+    waitLoad: (frameId: string | undefined, timeoutMs?: number) => Promise<void>;
+    // drop a frame's tracked lifecycle so a stale `load` from the previous page
+    // can't satisfy the next navigation (called right before Page.navigate)
+    resetFrame: (frameId: string) => void;
     close: () => void;
     closeTarget: () => Promise<void>;
 }
@@ -42,6 +51,11 @@ export async function connect(baseUrl: string): Promise<Conn> {
         number,
         { resolve: (v: any) => void; reject: (e: Error) => void }
     >();
+
+    // latest lifecycle event per frame — maintained for the connection's whole
+    // lifetime so a load that fired before waitLoad attached its listener is
+    // still visible (this is what eliminates the listener-attach race)
+    const lifecycle = new Map<string, { name: string; loaderId?: string }>();
 
     const ws = new WebSocket(webSocketDebuggerUrl);
     await new Promise<void>((ok, err) => {
@@ -73,6 +87,19 @@ export async function connect(baseUrl: string): Promise<Conn> {
                     sessionId,
                 }),
             );
+        } else if (msg.method === "Page.lifecycleEvent") {
+            // track the latest lifecycle transition per frame (load, networkIdle,
+            // etc.) so waitLoad can resolve the moment it happens — or realise
+            // it already happened — without a per-call listener race
+            const p = msg.params ?? {};
+            lifecycle.set(p.frameId, { name: p.name, loaderId: p.loaderId });
+        } else if (msg.method === "Page.frameNavigated") {
+            const p = msg.params ?? {};
+            if (p.frame?.loaderId)
+                lifecycle.set(p.frame.frameId, {
+                    name: "frameNavigated",
+                    loaderId: p.frame.loaderId,
+                });
         }
     };
 
@@ -93,6 +120,9 @@ export async function connect(baseUrl: string): Promise<Conn> {
     });
     await raw({ method: "Page.enable", sessionId });
     await raw({ method: "Runtime.enable", sessionId });
+    // emit Page.lifecycleEvent for every load/DOMContentLoaded/networkIdle
+    // transition (needed by waitLoad)
+    await raw({ method: "Page.setLifecycleEventsEnabled", params: { enabled: true }, sessionId });
 
     // If the socket drops after a successful connection (Chrome restart/crash),
     // invalidate the cache so the next tool call attempts to re-establish; if that
@@ -106,73 +136,61 @@ export async function connect(baseUrl: string): Promise<Conn> {
 
     return {
         send: (method, params = {}) => raw({ method, params, sessionId }),
-        // resolve only when a load event fires AND the page is actually at urlPart:
-        // a stale load event arriving late from an earlier navigation must not
-        // satisfy this wait and fake a successful navigation
-        waitLoad: async (urlPart, timeoutMs = 30000) => {
-            const deadline = Date.now() + timeoutMs;
-            for (;;) {
-                await new Promise<void>((resolve, reject) => {
-                    const timer = setTimeout(
-                        () => {
-                            ws.removeEventListener("message", onEvent);
-                            reject(
-                                new Error(
-                                    "timeout waiting for Page.loadEventFired",
-                                ),
-                            );
-                        },
-                        Math.max(100, deadline - Date.now()),
-                    );
-                    const onEvent = (ev: MessageEvent) => {
-                        let msg: any;
-                        try {
-                            msg = JSON.parse(ev.data);
-                        } catch {
-                            return;
-                        }
-                        if (msg?.method === "Page.loadEventFired") {
-                            clearTimeout(timer);
-                            ws.removeEventListener("message", onEvent);
-                            resolve();
-                        }
-                    };
-                    ws.addEventListener("message", onEvent);
-                });
-                // an event fired — confirm it was for OUR navigation, else keep waiting
-                const loc = await Promise.race([
-                    raw({
-                        method: "Runtime.evaluate",
-                        params: {
-                            expression: "location.href",
-                            returnByValue: true,
-                        },
-                        sessionId,
-                    }),
-                    new Promise((_, rej) =>
-                        setTimeout(
-                            () =>
-                                rej(
-                                    new Error(
-                                        `timeout waiting for page load matching ${urlPart}`,
-                                    ),
-                                ),
-                            Math.max(100, deadline - Date.now()),
-                        ),
-                    ),
-                ]);
-                const href = String(loc.result?.value);
-                // a failed load swaps in Chrome's error page, which still fires loadEventFired
-                if (href.startsWith("chrome-error://"))
-                    throw new Error(
-                        `could not load ${urlPart} (Chrome error page)`,
-                    );
-                if (href.includes(urlPart)) return;
-                if (Date.now() >= deadline)
-                    throw new Error(
-                        `timeout waiting for page load matching ${urlPart}`,
-                    );
-            }
+        // Resolve when the target frame reaches `load` / `networkIdle`. Because
+        // lifecycle events are tracked from connect time, a transition that
+        // already happened is seen immediately (no listener-attach race), and
+        // resetFrame() before navigate ensures a stale load from the previous
+        // page can't satisfy the new navigation.
+        waitLoad: (
+            frameId: string | undefined,
+            timeoutMs = 30000,
+        ): Promise<void> =>
+            new Promise<void>((resolve, reject) => {
+                const matches = (l?: { name: string; loaderId?: string }) =>
+                    !!l &&
+                    (l.name === "load" ||
+                        l.name === "networkIdle" ||
+                        l.name === "networkAlmostIdle");
+
+                const finish = (timedOut: boolean) => {
+                    clearTimeout(timer);
+                    ws.removeEventListener("message", onEvent);
+                    timedOut
+                        ? reject(new Error("timeout waiting for page load"))
+                        : resolve();
+                };
+
+                const timer = setTimeout(() => finish(true), timeoutMs);
+
+                const onEvent = (ev: MessageEvent) => {
+                    let msg: any;
+                    try {
+                        msg = JSON.parse(ev.data);
+                    } catch {
+                        return;
+                    }
+                    if (msg?.method === "Page.lifecycleEvent") {
+                        const p = msg.params ?? {};
+                        lifecycle.set(p.frameId, {
+                            name: p.name,
+                            loaderId: p.loaderId,
+                        });
+                        if (
+                            p.frameId === frameId &&
+                            matches(lifecycle.get(frameId as string))
+                        )
+                            finish(false);
+                    }
+                };
+                ws.addEventListener("message", onEvent);
+
+                // already loaded for this frame? resolve now — kills the race
+                // for fast pages that finished before we could listen
+                if (matches(lifecycle.get(frameId as string))) finish(false);
+            }),
+
+        resetFrame: (frameId: string) => {
+            lifecycle.delete(frameId);
         },
         close: () => ws.close(),
         // browser-level command, no session id
@@ -341,6 +359,14 @@ export default function (pi: ExtensionAPI) {
             const a = <T>(p: Promise<T>) => guard(p, { signal });
             try {
                 const c = await a(cdp(pi));
+                // learn the main frame id, then forget its prior lifecycle so a
+                // stale load from the previous page can't satisfy this nav
+                const tree = await a(c.send("Page.getFrameTree")).catch(
+                    () => undefined,
+                );
+                const frameId = (tree?.frameTree?.frame?.id ??
+                    undefined) as string | undefined;
+                if (frameId) c.resetFrame(frameId);
                 const nav = await a(
                     c.send("Page.navigate", { url: params.url }),
                 );
@@ -349,46 +375,63 @@ export default function (pi: ExtensionAPI) {
                     return fail(
                         new Error(`navigation failed: ${nav.errorText}`),
                     );
-                try {
-                    await a(c.waitLoad(params.url));
-                } catch (e) {
-                    if (signal?.aborted) return fail(e);
-                    // waitLoad throws a Chrome-error sentinel for failed loads; fail clean
-                    if (
-                        e instanceof Error &&
-                        e.message.includes("Chrome error page")
-                    )
-                        return fail(e);
-                    // no load event within 30s: press the browser's "stop" button,
-                    // freeing the page's main thread so evaluate works right away
-                    await a(c.send("Page.stopLoading"));
-                    // be skeptical: stopLoading cancels network activity but cannot interrupt
-                    // scripts already running; verify the renderer actually responds before
-                    // declaring the partial page usable
-                    const alive = await a(
-                        guard(
-                            c.send("Runtime.evaluate", {
-                                expression: "1",
-                                returnByValue: true,
-                            }),
-                            { ms: 5000, what: "renderer responsiveness check" },
-                        ).then(
-                            () => true,
-                            () => false,
+                // wait for the frame's load/network-idle lifecycle; resolves
+                // immediately if it already fired (no race). We don't fail on
+                // timeout here — the probe below decides what actually landed.
+                await a(
+                    c.waitLoad(frameId ?? (nav.frameId as string | undefined)),
+                ).then(
+                    () => undefined,
+                    () => undefined,
+                );
+                // verify what actually landed, whether or not we hit the timeout
+                const probe = await a(
+                    c.send("Runtime.evaluate", {
+                        expression:
+                            "location.href + '\\u0000' + document.readyState",
+                        returnByValue: true,
+                    }),
+                ).catch(() => undefined);
+                const [href = "", state = ""] = String(
+                    probe?.result?.value ?? "",
+                ).split("\u0000");
+                // a failed load swaps in Chrome's error page, which still fires load
+                if (href.startsWith("chrome-error://"))
+                    return fail(
+                        new Error(
+                            `could not load ${params.url} (Chrome error page)`,
                         ),
                     );
-                    if (!alive)
-                        return fail(
-                            new Error(
-                                `navigated to ${params.url}, but the page is still loading and its main thread is not responding ` +
-                                    `(a script on the partial page appears wedged); try again or use a lighter URL/mirror`,
-                            ),
-                        );
-                    return text(
-                        `navigated to ${params.url} (still loading after 30s — stopped loading; partial page is usable)`,
+                if (state === "interactive" || state === "complete")
+                    return text(`navigated to ${params.url}`);
+                // not (yet) interactive: press the browser's "stop" button to free
+                // the page's main thread, then confirm the renderer still answers
+                await a(c.send("Page.stopLoading"));
+                // be skeptical: stopLoading cancels network activity but cannot
+                // interrupt scripts already running; verify the renderer actually
+                // responds before declaring the partial page usable
+                const alive = await a(
+                    guard(
+                        c.send("Runtime.evaluate", {
+                            expression: "1",
+                            returnByValue: true,
+                        }),
+                        { ms: 5000, what: "renderer responsiveness check" },
+                    ).then(
+                        () => true,
+                        () => false,
+                    ),
+                );
+                if (!alive)
+                    return fail(
+                        new Error(
+                            `navigated to ${params.url}, but the page is still loading and its main thread is not responding ` +
+                                `(a script on the partial page appears wedged); try again or use a lighter URL/mirror`,
+                        ),
                     );
-                }
-                return text(`navigated to ${params.url}`);
+                return text(
+                    `navigated to ${params.url} (still loading — stopped loading; partial page is usable)`,
+                );
             } catch (e) {
                 return fail(e);
             }
