@@ -36,11 +36,9 @@ export interface Conn {
 
 // --- shared connection state ------------------------------------------------
 // connP caches the live connection. socketDropped is set when an *established*
-// socket closes (Chrome restart/crash); browserGone is set when a reconnect
-// attempt after a drop also fails, at which point we fail fast.
+// socket closes (Chrome restart/crash) so the next call retries a fresh connect.
 let connP: Promise<Conn> | undefined;
 let socketDropped = false;
-let browserGone = false;
 
 export async function connect(baseUrl: string): Promise<Conn> {
     const res = await fetch(`${baseUrl}/json/version`);
@@ -259,31 +257,63 @@ const callLine =
         );
     };
 
+// a destroyed tab/session (user closed the tab, target killed) surfaces as a
+// protocol error string; we reconnect and retry instead of failing the call
+const SESSION_GONE = /session with given id not found|target .* not found|no target|target .* closed|session .* closed/i;
+
+// stable handle over the live connection: delegates to `live`, and on a
+// destroyed-session error reconnects to a fresh target and retries the command.
+// Callers keep using `c` across the recovery, so it happens on the SAME call —
+// not the next one. The retry is bounded to one attempt (the fresh connection's
+// own send is unwrapped, so a still-dead target fails fast instead of looping).
+const wrap = (initial: Conn, url: string, timeoutMs: number): Conn => {
+    let live = initial;
+    const oneShot = (method: string, params: object) =>
+        guard(live.send(method, params), { ms: timeoutMs, what: method });
+    const send = async (method: string, params: object = {}) => {
+        try {
+            return await oneShot(method, params);
+        } catch (e) {
+            if (!(e instanceof Error) || !SESSION_GONE.test(e.message)) throw e;
+            // connP already points at this proxy (which self-heals via `live`), so
+            // we just swap in a fresh target and retry — no cache invalidation
+            live = await connect(url); // brand-new target + session
+            return oneShot(method, params); // retry once on the fresh connection
+        }
+    };
+    return {
+        send,
+        waitLoad: (f, t) => live.waitLoad(f, t),
+        resetFrame: (f) => live.resetFrame(f),
+        close: () => live.close(),
+        closeTarget: () => live.closeTarget(),
+    };
+};
+
 // reset on failure so a transient "browser down" doesn't poison every later call.
 // If an *established* socket later drops (Chrome restart/crash), socketDropped is
-// set by connect()'s onclose; the next call tries to re-establish, and if that also
-// fails we mark the browser gone and fail fast with a clear "browser went away" error.
+// set by connect()'s onclose; the next call re-runs connect() (which always creates
+// a fresh target), so reconnect/open-new-tab happens automatically. We never latch a
+// permanent failure: a down Chrome fails fast on ECONNREFUSED and simply retries on the
+// next call, so the session self-heals when Chrome comes back.
 const cdp = (pi: ExtensionAPI): Promise<Conn> => {
     const url = pi.getFlag("cdp-url") as string;
-    // already determined the browser is gone: fail fast without another attempt
-    if (browserGone)
-        return Promise.reject(
-            new Error(`browser went away — Chrome at ${url} is not reachable`),
-        );
     return (connP ??= connect(url).then(
         (c) => {
             socketDropped = false; // re-established (or first connect) — clear the flag
-            return c;
+            // wrap so a closed tab reconnects transparently and retries on the
+            // same call (recovery in the FIRST call, not the next)
+            return wrap(c, url, pi.getFlag("cdp-timeout") as number);
         },
         (e) => {
             connP = undefined;
-            if (socketDropped) {
-                browserGone = true;
+            // a dropped-then-unreachable browser gets a clear message; otherwise
+            // pass through the original connect error (ECONNREFUSED, etc.)
+            if (socketDropped)
                 throw new Error(
-                    `browser went away — Chrome at ${url} is not reachable`,
+                    `browser went away — Chrome at ${url} is not reachable (retrying on next call)`,
                 );
-            }
-            throw e; // initial connect never succeeded: surface the original reason
+            throw e;
         },
     ));
 };
@@ -313,13 +343,11 @@ export default function (pi: ExtensionAPI) {
     // Always release the websocket so print mode (-p) can exit; close our tab only on a
     // real quit. On /new, /resume or /fork the page survives in Chrome, but connect()
     // always creates a fresh target, so the next call reconnects to Chrome and attaches
-    // to a brand-new tab (the survived page is orphaned, not re-attached). browserGone is
-    // also cleared here so a later call can attempt to re-establish if Chrome had dropped.
+    // to a brand-new tab (the survived page is orphaned, not re-attached).
     pi.on("session_shutdown", (event) => {
         const p = connP;
         connP = undefined;
         socketDropped = false;
-        browserGone = false;
         p?.then((c) =>
             (event.reason === "quit"
                 ? c.closeTarget()
