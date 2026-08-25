@@ -1,12 +1,12 @@
 #!/bin/sh
 # Sandbox verification suite.
-# Tests the contract that ALL 4 sandbox types (bwrap-24, bwrap-26, docker, apple)
-# must satisfy once you're in the "user" phase.
+# Tests the contract that ALL sandbox types must satisfy once you're in the "user" phase.
 #
 # Detection:
 #   uid != 0       → bwrap   (already uid 1000)
-#   uid == 0 + /.dockerenv → docker  (su to uid 1000 for phase 2)
-#   uid == 0 + no /.dockerenv → apple  (stay root, system dirs must be writable)
+#   uid == 0 + /.dockerenv       → docker  (su to uid 1000 for phase 2)
+#   uid == 0 + /run/.containerenv → podman  (su to uid 1000 for phase 2)
+#   uid == 0 + neither            → apple  (stay root, system dirs must be writable)
 #
 # Output: PASS/FAIL lines. Exit 0 only if all pass.
 
@@ -30,6 +30,8 @@ if [ "$(id -u)" -eq 0 ]; then
     STARTED_AS_ROOT=1
     if [ -e /.dockerenv ]; then
         SANDBOX="docker"
+    elif [ -e /run/.containerenv ]; then
+        SANDBOX="podman"
     else
         SANDBOX="apple"
         IS_APPLE=1
@@ -85,8 +87,9 @@ if [ "$STARTED_AS_ROOT" -eq 1 ]; then
 fi
 
 # =====================================================================
-# Drop privileges for docker (su to uid 1000, preserving $HOME=/tmp).
+# Drop privileges for docker/podman (su to uid 1000, preserving $HOME=/tmp).
 # Apple stays root; bwrap is already uid 1000.
+# Uses runuser (not su) because container users may have locked passwords.
 # =====================================================================
 if [ "$STARTED_AS_ROOT" -eq 1 ] && [ "$IS_APPLE" -eq 0 ]; then
     U1000=$(id -nu 1000 2>/dev/null) || U1000=""
@@ -95,7 +98,7 @@ if [ "$STARTED_AS_ROOT" -eq 1 ] && [ "$IS_APPLE" -eq 0 ]; then
     fi
     echo ""
     echo "=== Dropping to uid 1000 ($U1000) for Phase 2 ==="
-    exec su - "$U1000" -c "HOME=/tmp exec \"$SCRIPT\" --phase2"
+    exec runuser -u "$U1000" -- sh -c "HOME=/tmp exec \"$SCRIPT\" --phase2"
     # (the exec replaces this process; --phase2 is ignored, script re-detects as bwrap-like uid≠0)
 fi
 

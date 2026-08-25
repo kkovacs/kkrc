@@ -1,0 +1,1 @@
+type -p podman || sudo apt install -y podman; podman pull docker.io/library/ubuntu:latest 2>/dev/null; podman run --rm -it --userns=keep-id --user 0 -e HOME=/tmp -v "$PWD":"$PWD" -m 4g docker.io/library/ubuntu:latest bash -c "cd $PWD; HOME=/tmp exec bash -i"
