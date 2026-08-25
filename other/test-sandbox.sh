@@ -98,7 +98,7 @@ if [ "$STARTED_AS_ROOT" -eq 1 ] && [ "$IS_APPLE" -eq 0 ]; then
     fi
     echo ""
     echo "=== Dropping to uid 1000 ($U1000) for Phase 2 ==="
-    exec runuser -u "$U1000" -- sh -c "HOME=/tmp exec \"$SCRIPT\" --phase2"
+    exec runuser -u "$U1000" -- sh -c "HOME=/tmp exec \"$SCRIPT\""
     # (the exec replaces this process; --phase2 is ignored, script re-detects as bwrap-like uid≠0)
 fi
 
