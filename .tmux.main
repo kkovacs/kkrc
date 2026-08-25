@@ -599,7 +599,7 @@ bind -T menus "s" display-menu -T " Sandbox... " \
 "Start apple containers ............." "a" "send-keys 'container run -e HOME=/tmp -v \"\$PWD\":\"\$PWD\" -m 4g --ssh --rm -it ubuntu bash -c \"cd \$PWD; HOME=/tmp exec bash\"' enter" \
 "Start docker ......................." "d" "send-keys 'docker run -e HOME=/tmp -v \"\$PWD\":\"\$PWD\" -m 4g --rm -it ubuntu bash -c \"cd \$PWD; HOME=/tmp exec bash\"' enter" \
 "" \
-"switch to user 1000 ................" "1" "send-keys 'runuser -u \"\$(id -nu 1000)\" -c \"cd \$PWD; HOME=/tmp exec bash -l\"' enter"
+"switch to user 1000 ................" "1" "send-keys 'runuser -u \"\$(id -nu 1000)\" -- sh -c \"cd \$PWD; HOME=/tmp exec bash -i\"' enter"
 
 # Submenu: vim
 bind -T menus "v" display-menu -T " vim... " \
