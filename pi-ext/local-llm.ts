@@ -16,6 +16,8 @@ const DEFAULT_MAX_TOKENS = 16_384;
 function getCtxWin(m: Record<string, unknown>): number | undefined {
     if (typeof m.context_window === "number" && m.context_window > 0)
         return m.context_window;
+    if (typeof m.max_model_len === "number" && m.max_model_len > 0)
+        return m.max_model_len;
     const meta = m.meta as Record<string, unknown> | undefined;
     if (meta) {
         if (typeof meta.n_ctx === "number" && meta.n_ctx > 0) return meta.n_ctx;
@@ -39,7 +41,10 @@ function numOrUndef(v: unknown): number | undefined {
 
 // Probe OpenAI-compat model listings. First hit wins; its path strip
 // defines the chat completion base URL.
-async function probe(baseUrl: string): Promise<{
+async function probe(
+    baseUrl: string,
+    apiKey?: string,
+): Promise<{
     chatBase: string;
     models: {
         id: string;
@@ -66,6 +71,7 @@ async function probe(baseUrl: string): Promise<{
         try {
             const r = await fetch(t.probe, {
                 signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
+                headers: apiKey ? { Authorization: `Bearer ${apiKey}` } : {},
             });
             if (!r.ok) continue;
             const list = t.extract((await r.json()) as Record<string, unknown>);
@@ -128,9 +134,9 @@ export default async function (pi: ExtensionAPI) {
     const envUrl = process.env.PI_LOCAL_LLM_URL;
     const flagUrl = getLocalUrlFromArgv();
     const baseUrl = (flagUrl ?? envUrl ?? DEFAULT_URL).replace(/\/+$/, "");
-    const apiKey = process.env.LOCAL_API_KEY ?? "no-key";
+    const envKey = process.env.LOCAL_API_KEY;
 
-    const result = await probe(baseUrl);
+    const result = await probe(baseUrl, envKey);
     if (!result) {
         // Server unreachable: skip silently so pi startup is not blocked.
         return;
@@ -139,7 +145,9 @@ export default async function (pi: ExtensionAPI) {
     pi.registerProvider("local-llm", {
         name: "Local LLM",
         baseUrl: result.chatBase,
-        apiKey,
+        // pi hides models without an apiKey in /model and --list-models,
+        // so keyless local servers keep a dummy placeholder value.
+        apiKey: envKey ?? "no-key",
         api: "openai-completions",
         models: result.models.map((m) => ({
             id: m.id,
