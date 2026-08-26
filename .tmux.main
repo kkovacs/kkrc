@@ -574,6 +574,7 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$GITHUB_TOKEN ...................." "" "send-keys ' stty -echo' enter ' export GITHUB_TOKEN=#{GITHUB_TOKEN}; stty echo' enter" \
 "Inject \$HTTPS_PROXY ....................." "h" "send-keys ' stty -echo' enter ' export HTTPS_PROXY=\"#{HTTPS_PROXY}\" HTTP_PROXY=\"#{HTTPS_PROXY}\"; stty echo' enter" \
 "Inject \$HUGGINGFACE_API_KEY ............." "" "send-keys ' stty -echo' enter ' export HUGGINGFACE_API_KEY=#{HUGGINGFACE_API_KEY}; stty echo' enter" \
+"Inject \$LOCAL_KEY and \$LOCAL_URL........." "l" "send-keys ' stty -echo' enter ' export LOCAL_KEY=#{LOCAL_KEY} LOCAL_URL=#{LOCAL_URL}; stty echo' enter" \
 "Inject \$MISTRAL_API_KEY ................." "" "send-keys ' stty -echo' enter ' export MISTRAL_API_KEY=#{MISTRAL_API_KEY}; stty echo' enter" \
 "Inject \$NVIDIA_API_KEY .................." "" "send-keys ' stty -echo' enter ' export NVIDIA_API_KEY=#{NVIDIA_API_KEY}; stty echo' enter" \
 "Inject \$OLLAMA_API_KEY .................." "" "send-keys ' stty -echo' enter ' export OLLAMA_API_KEY=#{OLLAMA_API_KEY}; stty echo' enter" \
