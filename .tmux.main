@@ -552,12 +552,12 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "" \
 "llama cli … ............................." "c" "send-keys \"llama cli -st --offline -p \\\"OCR\\\" --image \\\"\\\" -hf \"" \
 "llama server … .........................." "s" "send-keys 'llama server --webui-mcp-proxy --jinja --offline -hf '" \
-"gemma4:e2b Q4 (fast) ...................." "2" "send-keys 'unsloth/gemma-4-E2B-it-GGUF:UD-Q4_K_XL'" \
-"gemma4:e4b Q4 (good) ...................." "4" "send-keys 'unsloth/gemma-4-E4B-it-GGUF:UD-Q4_K_XL'" \
-"gemma4:12b Q3 (exit all, get coffee) .." "1" "send-keys 'unsloth/gemma-4-12b-it-GGUF:Q3_K_M'" \
-"qwen3.5:2b Q4 (fast) ...................." "w" "send-keys 'unsloth/Qwen3.5-2B-GGUF:Q4_K_M'" \
-"qwen3.5:4b Q4 (good) ...................." "W" "send-keys 'unsloth/Qwen3.5-4B-GGUF:Q4_K_M'" \
-"GLM-(O)CR ..............................." "o" "send-keys 'ggml-org/GLM-OCR-GGUF'"
+"gemma4:e2b Q4 (fast) ...................." "" "send-keys 'unsloth/gemma-4-E2B-it-GGUF:UD-Q4_K_XL'" \
+"gemma4:e4b Q4 (good) ...................." "" "send-keys 'unsloth/gemma-4-E4B-it-GGUF:UD-Q4_K_XL'" \
+"gemma4:12b Q3 (exit all, get coffee) ...." "" "send-keys 'unsloth/gemma-4-12b-it-GGUF:Q3_K_M'" \
+"qwen3.5:2b Q4 (fast) ...................." "" "send-keys 'unsloth/Qwen3.5-2B-GGUF:Q4_K_M'" \
+"qwen3.5:4b Q4 (good) ...................." "" "send-keys 'unsloth/Qwen3.5-4B-GGUF:Q4_K_M'" \
+"GLM-(O)CR ..............................." "" "send-keys 'ggml-org/GLM-OCR-GGUF'"
 
 # Submenu: environment
 # Load age-encrypted environment variables in tmux session, so they can be injected.
