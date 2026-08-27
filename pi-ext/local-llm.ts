@@ -93,9 +93,11 @@ export default async function (pi: ExtensionAPI) {
   const result = await probe(baseUrl, envKey);
   if (!result) return; // unreachable: skip silently so startup isn't blocked
 
-  // Some servers require *any* non-empty key even when unauthenticated, so
-  // keep a dummy placeholder when none is configured.
-  // XXX: verify Pi no longer hides keyless models; drop the dummy if so.
+  // Pi only exposes models from "configured" providers (getAvailable() filters by
+  // configuredProviders), and a provider is configured only if auth resolves — which
+  // for an API-key provider needs an apiKey. Omit it and /model + --list-models hide
+  // every model. So the dummy is required, not cosmetic. Some servers also demand
+  // *any* non-empty key even when unauthenticated.
   // XXX: llama.cpp /v1/models omits n_ctx, so small -c servers fall back to
   // 128k and won't clamp. Probe the singular /v1/model (meta.n_ctx) to fix.
   pi.registerProvider("local-llm", {
