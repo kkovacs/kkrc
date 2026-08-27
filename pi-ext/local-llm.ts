@@ -11,6 +11,17 @@ const PROBE_TIMEOUT_MS = 2000;
 const DEFAULT_CONTEXT_WINDOW = 128_000;
 const DEFAULT_MAX_TOKENS = 16_384;
 
+// Output-token budget guardrails (see the maxTokens computation below).
+// Local servers (e.g. llama.cpp) advertise their *runtime* context via
+// meta.n_ctx, which can be small -- it is simply whatever was passed to -c.
+// The previous `ctxWin / 8` heuristic turned a 4096-token context into a
+// 512-token output cap and produced "Response was truncated before
+// completion." These constants keep a usable floor while never requesting
+// more output than the server's real context can actually hold.
+const MIN_OUTPUT_TOKENS = 2_048; // floor so small-context servers can still answer
+const MAX_OUTPUT_TOKENS = 32_768; // ceiling to avoid oversized generation requests
+const INPUT_RESERVE_TOKENS = 1_024; // tokens kept free for prompt/system/tools
+
 // Extract context window from meta.n_ctx, direct field, etc.
 function getCtxWin(m: Record<string, unknown>): number | undefined {
     if (typeof m.context_window === "number" && m.context_window > 0)
@@ -23,6 +34,15 @@ function getCtxWin(m: Record<string, unknown>): number | undefined {
         if (typeof meta.n_ctx_train === "number" && meta.n_ctx_train > 0)
             return meta.n_ctx_train;
     }
+    return undefined;
+}
+
+// Extract the model's maximum supported context (training context), used to
+// suggest a -c value when the server was launched with a small context.
+function getMaxCtx(m: Record<string, unknown>): number | undefined {
+    const meta = m.meta as Record<string, unknown> | undefined;
+    if (meta && typeof meta.n_ctx_train === "number" && meta.n_ctx_train > 0)
+        return meta.n_ctx_train;
     return undefined;
 }
 
@@ -50,6 +70,7 @@ async function probe(
         context_window: number;
         max_tokens: number;
         multimodal: boolean;
+        recommended_ctx?: number;
     }[];
 } | null> {
     const tries = [
@@ -86,16 +107,37 @@ async function probe(
                               : null;
                     if (!id) return null;
                     const ctxWin = getCtxWin(m);
+                    // Derive an output budget from the (real) context window:
+                    //  - floor half the context, but never below MIN_OUTPUT_TOKENS,
+                    //    so a small -c (e.g. 4096) still yields a usable ~2048 tokens
+                    //    instead of the old 512-token cap that truncated responses;
+                    //  - capped at MAX_OUTPUT_TOKENS so we never ask for a huge output;
+                    //  - also clamped to ctxWin - INPUT_RESERVE_TOKENS so the output
+                    //    fits inside the server's actual context alongside the prompt
+                    //    (this term dominates for tiny contexts, e.g. -c 2048);
+                    //  - the outer Math.max(256, ...) guarantees a non-zero minimum
+                    //    even for pathological contexts.
                     const maxTok =
                         numOrUndef(m.max_tokens) ??
                         (ctxWin
-                            ? Math.min(Math.floor(ctxWin / 8), 32768)
+                            ? Math.max(
+                                  256,
+                                  Math.min(
+                                      Math.max(
+                                          Math.floor(ctxWin * 0.5),
+                                          MIN_OUTPUT_TOKENS,
+                                      ),
+                                      MAX_OUTPUT_TOKENS,
+                                      ctxWin - INPUT_RESERVE_TOKENS,
+                                  ),
+                              )
                             : DEFAULT_MAX_TOKENS);
                     return {
                         id,
                         context_window: ctxWin ?? DEFAULT_CONTEXT_WINDOW,
                         max_tokens: maxTok,
                         multimodal: isMultimodal(m),
+                        recommended_ctx: getMaxCtx(m),
                     };
                 })
                 .filter((m): m is NonNullable<typeof m> => m !== null);
@@ -135,4 +177,26 @@ export default async function (pi: ExtensionAPI) {
             maxTokens: m.max_tokens,
         })),
     });
+
+    // Remind the user when a local model is loaded with a small context
+    // window: agentic coding needs room for the system prompt, tool schemas,
+    // history, and output. Recommend relaunching llama.cpp with a larger -c.
+    const LOW_CTX_THRESHOLD = 65536;
+    const lowCtx = result.models
+        .filter((m) => m.context_window < LOW_CTX_THRESHOLD)
+        .map((m) => ({ id: m.id, have: m.context_window, max: m.recommended_ctx }));
+    if (lowCtx.length > 0) {
+        pi.on("session_start", (_event, ctx) => {
+            if (!ctx.ui.hasUI) return;
+            for (const w of lowCtx) {
+                const tip = w.max
+                    ? `Relaunch llama.cpp with -c ${w.max} (model max) for agentic coding.`
+                    : `Relaunch llama.cpp with a larger -c (e.g. 65536+) for agentic coding.`;
+                ctx.ui.notify(
+                    `Local LLM "${w.id}" context is ${w.have} tokens (< 64k). ${tip}`,
+                    "warning",
+                );
+            }
+        });
+    }
 }
