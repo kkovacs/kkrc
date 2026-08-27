@@ -24,15 +24,7 @@ function compact(msg: Record<string, unknown>): {
     isToolOnly: boolean;
     originalLength: number;
 } {
-    const {
-        role,
-        content,
-        command,
-        output,
-        fullOutputPath,
-        toolName,
-        details,
-    } = msg;
+    const { role, content, command, output, fullOutputPath } = msg;
 
     switch (role) {
         case "user": {
@@ -123,32 +115,10 @@ function compact(msg: Record<string, unknown>): {
             return { text: r, isToolOnly: false, originalLength };
         }
 
-        case "toolResult": {
-            // Non-bash tool results (read, write, edit, pingme, custom tools...).
-            // Previously fell through to default and were dropped entirely.
-            const blocks = Array.isArray(content) ? (content as any[]) : [];
-            const texts: string[] = [];
-            let originalLength = 0;
-            for (const b of blocks) {
-                if (b?.type === "text" && typeof b.text === "string") {
-                    texts.push(b.text);
-                    originalLength += b.text.length;
-                } else if (b?.type === "image" && typeof b.data === "string") {
-                    originalLength += b.data.length;
-                }
-            }
-            if (details) originalLength += JSON.stringify(details).length;
-            const text = texts.join("");
-            const body = text
-                ? "[" + (toolName ?? "tool") + " result] " + text + "\n"
-                : "";
-            return {
-                text: body ? "# User\n\n" + body : "",
-                isToolOnly: false,
-                originalLength,
-            };
-        }
-
+        // toolResult intentionally falls through to default — tool outputs
+        // (read, write, edit, pingme, custom tools) are excluded from the
+        // compacted summary. The assistant's tool calls are already captured
+        // above, and the results add bulk without useful context for continuation.
         default:
             return { text: "", isToolOnly: false, originalLength: 0 };
     }
