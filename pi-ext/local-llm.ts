@@ -28,22 +28,21 @@ function isMultimodal(m: Record<string, unknown>): boolean {
   return details?.multimodal === true;
 }
 
-// Ollama-style servers return both `data` (carries meta.n_ctx) and `models`
-// (carries capabilities). Merge by id so we keep the context window AND the
-// multimodal flag from whichever array exposes each.
+// llama.cpp (OpenAI mode) returns two parallel arrays: `data` carries
+// meta.n_ctx (the real context window) and `models` carries capabilities.
+// They share an id, so merge by id to keep BOTH fields on each model.
+// Singular /v1/model exists on native llama.cpp but 404s here -- skip it.
 function mergeModelLists(data?: unknown, models?: unknown): Record<string, unknown>[] {
   const byKey = new Map<string, Record<string, unknown>>();
-  const add = (arr: unknown) => {
-    if (!Array.isArray(arr)) return;
+  for (const arr of [data, models]) {
+    if (!Array.isArray(arr)) continue;
     for (const e of arr) {
       const m = e as Record<string, unknown>;
-      const key = typeof m.id === "string" ? m.id : typeof m.name === "string" ? m.name : null;
-      if (!key) continue;
+      const key = (m.id ?? m.name) as string | undefined;
+      if (typeof key !== "string") continue;
       byKey.set(key, { ...byKey.get(key), ...m });
     }
-  };
-  add(data);
-  add(models);
+  }
   return [...byKey.values()];
 }
 
@@ -98,8 +97,8 @@ export default async function (pi: ExtensionAPI) {
   // for an API-key provider needs an apiKey. Omit it and /model + --list-models hide
   // every model. So the dummy is required, not cosmetic. Some servers also demand
   // *any* non-empty key even when unauthenticated.
-  // XXX: llama.cpp /v1/models omits n_ctx, so small -c servers fall back to
-  // 128k and won't clamp. Probe the singular /v1/model (meta.n_ctx) to fix.
+  // XXX: llama.cpp (OpenAI mode) /v1/models already carries meta.n_ctx
+  // (validated: 131072); singular /v1/model 404s. 128k is just a safe floor.
   pi.registerProvider("local-llm", {
     name: "Local LLM",
     baseUrl: result.chatBase,
