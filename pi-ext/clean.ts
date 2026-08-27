@@ -24,7 +24,7 @@ function compact(msg: Record<string, unknown>): {
     isToolOnly: boolean;
     originalLength: number;
 } {
-    const { role, content, command, output, fullOutputPath } = msg;
+    const { role, content, command, output, fullOutputPath, details } = msg;
 
     switch (role) {
         case "user": {
@@ -115,10 +115,22 @@ function compact(msg: Record<string, unknown>): {
             return { text: r, isToolOnly: false, originalLength };
         }
 
-        // toolResult intentionally falls through to default — tool outputs
-        // (read, write, edit, pingme, custom tools) are excluded from the
-        // compacted summary. The assistant's tool calls are already captured
-        // above, and the results add bulk without useful context for continuation.
+        case "toolResult": {
+            // toolResult intentionally excluded from compacted output, but we
+            // still count its size toward originalChars so the reduction %
+            // reflects the true original context the LLM saw.
+            const blocks = Array.isArray(content) ? (content as any[]) : [];
+            let originalLength = 0;
+            for (const b of blocks) {
+                if (b?.type === "text" && typeof b.text === "string")
+                    originalLength += b.text.length;
+                else if (b?.type === "image" && typeof b.data === "string")
+                    originalLength += b.data.length;
+            }
+            if (details) originalLength += JSON.stringify(details).length;
+            return { text: "", isToolOnly: false, originalLength };
+        }
+
         default:
             return { text: "", isToolOnly: false, originalLength: 0 };
     }
@@ -179,9 +191,9 @@ export default function (pi: ExtensionAPI) {
             const parentSession = sm.getSessionFile() as string | undefined;
             const sessionId = sm.getSessionId();
             const compactChars = summary.length;
-            const reduction =
+            const remaining =
                 originalChars > 0
-                    ? Math.round((1 - compactChars / originalChars) * 100)
+                    ? Math.round((compactChars / originalChars) * 100)
                     : 0;
 
             const seededText = `Here is a summary of our previous session ${sessionId}.\n\n${summary}\n\n# User - Let's continue on this:\n\n`;
@@ -192,7 +204,7 @@ export default function (pi: ExtensionAPI) {
                 withSession: async (freshCtx) => {
                     freshCtx.ui.setEditorText(seededText);
                     freshCtx.ui.notify(
-                        `/clean: ${originalChars.toLocaleString()} → ${compactChars.toLocaleString()} chars (${reduction}% reduction)`,
+                        `/clean: ${originalChars.toLocaleString()} → ${compactChars.toLocaleString()} chars (reduced to ${remaining}%)`,
                         "success",
                     );
                 },
