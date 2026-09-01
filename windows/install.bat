@@ -7,17 +7,19 @@ winget.exe update
 
 REM Install software that requires administrator
 winget.exe install Microsoft.WindowsTerminal
-winget.exe install vim.vim
-winget.exe install Neovim.Neovim
 winget.exe install Git.Git
-winget.exe install MullvadVPN.MullvadBrowser
-winget.exe install WinScp.WinScp
+winget.exe install vim.vim
+REM winget.exe install Neovim.Neovim
+REM winget.exe install MullvadVPN.MullvadBrowser
 
 REM Install software that can be installed on the user-level
 winget.exe install --scope user Microsoft.PowerToys
-winget.exe install --scope user Microsoft.VisualStudioCode
-winget.exe install --scope user DuckDB.cli
-winget.exe install --scope user DuckDuckGo.DesktopBrowser
+REM winget.exe install --scope user Microsoft.VisualStudioCode
+REM winget.exe install --scope user DuckDB.cli
+REM winget.exe install --scope user DuckDuckGo.DesktopBrowser
+winget.exe install --scope user Astral-sh.uv
+winget.exe install --scope user Oven-sh.bun
+winget.exe install --scope user SST.opencode
 
 REM Install OpenSSH - special case
 winget.exe install Microsoft.OpenSSH.Beta
