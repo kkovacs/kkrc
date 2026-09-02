@@ -531,8 +531,10 @@ bind -T menus "a" display-menu -T " AI... " \
 
 # Submenu: AI harnesses
 bind -T menus "h" display-menu -T " Harnesses... " \
-"Inject (a)i shell+python snippet...." "a" "inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"BLUF only:\\\"\"" \
-"Inject (A)I bash function .........." "A" "send-keys \" function AI() {\" ; inject_ai_snippet \; send-keys \" \\\"\\\${2:-#{INJECT_AI_MODEL}}\\\" \\\"\\\$1\\\"; }; export -f AI\" enter" \
+"Inject (a)i shell+python snippet........." "a" "inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"BLUF only:\\\"\"" \
+"Inject (A)I bash function ..............." "A" "send-keys \" function AI() {\" ; inject_ai_snippet \; send-keys \" \\\"\\\${2:-#{INJECT_AI_MODEL}}\\\" \\\"\\\$1\\\"; }; export -f AI\" enter" \
+"" \
+"Download (h)herdr ......................." "h" "send-keys ' mkdir -p ~/.local/bin ; curl -Lo ~/.local/bin/herdr https://github.com/herdrdev/herdr/releases/latest/download/herdr-linux-\$(uname -m) && chmod 755 ~/.local/bin/herdr' enter" \
 "" \
 "Download (p)i ..........................." "p" setup_pi \
 "Bun install pi ........................" "c-p" setup_pi_bun \
@@ -558,7 +560,7 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "qwen3.5:2b Q4 (fast) ...................." "" "send-keys 'unsloth/Qwen3.5-2B-GGUF:Q4_K_M'" \
 "qwen3.5:4b Q4 (good) ...................." "" "send-keys 'unsloth/Qwen3.5-4B-GGUF:Q4_K_M'" \
 "LFM2.5-2.6B (fast) ......................" "" "send-keys 'LiquidAI/LFM2.5-2.6B-GGUF:Q4_K_M'" \
-"GLM-(O)CR ..............................." "" "send-keys 'ggml-org/GLM-OCR-GGUF'"
+"GLM-OCR ................................." "" "send-keys 'ggml-org/GLM-OCR-GGUF'"
 
 # Submenu: environment
 # Load age-encrypted environment variables in tmux session, so they can be injected.
