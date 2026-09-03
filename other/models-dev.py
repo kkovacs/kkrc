@@ -11,11 +11,12 @@ Usage:
     uv run models-dev.py -a              # all models, all providers
     ./models-dev.py -p opencode-go -i aud
     ./models-dev.py -m deepseek-v4-flash -M 0.3   # defaults to -p openrouter
-    ./models-dev.py -m '.*gpt.*' -M 10
+    ./models-dev.py -m '.*gpt.*' -M 10            # cap the Over ~1.75M input tokens bar
     ./models-dev.py -p openrouter -O               # sort by output price
     ./models-dev.py -p openrouter -I               # sort by input price
     ./models-dev.py -p openrouter -c               # context column, sorted desc by context
-    ./models-dev.py -p openrouter -C               # cache r/w column
+    ./models-dev.py -p openrouter -C               # cache write column
+    ./models-dev.py -p openrouter -P               # sort by effective blended price
 """
 
 from __future__ import annotations
@@ -33,6 +34,18 @@ from typing import Any
 
 CATALOG_URL = "https://models.dev/catalog.json"
 CACHE_TTL_HOURS = 24
+# --- Cost column: "blended price once ~1.75M input tokens are processed" ---
+# effective_price() below is the blended per-M price assuming a typical request mix of
+# 90% cache-read / 7% fresh input / 3% output tokens. We frame the displayed column as the
+# total cost at the point 1.75M INPUT tokens have been processed. At a 7% input share that
+# implies 1.75 / 0.07 = 25M total tokens, so the per-M blended price is multiplied by 25
+# (BASE_VOLUME == PRICE_SCALE). INPUT_VOLUME_M = BASE_VOLUME * INPUT_WEIGHT derives the
+# 1.75M input-token count used in the label. Retune by changing INPUT_WEIGHT / BASE_VOLUME;
+# the label and scaling follow automatically.
+INPUT_WEIGHT = 0.07   # Fresh-input share of the blended-price mix (90% cache / 7% input / 3% output).
+BASE_VOLUME = 25       # Total token volume (M) framed; also the multiplier on the per-M blended price.
+INPUT_VOLUME_M = BASE_VOLUME * INPUT_WEIGHT  # 1.75 → input tokens (M) within that volume.
+PRICE_SCALE = BASE_VOLUME  # Blended cost for ~25M tokens (which hold ~1.75M input).
 
 
 def fetch_catalog(cache_dir: Path, refresh: bool = False) -> dict[str, Any]:
@@ -84,10 +97,6 @@ def make_row(label: str, info: dict[str, Any]) -> dict[str, Any]:
 
     cache_read = cost.get("cache_read")
     cache_write = cost.get("cache_write")
-    cache_parts = [
-        f"${cache_read:.2f}" if cache_read is not None else "-",
-        f"${cache_write:.2f}" if cache_write is not None else "-",
-    ]
 
     age_days: int | None = None
     release_date_str = info.get("release_date")
@@ -108,7 +117,6 @@ def make_row(label: str, info: dict[str, Any]) -> dict[str, Any]:
         "in_price": cost.get("input", 0.0),
         "out_price": cost.get("output", 0.0),
         "has_tiers": has_tiers,
-        "cache_rw": " / ".join(cache_parts),
         "cache_read": cache_read,
         "cache_write": cache_write,
         "age_days": age_days,
@@ -117,41 +125,75 @@ def make_row(label: str, info: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def format_chart(value: float, max_value: float, bar_width: int = 30) -> str:
-    capped = max_value > 0 and value > max_value
-    if capped:
-        return f"{'█' * (bar_width - 1)}▶ ${value:.2f}+"
-    if max_value <= 0 or value <= 0:
-        bar = "░" * bar_width
+def format_calc_bar(row: dict[str, Any], max_value: float, bar_width: int = 30) -> str:
+    # Stacked bar of the blended price: █ cache, ▓ input, ▒ output (lengths ∝ each $ share).
+    eff = effective_price(row) * PRICE_SCALE
+    cr = row["cache_read"] if row["cache_read"] is not None else row["in_price"]
+    cache = 0.9 * cr
+    inp = INPUT_WEIGHT * row["in_price"]
+    out = 0.03 * row["out_price"]
+    raw = cache + inp + out  # = effective_price(row)
+
+    capped = max_value > 0 and eff > max_value
+    if max_value <= 0 or eff <= 0:
+        bar = ""  # free / zero-cost model: no bar (avoid a full-width empty line)
     else:
-        n = max(1, min(int(round(value / max_value * bar_width)), bar_width))
-        bar = "█" * n + "░" * (bar_width - n)
-    return f"{bar} ${value:.2f}"
+        total = bar_width if capped else max(1, min(int(round(eff / max_value * bar_width)), bar_width))
+        c_len = int(round(cache / raw * total))
+        i_len = int(round(inp / raw * total))
+        o_len = total - c_len - i_len
+        if o_len < 0:  # rounding overshoot: trim the larger segment
+            if c_len >= i_len:
+                c_len += o_len
+            else:
+                i_len += o_len
+            o_len = 0
+        bar = "█" * c_len + "▓" * i_len + "▒" * o_len
+    mark = "†" if row["cache_write"] else ""  # cache-write price exists (matches `†` in Cache/In/Out)
+    if capped:
+        return f"{bar}▶ ${eff:.2f}{mark}+"
+    return f"{bar} ${eff:.2f}{mark}"
+
+
+def effective_price(row: dict[str, Any]) -> float:
+    # Blended cost: 90% cache read (input price when no cache), 7% input, 3% output.
+    cr = row["cache_read"] if row["cache_read"] is not None else row["in_price"]
+    return 0.9 * cr + INPUT_WEIGHT * row["in_price"] + 0.03 * row["out_price"]
 
 
 def build_table(
     columns: list[tuple[str, str]],
     rows: list[dict[str, Any]],
     footnote: str,
-    chart_max: float | None = None,
+    calc_max: float | None = None,
 ) -> str:
     if not rows:
         raise RuntimeError("No rows to render.")
 
-    max_out = chart_max if chart_max is not None else max(r["out_price"] for r in rows)
+    # Scale the bar by the max displayed blended cost, or the -M cap (both in displayed units).
+    max_val = calc_max if calc_max is not None else max(effective_price(r) * PRICE_SCALE for r in rows)
     headers, keys = zip(*columns)
 
     formatted: list[dict[str, str]] = []
     for r in rows:
         tier_marker = " *" if r["has_tiers"] else ""
+        # Cache read first, in a fixed-width token so in/out align even with no cache read.
+        # `†` marks a cache-write price; `-     ` is the no-cache-read placeholder (left-aligned).
+        if r["cache_read"] is not None:
+            mark = "†" if r["cache_write"] else " "
+            cr_token = f"${r['cache_read']:.2f}{mark}"
+        else:
+            cr_token = f"{'-':<6}"
+        cache_read_str = f"{cr_token} / "
+        cache_write_str = f"${r['cache_write']:.2f}" if r["cache_write"] is not None else "-"
         formatted.append(
             {
                 "label": r["label"],
                 "provider": r.get("provider", ""),
                 "input_modality": r["input_modality"],
-                "in_out": f"${r['in_price']:.2f} / ${r['out_price']:.2f}{tier_marker}",
-                "cache_rw": r["cache_rw"],
-                "chart": format_chart(r["out_price"], max_out),
+                "in_out": f"{cache_read_str}${r['in_price']:.2f} / ${r['out_price']:.2f}{tier_marker}",
+                "cache_write": cache_write_str,
+                "calc": format_calc_bar(r, max_val),
                 "age_days": str(r["age_days"]) if r["age_days"] is not None else "-",
                 "context_limit": f"{r['context_limit']:,}" if r.get("context_limit") is not None else "-",
             }
@@ -174,9 +216,9 @@ def build_table(
 
     lines.append("")
     lines.append(footnote)
-    if chart_max is not None:
+    if calc_max is not None:
         lines.append(
-            f"_Chart capped at ${chart_max:.2f} output; values above the cap show a trailing `▶` and a `+` price suffix._"
+            f"_Over ~1.75M input tokens capped at ${calc_max:.2f}; values above the cap show a trailing `▶` and a `+` price suffix._"
         )
 
     return "\n".join(lines)
@@ -187,9 +229,10 @@ def build_filtered_table(
     provider_filter: str | None = None,
     model_filter: str | None = None,
     input_filter: str | None = None,
-    chart_max: float | None = None,
+    calc_max: float | None = None,
     in_price_sort: bool = False,
     out_price_sort: bool = False,
+    price_sort: bool = False,
     show_date: bool = False,
     date_sort: bool = False,
     show_cache: bool = False,
@@ -241,6 +284,8 @@ def build_filtered_table(
         rows.sort(key=lambda r: (r["in_price"], r["out_price"], r["label"].lower(), r["provider"].lower()))
     elif out_price_sort:
         rows.sort(key=lambda r: (r["out_price"], r["in_price"], r["label"].lower(), r["provider"].lower()))
+    elif price_sort:
+        rows.sort(key=lambda r: (effective_price(r), r["label"].lower(), r["provider"].lower()))
     elif show_context:
         rows.sort(key=lambda r: (-r["context_limit"] if r["context_limit"] is not None else float("inf"), r["label"].lower(), r["provider"].lower()))
     else:
@@ -254,13 +299,13 @@ def build_filtered_table(
         columns.append(("Context", "context_limit"))
     columns.extend([
         ("Input modality", "input_modality"),
-        ("In/Out ($/M)", "in_out"),
+        ("Cache/In/Out ($/M)", "in_out"),
     ])
     if show_cache:
-        columns.append(("Cache r/w (M)", "cache_rw"))
+        columns.append(("CacheW", "cache_write"))
     if show_date:
         columns.append(("Age", "age_days"))
-    columns.append(("Output price chart", "chart"))
+    columns.append(("Over ~1.75M input tokens", "calc"))
 
     filter_notes = []
     if model_filter:
@@ -275,9 +320,11 @@ def build_filtered_table(
 
     footnote = (
         f"_Prices from [models.dev](https://models.dev) catalog{filter_note}, "
-        "per million tokens. Base prices shown; `*` = context-length tiers._"
+        "per million tokens. Base prices shown; `*` = context-length tiers, "
+        "`†` = a cache write price exists (use -C to reveal it). "
+        "Bar glyphs `█`/`▓`/`▒` show cache/input/output shares of the price._"
     )
-    return build_table(columns, rows, footnote, chart_max)
+    return build_table(columns, rows, footnote, calc_max)
 
 
 def main() -> int:
@@ -331,7 +378,7 @@ def main() -> int:
         "--max",
         type=float,
         metavar="PRICE",
-        help="Cap the output price chart at this value (useful when a few expensive models dwarf the rest)",
+        help="Cap the Over ~1.75M input tokens bar at this value (useful when a few expensive models dwarf the rest)",
     )
     parser.add_argument(
         "-i",
@@ -373,7 +420,13 @@ def main() -> int:
         "-C",
         "--cache",
         action="store_true",
-        help="Show cache read/write price column",
+        help="Show cache write price column (cache read is always shown in Cache/In/Out)",
+    )
+    parser.add_argument(
+        "-P",
+        "--price",
+        action="store_true",
+        help="Sort by effective blended price (90%% cache read + 7%% input + 3%% output), ascending",
     )
     args = parser.parse_args()
 
@@ -407,13 +460,14 @@ def main() -> int:
             provider_filter=provider_filter,
             model_filter=args.model,
             input_filter=args.input,
-            chart_max=args.max,
+            calc_max=args.max,
             in_price_sort=args.in_price,
             out_price_sort=args.out_price,
             show_date=args.date,
             date_sort=args.date_sort,
             show_cache=args.cache,
             show_context=args.context,
+            price_sort=args.price,
         )
     except RuntimeError as exc:
         print(f"Error: {exc}", file=sys.stderr)
