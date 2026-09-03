@@ -11,8 +11,7 @@ A subagent is a **separate LLM session**: different model, fresh context, no wor
 **Tips:**
 - Especially for the isolated agent, use `@file.md` or `@image.jpg` (vision models only) to attach the contents of a file. More info: `pi --help`
 - `@file.md` loads as a file *attachment*; some models treat it as external input rather than prompt text. To prompt from a file, use `"$(cat prompt.md)"`.
-- The `--print` option makes `pi` exit on ready, else it waits for user input. Remove `--print` only if you run pi interactively in a `tmux` window.
-- Parallel fan-out: background each call (`&`), redirect output, then `wait` — watch rate limits.
+- The `--print` option makes `pi` exit on ready, else it waits for user input. Remove `--print` only if you run pi interactively in tmux or herdr.
 - Capture output to a file or variable; otherwise it interleaves with main session logs.
 - You can even follow up with subagents by using the same `--session-id <job-name>`.
 
