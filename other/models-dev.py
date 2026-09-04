@@ -12,11 +12,11 @@ Usage:
     ./models-dev.py -p opencode-go -i aud
     ./models-dev.py -m deepseek-v4-flash -M 0.3   # defaults to -p openrouter
     ./models-dev.py -m '.*gpt.*' -M 10            # cap the Over ~1.75M input tokens bar
-    ./models-dev.py -p openrouter -O               # sort by output price
-    ./models-dev.py -p openrouter -I               # sort by input price
-    ./models-dev.py -p openrouter -c               # context column, sorted desc by context
+    ./models-dev.py -p openrouter -O               # sort by output price (desc)
+    ./models-dev.py -p openrouter -I               # sort by input price (desc)
+    ./models-dev.py -p openrouter -c               # context column, sorted asc by context
     ./models-dev.py -p openrouter -C               # cache write column
-    ./models-dev.py -p openrouter -P               # sort by effective blended price
+    ./models-dev.py -p openrouter -P               # sort by effective blended price (desc)
 """
 
 from __future__ import annotations
@@ -279,17 +279,17 @@ def build_filtered_table(
         show_date = True
 
     if date_sort:
-        rows.sort(key=lambda r: (r["age_days"] if r["age_days"] is not None else float("inf"), r["label"].lower(), r["provider"].lower()))
+        rows.sort(key=lambda r: (r["age_days"] if r["age_days"] is not None else float("inf"), r["label"].lower(), r["provider"].lower()), reverse=True)
     elif in_price_sort:
-        rows.sort(key=lambda r: (r["in_price"], r["out_price"], r["label"].lower(), r["provider"].lower()))
+        rows.sort(key=lambda r: (r["in_price"], r["out_price"], r["label"].lower(), r["provider"].lower()), reverse=True)
     elif out_price_sort:
-        rows.sort(key=lambda r: (r["out_price"], r["in_price"], r["label"].lower(), r["provider"].lower()))
+        rows.sort(key=lambda r: (r["out_price"], r["in_price"], r["label"].lower(), r["provider"].lower()), reverse=True)
     elif price_sort:
-        rows.sort(key=lambda r: (effective_price(r), r["label"].lower(), r["provider"].lower()))
+        rows.sort(key=lambda r: (effective_price(r), r["label"].lower(), r["provider"].lower()), reverse=True)
     elif show_context:
-        rows.sort(key=lambda r: (-r["context_limit"] if r["context_limit"] is not None else float("inf"), r["label"].lower(), r["provider"].lower()))
+        rows.sort(key=lambda r: (r["context_limit"] if r["context_limit"] is not None else float("inf"), r["label"].lower(), r["provider"].lower()))
     else:
-        rows.sort(key=lambda r: (r["label"].lower(), r["out_price"], r["provider"].lower()))
+        rows.sort(key=lambda r: (r["label"].lower(), r["out_price"], r["provider"].lower()), reverse=True)
 
     columns = [
         ("Model", "label"),
@@ -390,13 +390,13 @@ def main() -> int:
         "-O",
         "--out-price",
         action="store_true",
-        help="Sort by output price ascending, then model, then provider",
+        help="Sort by output price descending, then model, then provider",
     )
     parser.add_argument(
         "-I",
         "--in-price",
         action="store_true",
-        help="Sort by input price ascending, then model, then provider",
+        help="Sort by input price descending, then model, then provider",
     )
     parser.add_argument(
         "-d",
@@ -408,13 +408,13 @@ def main() -> int:
         "-D",
         "--date-sort",
         action="store_true",
-        help="Sort by model age ascending",
+        help="Sort by model age descending (newest at bottom)",
     )
     parser.add_argument(
         "-c",
         "--context",
         action="store_true",
-        help="Show context length column and sort by it (descending)",
+        help="Show context length column and sort by it (ascending)",
     )
     parser.add_argument(
         "-C",
@@ -426,7 +426,7 @@ def main() -> int:
         "-P",
         "--price",
         action="store_true",
-        help="Sort by effective blended price (90%% cache read + 7%% input + 3%% output), ascending",
+        help="Sort by effective blended price (90% cache read + 7% input + 3% output), descending",
     )
     args = parser.parse_args()
 
