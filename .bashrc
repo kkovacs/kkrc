@@ -158,6 +158,8 @@ function gg() { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :
 
 # tmux-first (NOTE: tmux show-environment is set automatically, no need for hack)
 function s() { tmux attach-session || tmux new-session \; set prefix2 c-a ; }
+# GNU screen idempotently start or attach
+function sx() { screen -xR ; }
 
 # Avoid mandatory reconfiguration of git with user/email for hotfixes. File permission matching git does by itself since 2022 (was here earlier)
 function git() { command git -c user.email="${USER:-$(id -un)}@${HOSTNAME:-$(uname -n)}" -c user.name="${USER:-$(id -un)}" "$@" ; } ; export -f git
