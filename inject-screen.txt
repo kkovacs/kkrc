@@ -1,4 +1,5 @@
 :echo loading
+:bindkey "^B" command
 :vbell off
 :bell_msg "^G"
 :defscrollback 10000
