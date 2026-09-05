@@ -505,6 +505,7 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "Docker run chrome CDP .............." "c" "send-keys 'sudo docker run -u `id -u $USER` -it --rm --add-host host.docker.internal:host-gateway -p 9222:9222 chromedp/headless-shell:latest --no-sandbox --disable-web-security --disable-site-isolation-trials --window-size=1280,720' enter" \
 "Params for (c)hrome devtools ......." "D" "send-keys ' --remote-debugging-port=9222 --user-data-dir=/tmp/cdp/ --disable-web-security --disable-site-isolation-trials --no-first-run --no-default-browser-check --disable-signin-promo --disable-sync --disable-infobars https://example.com/ ; rm -rf /tmp/cdp' enter" \
 "" \
+"Install (t)tailcat ................." "t" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/tailscale/tailcat/releases/latest/download/tailcat_0.6.0_linux_\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | tar zxv -C ~/.local/bin/ tailcat' enter" \
 "Install (b)rew ....................." "b" setup_brew \
 "Install (d)ocker ..................." "d" setup_docker \
 "Install k(3)s ......................" "3" "send-keys ' curl -sfL https://get.k3s.io | sh -' enter" \
