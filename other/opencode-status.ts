@@ -141,7 +141,8 @@ function extractPrivacy(html: string): { rows: PrivacyRow[]; notes: string[] } {
 }
 
 // Locate a <table> whose header row contains ALL of `headers`.
-function findTableByHeader(html: string, headers: string[]): string {
+// Each header may be a string or an array of acceptable alternatives.
+function findTableByHeader(html: string, headers: (string | string[])[]): string {
   for (const table of html.matchAll(/<table>([\s\S]*?)<\/table>/g)) {
     const body = table[1];
     const firstRow = body.match(/<tr>([\s\S]*?)<\/tr>/);
@@ -149,7 +150,10 @@ function findTableByHeader(html: string, headers: string[]): string {
     const head = [...firstRow[1].matchAll(/<t[dh]>([\s\S]*?)<\/t[dh]>/g)].map((m) =>
       stripTags(m[1]).toLowerCase(),
     );
-    if (headers.every((h) => head.some((c) => c.includes(h)))) return body;
+    if (headers.every((h) => {
+      const alts = Array.isArray(h) ? h : [h];
+      return head.some((c) => alts.some((a) => c.includes(a)));
+    })) return body;
   }
   throw new Error(`Could not locate table with headers: ${headers.join(", ")}`);
 }
@@ -176,7 +180,7 @@ interface PricingRow {
 
 // Parse the pricing table: normalized model name -> full pricing.
 function extractPricing(html: string): Map<string, PricingRow> {
-  const body = findTableByHeader(html, ["cached read", "usage"]);
+  const body = findTableByHeader(html, ["cached read", ["usage", "monthly limit"]]);
   const out = new Map<string, PricingRow>();
   for (const tr of body.matchAll(/<tr>([\s\S]*?)<\/tr>/g)) {
     const cells = [...tr[1].matchAll(/<t[dh]>([\s\S]*?)<\/t[dh]>/g)].map((m) =>
