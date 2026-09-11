@@ -534,7 +534,7 @@ bind -T menus "a" display-menu -T " AI... " \
 "Inject work summary snippet ........" "5" "pipe-pane -I 'cat ~/.kkrc/inject-ai-summary.md'" \
 "Inject code review snippet ........." "7" "pipe-pane -I 'cat ~/.kkrc/inject-ai-codereview.md'" \
 "Inject update docs snippet ........." "8" "pipe-pane -I 'cat ~/.kkrc/inject-ai-docs-update.md'" \
-"git commit with AI message ........." "9" "send-keys 'git diff --cached | ' ; inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"Please craft a git commit message from this. Just the text, no markdown code markers.\\\" | git commit -F -\" enter"
+"git commit with AI message ........." "9" "send-keys 'git diff --cached | ' ; inject_ai_snippet ; send-keys \"  \\\"#{INJECT_AI_MODEL}\\\" \\\"Please craft a concise git commit message from this. Just the text, no markdown code markers.\\\" | git commit -F -\" enter"
 
 # Submenu: AI harnesses
 bind -T menus "h" display-menu -T " Harnesses... " \
