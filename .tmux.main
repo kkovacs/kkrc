@@ -3,8 +3,8 @@
 set -g prefix c-q
 
 # C-s is XOFF: if you don't know how to reset it (C-q q) then it freezes your screen
-bind -n c-s send c-b
-# But occasionally:
+bind -n c-s ""
+# But occasionally we need it anyway, so "c-q c-s" sends it:
 bind c-s send c-s
 
 # Design. Use only plain unicode, still look somewhat special. No powerline special font needed
