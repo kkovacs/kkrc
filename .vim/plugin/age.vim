@@ -4,6 +4,13 @@
 " License: MIT
 " Reference: https://age-encryption.org
 "
+" Remote files are supported via netrw (e.g. vim scp://host//path/foo.age):
+" netrw transfers the file over the network, while the age encryption/
+" decryption itself always runs LOCALLY on the buffer contents. Note that
+" like local files, remote .age files are expected to be ASCII-armored
+" (the default; a custom g:age_enc_params without -a won't be detected
+" when re-reading an already decrypted remote buffer).
+"
 " If ~/.ssh/age.key exists, it is used as identity, else simple password
 " encryption is used.
 "
@@ -107,7 +114,25 @@ function! s:AgeReadPost()
     " shellescape() additionally escapes '!', '%' and '#' which are
     " special to :execute / :!.
     let l:fname = expand("<afile>")
-    let l:expr = "%!age " . g:age_dec_params . " " . shellescape(l:fname, 1)
+
+    " NETRW (remote files, e.g. scp://host//path/foo.age): netrw transfers
+    " the file into a local temp file and loads it into the buffer itself,
+    " then fires BufReadPost/FileReadPost with the URL as <afile>. Since
+    " "age" cannot read URLs, decrypt from STDIN instead - the (armored)
+    " content is already in the buffer, and "age" still runs locally.
+    if l:fname =~ '^[a-z]\+://'
+        " If the buffer is not age-armored, it has been decrypted by an
+        " earlier event already (netrw's file:// handling fires these
+        " events twice); don't touch it.
+        if getline(1) !~# '^\(-\{5}BEGIN AGE ENCRYPTED FILE-\{5}\|age-encryption\.org/v1\)'
+            setlocal nobin
+            call s:AgeRestoreOpts()
+            return
+        endif
+        let l:expr = "%!age " . g:age_dec_params
+    else
+        let l:expr = "%!age " . g:age_dec_params . " " . shellescape(l:fname, 1)
+    endif
 
     setlocal undolevels=-1
     silent! execute l:expr
@@ -143,7 +168,12 @@ function! s:AgeWritePre()
     setlocal bin
     let l:expr = "%!age " . g:age_enc_params
     silent! execute l:expr
-    let l:success = ! v:shell_error
+    " Success requires the ciphertext header, not just a zero exit code:
+    " a misconfigured age (or wrapper) that exits 0 without encrypting
+    " would otherwise let PLAINTEXT reach netrw's local temp file and the
+    " remote host. (age's binary format also starts with the ASCII string
+    " "age-encryption.org/v1", so this covers non-armored output too.)
+    let l:success = ! v:shell_error && getline(1) =~# '^\(-\{5}BEGIN AGE ENCRYPTED FILE-\{5}\|age-encryption\.org/v1\)'
 
     if ! l:success
         " Revert the failed filter so the buffer contains plaintext again.
@@ -157,10 +187,17 @@ function! s:AgeWritePre()
 endfunction
 
 function! s:AgeWritePost()
+    " netrw's BufWriteCmd marks the buffer unmodified BEFORE this event; a
+    " plain :w does it via Vim itself. Remember it, because the undo below
+    " re-modifies the buffer, and we want to preserve the saved-state flag.
+    let l:was_nomod = ! &l:modified
     " Undo the encryption so the buffer holds plaintext again.
     silent! undo
     setlocal nobin
     call s:AgeRestoreOpts()
+    if l:was_nomod
+        setlocal nomod
+    endif
     " Jump back to saved cursor position.
     if exists("b:line_before_save")
         call setpos('.', b:line_before_save)
