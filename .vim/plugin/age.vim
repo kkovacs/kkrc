@@ -50,9 +50,9 @@ endif
 " restore them later. We must use the global options (viminfo, clipboard,
 " shelltemp, backup, shell, shellredir are all global) because :setlocal
 " on a global option is either a no-op or affects everyone.
+" NOTE: viminfo we never restore, to prevent copy-buffers leak into it.
 function! s:AgeSaveOpts()
     let b:age_saved_opts = {
-        \ 'viminfo':    &g:viminfo,
         \ 'clipboard':  &g:clipboard,
         \ 'shelltemp':  &g:shelltemp,
         \ 'backup':     &g:backup,
@@ -67,7 +67,6 @@ function! s:AgeRestoreOpts()
     if !exists("b:age_saved_opts")
         return
     endif
-    let &g:viminfo     = b:age_saved_opts.viminfo
     let &g:clipboard   = b:age_saved_opts.clipboard
     let &g:shelltemp   = b:age_saved_opts.shelltemp
     let &g:backup      = b:age_saved_opts.backup
