@@ -1,3 +1,5 @@
+
+
 # Shared GNU screen session: run & observe daemons for human + AI
 
 One `llm` session where a human + AI watch the SAME output and inject input via `stuff`.
@@ -21,3 +23,5 @@ screen -S llm -p "$NAME" -X hardcopy -h /tmp/scr-"$NAME" && tail -n 20 /tmp/scr-
 - Kill/stop ONLY windows you created.
 - Quote the `stuff` string (single quotes) so `$`, `$(...)`, backticks reach the remote shell literally.
 - `hardcopy` echoes the input line with `$vars` rendered oddly; trust the output lines, not the echoed prompt.
+
+
