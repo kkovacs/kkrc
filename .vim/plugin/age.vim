@@ -108,16 +108,15 @@ function! s:AgeReadPre()
 endfunction
 
 function! s:AgeReadPost()
-    " <afile> is the file being read (correct for both BufReadPost and
-    " FileReadPost); shellescape() prevents command injection via
-    " filenames containing shell metacharacters. The '1' argument to
-    " shellescape() additionally escapes '!', '%' and '#' which are
-    " special to :execute / :!.
+    " <afile> is the file being read; shellescape() prevents command
+    " injection via filenames containing shell metacharacters. The '1'
+    " argument to shellescape() additionally escapes '!', '%' and '#' which
+    " are special to :execute / :!.
     let l:fname = expand("<afile>")
 
     " NETRW (remote files, e.g. scp://host//path/foo.age): netrw transfers
     " the file into a local temp file and loads it into the buffer itself,
-    " then fires BufReadPost/FileReadPost with the URL as <afile>. Since
+    " then fires BufReadPost with the URL as <afile>. Since
     " "age" cannot read URLs, decrypt from STDIN instead - the (armored)
     " content is already in the buffer, and "age" still runs locally.
     if l:fname =~ '^[a-z]\+://'
@@ -206,8 +205,8 @@ function! s:AgeWritePost()
     redraw!
 endfunction
 
-autocmd BufReadPre,FileReadPre     *.age call s:AgeReadPre()
-autocmd BufReadPost,FileReadPost   *.age call s:AgeReadPost()
+autocmd BufReadPre                 *.age call s:AgeReadPre()
+autocmd BufReadPost                *.age call s:AgeReadPost()
 autocmd BufWritePre,FileWritePre   *.age call s:AgeWritePre()
 autocmd BufWritePost,FileWritePost *.age call s:AgeWritePost()
 " NOTE: at BufNew the new buffer is NOT current, so :setlocal would hit the wrong buffer — setbufvar() targets <abuf> explicitly.
