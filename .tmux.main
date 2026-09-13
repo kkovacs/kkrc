@@ -507,7 +507,7 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "" \
 "Install (t)tailcat ................." "t" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/tailscale/tailcat/releases/latest/download/tailcat_0.6.0_linux_\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | tar zxv -C ~/.local/bin/ tailcat' enter" \
 "Install (b)rew ....................." "b" setup_brew \
-"Install (a)ge ......................" "a" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/FiloSottile/age/releases/download/v1.3.2/age-v1.3.2-linux-\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1 --wildcards \"age*\"' enter" \
+"Install (a)ge ......................" "a" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/FiloSottile/age/releases/download/v1.3.2/age-v1.3.2-linux-\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1 --wildcards \"age/age*\"' enter" \
 "Install (d)ocker ..................." "d" setup_docker \
 "Install k(3)s ......................" "3" "send-keys ' curl -sfL https://get.k3s.io | sh -' enter" \
 "Install (h)url ....................." "h" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/Orange-OpenSource/hurl/releases/download/8.0.1/hurl-8.0.1-\$(uname -m)-unknown-linux-gnu.tar.gz | tar zxv -C ~/.local/bin/ --strip-components=2 --wildcards \"hurl-*/bin/hurl*\"' enter" \
