@@ -173,6 +173,8 @@ autocmd BufReadPre,FileReadPre     *.age call s:AgeReadPre()
 autocmd BufReadPost,FileReadPost   *.age call s:AgeReadPost()
 autocmd BufWritePre,FileWritePre   *.age call s:AgeWritePre()
 autocmd BufWritePost,FileWritePost *.age call s:AgeWritePost()
+" NOTE: at BufNew the new buffer is NOT current, so :setlocal would hit the wrong buffer — setbufvar() targets <abuf> explicitly.
+autocmd BufNew *.age set viminfo= | call setbufvar(str2nr(expand('<abuf>')), '&swapfile', 0) | call setbufvar(str2nr(expand('<abuf>')), '&undofile', 0)
 
 " End of age_encrypted
 augroup END
