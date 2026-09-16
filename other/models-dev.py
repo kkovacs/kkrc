@@ -426,7 +426,7 @@ def main() -> int:
         "-P",
         "--price",
         action="store_true",
-        help="Sort by effective blended price (90% cache read + 7% input + 3% output), descending",
+        help="Sort by effective blended price (90%% cache read + 7%% input + 3%% output), descending",
     )
     args = parser.parse_args()
 
