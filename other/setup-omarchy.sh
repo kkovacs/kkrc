@@ -53,7 +53,7 @@ hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 -- END kkrc
 EOF
 
-# Edit hypr inputs
+# Edit ghostty config
 _blockinfile "# START kkrc" "# END kkrc" ~/.config/ghostty/config <<"EOF"
 # START kkrc
 font-feature = -calt
@@ -68,6 +68,9 @@ theme = Synthwave
 #theme = Vercel
 # END kkrc
 EOF
+
+# Disable Omarchy's ghostty auto-config
+sed -i 's/^config-file =/#&/' ~/.config/ghostty/config
 
 # Exit with success
 exit 0
