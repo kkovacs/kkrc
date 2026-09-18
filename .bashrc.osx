@@ -4,6 +4,9 @@
 # It's recommended to load from .bashrc.local :
 # . ~/.kkrc/.bashrc.osx
 
+# If we have `brew install coreutils`, then use the linux-compatible `ls`
+[ -f /opt/homebrew/bin/gls ] && alias ls="gls --color"
+
 # OS X rsync does not take "--info=progress2"
 alias rsync="rsync --progress"
 

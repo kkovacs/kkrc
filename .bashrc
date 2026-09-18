@@ -12,13 +12,6 @@ if [ -e ~/.bashrc.orig ]; then . ~/.bashrc.orig; fi
 # (This is inserted separately to the front of the the inject file)
 HISTCONTROL=ignoreboth
 
-# OS X specifics, before
-if [[ "$OSTYPE" == "darwin"* ]]; then
-	# If we have `brew install coreutils`, then use the linux-compatible `ls`
-	# NOTE: Have this before defining `lll`, so that uses gls too
-	[ -f /opt/homebrew/bin/gls ] && alias ls="gls --color"
-fi
-
 # START of part to be injected
 
 # I need VI keys
@@ -94,6 +87,7 @@ alias nvim='nvim -n -i NONE "+set nobackup noswapfile mouse=a"'
 . /usr/share/bash-completion/bash_completion 2>/dev/null
 
 # Set up some handy aliases
+unalias ls 2>/dev/null # Clear pre-existing ls override (I'm looking at you, Omarchy)
 alias l="ls -lrtAp" # Always shows hidden files too.
 alias la="ls -lrtAp -I*" # For Linux. Hidden files ONLY.
 #alias la="ls -lrtd .*" # For stupider systems (OS X, ash, etc), works only in current dir
