@@ -35,6 +35,7 @@ elif [[ $ID_LIKE == *"suse"* ]]; then
 elif [[ $ID == "alpine" ]]; then
 	$SUDO apk add bash-completion bind-tools curl git htop less psmisc rsync screen socat tig unzip vim wget zip
 elif [[ $ID == "omarchy" ]]; then
+	echo y | yay -S htop screen tig vim wget age
 	~/.kkrc/other/setup-omarchy.sh
 else
 	echo "Unknown OS - can't setup!"
