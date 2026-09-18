@@ -3,10 +3,13 @@
 # Change to own dir
 cd "$(dirname "$0")" || exit 1
 
+# Load environment
+. /etc/os-release
+
 # Asked to configure the OS too?
 if [[ "$1" == "--os" ]]; then
 	# Run script. (We are already in the right directory.)
-	./os-setup.sh
+	./other/setup-os.sh
 fi
 
 # .bashrc is a special case, since it usually exists. If it's not ours,

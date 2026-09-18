@@ -34,6 +34,8 @@ elif [[ $ID_LIKE == *"suse"* ]]; then
 	$SUDO zypper install -y bash-completion bind-utils curl git htop less psmisc rsync screen socat tig unzip util-linux vim wget zip
 elif [[ $ID == "alpine" ]]; then
 	$SUDO apk add bash-completion bind-tools curl git htop less psmisc rsync screen socat tig unzip vim wget zip
+elif [[ $ID == "omarchy" ]]; then
+	~/.kkrc/other/setup-omarchy.sh
 else
 	echo "Unknown OS - can't setup!"
 	exit 1
