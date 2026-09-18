@@ -554,15 +554,16 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "bun install opencode beta ..............." "" "send-keys ' bun install -g --minimum-release-age 0 --trust @opencode-ai/cli@beta' enter" \
 "config reset ............................" "O" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\", \\\"permission\\\": { \\\"external_directory\\\": { \\\"/tmp/**\\\": \\\"allow\\\" } } }\" >#{opencode_config}' enter" \
 "install MCP Chrome CDP .................." "" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
-"config \"any\" LLM on :8080 ..............." "" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:8080/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
+"config \"any\" LLM on :9931 ..............." "" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:9931/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
 "Clean up opencode ......................." "" "send-keys ' rm -rf ~/{.config,.local/state,.local/share,.cache}/opencode ~/.bun ; rm -rf ~/.local/bin/opencode ' enter" \
 "" \
 "Download Vercel fx ......................" "" "send-keys ' mkdir -p ~/.local/bin && curl -fsSL \"https://releases.fx.sh/\$(curl -fsSL https://releases.fx.sh/latest.txt)/fx-linux-\$(uname -m).tar.gz\" | tar -xz -C ~/.local/bin/ fx' enter" \
 "Install Claude Code ....................." "" "send-keys ' curl -fsSL https://claude.ai/install.sh | bash' enter" \
 "Install Codex CLI ......................." "" "send-keys ' curl -fsSL https://chatgpt.com/codex/install.sh | sh' enter" \
 "" \
+"uv tool mlx_lm.server … ................." "s" "send-keys 'uv tool install mlx-lm && mlx_lm.server --port 9931 --model '" \
 "llama cli … ............................." "c" "send-keys \"llama cli -st --offline -p \\\"OCR\\\" --image \\\"\\\" -hf \"" \
-"llama server … .........................." "s" "send-keys 'llama server --webui-mcp-proxy --jinja --offline -hf '" \
+"llama server … .........................." "s" "send-keys 'llama server --webui-mcp-proxy --jinja --port 9931 --offline -hf '" \
 "gemma4:e2b Q4 (fast) ...................." "" "send-keys 'unsloth/gemma-4-E2B-it-GGUF:UD-Q4_K_XL'" \
 "gemma4:e4b Q4 (good) ...................." "" "send-keys 'unsloth/gemma-4-E4B-it-GGUF:UD-Q4_K_XL'" \
 "gemma4:12b Q3 (exit all, get coffee) ...." "" "send-keys 'unsloth/gemma-4-12b-it-GGUF:Q3_K_M'" \

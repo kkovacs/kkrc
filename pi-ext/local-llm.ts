@@ -6,7 +6,7 @@
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
-const DEFAULT_URL = "http://127.0.0.1:8080";
+const DEFAULT_URL = "http://127.0.0.1:9931";
 const PROBE_TIMEOUT_MS = 2000;
 const DEFAULT_CONTEXT_WINDOW = 128_000;
 const DEFAULT_MAX_TOKENS = 16_384;
