@@ -551,7 +551,7 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "Clean up pi ............................." "" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi' enter" \
 "" \
 "Download (o)pencode......................" "o" setup_opencode \
-"bun install opencode beta ..............." "" "send-keys ' bun install -g --minimum-release-age 0 --trust @opencode-ai/cli@beta' enter" \
+"bun install opencode ...................." "c-o" "send-keys ' bun install -g --minimum-release-age 0 --trust @opencode-ai/cli' enter" \
 "config reset ............................" "O" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\", \\\"permission\\\": { \\\"external_directory\\\": { \\\"/tmp/**\\\": \\\"allow\\\" } } }\" >#{opencode_config}' enter" \
 "install MCP Chrome CDP .................." "" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
 "config \"any\" LLM on :9931 ..............." "" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:9931/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
