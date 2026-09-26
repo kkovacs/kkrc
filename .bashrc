@@ -408,6 +408,7 @@ function ssh() {
 	#tmux set-window-option automatic-rename "on" >/dev/null 2>/dev/null
 	# Restore from alternate mode (if set),
 	# and move cursor to the last line (so if ssh lost connection in the middle of a full-screen app like VI, then don't leave the cursor in the middle of some content).
+	stty sane
 	printf '\e[?47l\e[99B'
 }
 
