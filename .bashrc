@@ -328,6 +328,8 @@ function sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 function pi0() { pi -ne -ns -nt -nc "$@" ; } ; export -f pi0
 # Read-only pi agent (read/grep/find/ls tools only).
 function pir() { pi -ne -ns --tools read,grep,find,ls "$@" ; } ; export -f pir
+# Shortcut to enable codemode
+function pii() { pi --tools read,bash,edit,write,codemode "$@" ; } ; export -f pii
 
 # ~/.local/bin is in the XDG Base Directory Specification: https://specifications.freedesktop.org/basedir/latest/
 # Use linuxbrew if installed. Pi installs rg and fd even on older systems, why not use them.
