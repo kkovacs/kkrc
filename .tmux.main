@@ -572,6 +572,7 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "qwen3.5:2b Q4 (fast) ...................." "" "send-keys 'unsloth/Qwen3.5-2B-GGUF:Q4_K_M'" \
 "qwen3.5:4b Q4 (good) ...................." "" "send-keys 'unsloth/Qwen3.5-4B-GGUF:Q4_K_M'" \
 "LFM2.5-2.6B (fast) ......................" "" "send-keys 'LiquidAI/LFM2.5-2.6B-GGUF:Q4_K_M'" \
+"mapika-decider:0.8b (jev)................" "" "send-keys 'mradermacher/decider-0.8b-GGUF'" \
 "GLM-OCR ................................." "" "send-keys 'ggml-org/GLM-OCR-GGUF'"
 
 # Submenu: environment
