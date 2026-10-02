@@ -408,10 +408,11 @@ function ssh() {
 	#tmux rename-window "$SAVED" >/dev/null 2>/dev/null
 	# To switch back to auto-renaming after disconnection:
 	#tmux set-window-option automatic-rename "on" >/dev/null 2>/dev/null
-	# Restore from alternate mode (if set),
-	# and move cursor to the last line (so if ssh lost connection in the middle of a full-screen app like VI, then don't leave the cursor in the middle of some content).
+	# 47l exits alt screen (no cursor restore), 25h re-shows the cursor that a
+	# remote full-screen app may have hidden before the connection died, and 99B
+	# moves to the last line (so we don't type in the middle of leftover screen text).
 	stty sane
-	printf '\e[?47l\e[99B'
+	printf '\e[?47l\e[?25h\e[99B'
 }
 
 # Strictly NOT in inject, just LOCAL: open files from vim :term back in VIM.
