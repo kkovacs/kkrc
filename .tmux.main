@@ -563,7 +563,7 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "Install Claude Code ....................." "" "send-keys ' curl -fsSL https://claude.ai/install.sh | bash' enter" \
 "Install Codex CLI ......................." "" "send-keys ' curl -fsSL https://chatgpt.com/codex/install.sh | sh' enter" \
 "" \
-"uv tool mlx_lm.server … ................." "s" "send-keys 'uv tool install mlx-lm && mlx_lm.server --port 9931 --model '" \
+"uv tool mlx_lm.server … ................." "x" "send-keys 'uv tool install mlx-lm && mlx_lm.server --port 9931 --model '" \
 "llama cli … ............................." "c" "send-keys \"llama cli -st --offline -p \\\"OCR\\\" --image \\\"\\\" -hf \"" \
 "llama server … .........................." "s" "send-keys 'llama server --webui-mcp-proxy --jinja --port 9931 --offline -hf '" \
 "gemma4:e2b Q4 (fast) ...................." "" "send-keys 'unsloth/gemma-4-E2B-it-GGUF:UD-Q4_K_XL'" \
@@ -572,7 +572,7 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "qwen3.5:2b Q4 (fast) ...................." "" "send-keys 'unsloth/Qwen3.5-2B-GGUF:Q4_K_M'" \
 "qwen3.5:4b Q4 (good) ...................." "" "send-keys 'unsloth/Qwen3.5-4B-GGUF:Q4_K_M'" \
 "LFM2.5-2.6B (fast) ......................" "" "send-keys 'LiquidAI/LFM2.5-2.6B-GGUF:Q4_K_M'" \
-"mapika-decider:0.8b (jev)................" "" "send-keys 'mradermacher/decider-0.8b-GGUF'" \
+"clef-flash Q4 (jev) ....................." "" "send-keys 'ggml-org/Clef-Flash-GGUF:Q4_K_M'" \
 "GLM-OCR ................................." "" "send-keys 'ggml-org/GLM-OCR-GGUF'"
 
 # Submenu: environment
