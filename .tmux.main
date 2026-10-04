@@ -583,13 +583,15 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$SSH_AUTH_SOCK ..................." "a" 'send-keys " export SSH_AUTH_SOCK=$(tmux show-environment SSH_AUTH_SOCK | cut -d= -f2)" enter' \
 "" \
 "Load (e)nv.age to tmux .................." "e" "display-popup -T \"Load env.age to tmux\" -EE bash -c \"age -i ~/.ssh/age.key -d ~/.ssh/env.age | awk '!/^\s*(\\\$|#)/ { sub(/=/, \\\" \\\"); print \\\"set-environment -h\\\", \$0 }' | tmux source-file -\" ; source-file ~/.kkrc/.tmux.main" \
+"Inject \$AI_GATEWAY_API_KEY (Vercel) ....." "v" "send-keys ' stty -echo' enter ' export AI_GATEWAY_API_KEY=#{AI_GATEWAY_API_KEY}; stty echo' enter" \
+"Inject \$CLOUDFLARE_… ...................." "" "send-keys ' stty -echo' enter ' export CLOUDFLARE_API_KEY=#{CLOUDFLARE_API_KEY} CLOUDFLARE_ACCOUNT_ID=#{CLOUDFLARE_ACCOUNT_ID} CLOUDFLARE_GATEWAY_ID=#{CLOUDFLARE_GATEWAY_ID}; stty echo' enter" \
 "Inject \$ELEVENLABS_API_KEY .............." "" "send-keys ' stty -echo' enter ' export ELEVENLABS_API_KEY=#{ELEVENLABS_API_KEY}; stty echo' enter" \
 "Inject \$EXA_API_KEY ....................." "x" "send-keys ' stty -echo' enter ' export EXA_API_KEY=#{EXA_API_KEY}; stty echo' enter" \
 "Inject \$GEMINI_API_KEY .................." "" "send-keys ' stty -echo' enter ' export GEMINI_API_KEY=#{GEMINI_API_KEY} GOOGLE_GENERATIVE_AI_API_KEY=#{GEMINI_API_KEY}; stty echo' enter" \
-"Inject \$CLOUDFLARE_… ...................." "" "send-keys ' stty -echo' enter ' export CLOUDFLARE_API_KEY=#{CLOUDFLARE_API_KEY} CLOUDFLARE_ACCOUNT_ID=#{CLOUDFLARE_ACCOUNT_ID} CLOUDFLARE_GATEWAY_ID=#{CLOUDFLARE_GATEWAY_ID}; stty echo' enter" \
 "Inject \$GITHUB_TOKEN ...................." "" "send-keys ' stty -echo' enter ' export GITHUB_TOKEN=#{GITHUB_TOKEN}; stty echo' enter" \
-"Inject \$HTTPS_PROXY ....................." "h" "send-keys ' stty -echo' enter ' export HTTPS_PROXY=\"#{HTTPS_PROXY}\" HTTP_PROXY=\"#{HTTPS_PROXY}\"; stty echo' enter" \
 "Inject \$HUGGINGFACE_API_KEY ............." "" "send-keys ' stty -echo' enter ' export HUGGINGFACE_API_KEY=#{HUGGINGFACE_API_KEY}; stty echo' enter" \
+"Inject \$LLAMA_BASE_URL :8080 ............" "" "send-keys ' export LLAMA_BASE_URL=http://127.0.0.1:8080' enter" \
+"Inject \$LLAMA_BASE_URL :9931 ............" "9" "send-keys ' export LLAMA_BASE_URL=http://127.0.0.1:9931' enter" \
 "Inject \$LOCAL_KEY and \$LOCAL_URL........." "l" "send-keys ' stty -echo' enter ' export LOCAL_KEY=#{LOCAL_KEY} LOCAL_URL=#{LOCAL_URL}; stty echo' enter" \
 "Inject \$MISTRAL_API_KEY ................." "" "send-keys ' stty -echo' enter ' export MISTRAL_API_KEY=#{MISTRAL_API_KEY}; stty echo' enter" \
 "Inject \$NVIDIA_API_KEY .................." "" "send-keys ' stty -echo' enter ' export NVIDIA_API_KEY=#{NVIDIA_API_KEY}; stty echo' enter" \
@@ -597,7 +599,6 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$OPENCODE_API_KEY (x2)............" "o" "send-keys ' stty -echo' enter ' export OPENCODE_API_KEY=#{?#{@api_key_index},#{OPENCODE_API_KEY1},#{OPENCODE_API_KEY0}}; stty echo; echo K#{@api_key_index};' enter ; set -F @api_key_index '#{?#{@api_key_index},0,1}'" \
 "Inject \$OPENROUTER_API_KEY .............." "O" "send-keys ' stty -echo' enter ' export OPENROUTER_API_KEY=#{OPENROUTER_API_KEY}; stty echo' enter" \
 "Inject \$RECRAFT_API_KEY ................." "" "send-keys ' stty -echo' enter ' export RECRAFT_API_KEY=#{RECRAFT_API_KEY}; stty echo' enter" \
-"Inject \$AI_GATEWAY_API_KEY (Vercel) ....." "" "send-keys ' stty -echo' enter ' export AI_GATEWAY_API_KEY=#{AI_GATEWAY_API_KEY}; stty echo' enter" \
 "Inject \$XAI_API_KEY ....................." "" "send-keys ' stty -echo' enter ' export XAI_API_KEY=#{XAI_API_KEY}; stty echo' enter" \
 "Poor man's Claude (OpenCode Go+minimax)"    "" "send-keys ' stty -echo' enter ' export ANTHROPIC_DEFAULT_OPUS_MODEL=minimax-m3 ANTHROPIC_DEFAULT_SONNET_MODEL=minimax-m3 ANTHROPIC_DEFAULT_HAIKU_MODEL=minimax-m3 CLAUDE_CODE_SUBAGENT_MODEL=minimax-m3 ANTHROPIC_BASE_URL=\"https://opencode.ai/zen/go/\" ANTHROPIC_AUTH_TOKEN=\"\" ANTHROPIC_API_KEY=\"#{OPENCODE_API_KEY}\"; stty echo' enter" \
 "Rich man's Claude (OpenRouter+opus,sonnet)" "" "send-keys ' stty -echo' enter ' export ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" ANTHROPIC_AUTH_TOKEN=\"#{OPENROUTER_API_KEY}\" ANTHROPIC_API_KEY=\"\"; stty echo' enter" \
@@ -605,6 +606,7 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject proxy socks5h:(1)080 (ssh -D 1080)" "1" 'send-keys " export all_proxy=socks5h://127.0.0.1:1080" enter' \
 "Inject proxy http:888(8)................." "8" 'send-keys " export {http,https}_proxy=http://127.0.0.1:8888 {HTTP,HTTPS}_PROXY=http://127.0.0.1:8888" enter' \
 "Inject proxy http:808(0)................." "0" 'send-keys " export {http,https}_proxy=http://127.0.0.1:8080 {HTTP,HTTPS}_PROXY=http://127.0.0.1:8080" enter' \
+"Inject \$HTTPS_PROXY ....................." "h" "send-keys ' stty -echo' enter ' export HTTPS_PROXY=\"#{HTTPS_PROXY}\" HTTP_PROXY=\"#{HTTPS_PROXY}\"; stty echo' enter" \
 "Unset proxies ..........................." "-" 'send-keys " unset {http,https,all}_proxy {HTTP,HTTPS,ALL}_PROXY WSL_PAC_URL" enter'
 
 # Submenu: sandbox
