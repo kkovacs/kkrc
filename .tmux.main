@@ -585,6 +585,7 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "" \
 "Load (e)nv.age to tmux .................." "e" "display-popup -T \"Load env.age to tmux\" -EE bash -c \"age -i ~/.ssh/age.key -d ~/.ssh/env.age | awk '!/^\s*(\\\$|#)/ { sub(/=/, \\\" \\\"); print \\\"set-environment -h\\\", \$0 }' | tmux source-file -\" ; source-file ~/.kkrc/.tmux.main" \
 "Inject \$AI_GATEWAY_API_KEY (Vercel) ....." "v" "send-keys ' stty -echo' enter ' export AI_GATEWAY_API_KEY=#{AI_GATEWAY_API_KEY}; stty echo' enter" \
+"Inject \$ANTHROPIC_API_KEY ..............." "a" "send-keys ' stty -echo' enter ' export ANTHROPIC_API_KEY=#{ANTHROPIC_API_KEY}; stty echo' enter" \
 "Inject \$CLOUDFLARE_… ...................." "" "send-keys ' stty -echo' enter ' export CLOUDFLARE_API_KEY=#{CLOUDFLARE_API_KEY} CLOUDFLARE_ACCOUNT_ID=#{CLOUDFLARE_ACCOUNT_ID} CLOUDFLARE_GATEWAY_ID=#{CLOUDFLARE_GATEWAY_ID}; stty echo' enter" \
 "Inject \$ELEVENLABS_API_KEY .............." "" "send-keys ' stty -echo' enter ' export ELEVENLABS_API_KEY=#{ELEVENLABS_API_KEY}; stty echo' enter" \
 "Inject \$EXA_API_KEY ....................." "x" "send-keys ' stty -echo' enter ' export EXA_API_KEY=#{EXA_API_KEY}; stty echo' enter" \
