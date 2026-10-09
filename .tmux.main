@@ -634,7 +634,7 @@ bind -T menus "v" display-menu -T " vim... " \
 
 # Submenu: zmodem-like (= binary-to-ascii and back)
 bind -T menus "z" display-menu -T " Zmodem... " \
-"tmodem send ......................" "i" "command-prompt -p 'Send path:' -I '.' \"send-keys ' base64 -d | tar zxv' enter ; run-shell '(COPYFILE_DISABLE=1 tar cf - --no-xattrs -C `dirname %1` `basename %1` | gzip -c | base64 | fold -w76; echo) | tmux load-buffer -b sendbuf -' ; paste-buffer -r -d -b sendbuf ; send-keys C-d\"" \
+"tmodem send ......................" "i" "command-prompt -p 'Send path:' -I '/' \"send-keys ' base64 -d | tar zxv' enter ; run-shell '(COPYFILE_DISABLE=1 tar cf - --no-xattrs -C `dirname %1` `basename %1` | gzip -c | base64 | fold -w76; echo) | tmux load-buffer -b sendbuf -' ; paste-buffer -r -d -b sendbuf ; send-keys C-d\"" \
 "" \
 "tar+gzip+base64 ingress .........." "i" "send-keys \" (base64 -di | tar zxv)\" enter" \
 "tar+gzip+base64 egress ..........." "e" "send-keys ' COPYFILE_DISABLE=1 tar cf - --no-xattrs . | gzip -c | base64 -w0'" \
