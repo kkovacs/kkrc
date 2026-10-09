@@ -1,4 +1,7 @@
 #!/bin/bash
+#
+# Minimalist sandbox solution using only default Linux tools, no root needed on Ubuntu 26.04.
+#
 # sandbox [cmd...] - run cmd (default: bash -i) as the current uid in a fresh root:
 # only $PWD is real/writable; /usr /etc /var /opt are read-only; fresh /tmp; nothing else of the host.
 H=$(pwd -P) R=$(readlink -f /etc/resolv.conf) U=$(id -u) G=$(id -g)
@@ -15,7 +18,7 @@ for l in bin sbin lib lib64; do ln -s usr/$l $N/$l; done
 mkdir -p $N$H $N/tmp $N/dev $N/proc $N/run
 mount --rbind "$H" $N$H                      # the only real host dir
 mount -t tmpfs t $N/tmp; chmod 1777 $N/tmp
-mount -t tmpfs -o mode=0755 t $N/dev                   # minimal /dev: individual nodes + private devpts
+mount -t tmpfs -o mode=0755 t $N/dev         # minimal /dev: individual nodes + private devpts
 for n in null zero full random urandom tty; do touch $N/dev/$n; mount --bind /dev/$n $N/dev/$n; done
 mkdir $N/dev/pts $N/dev/shm; mount -t devpts -o newinstance,ptmxmode=0666 devpts $N/dev/pts
 mount -t tmpfs t $N/dev/shm; ln -s pts/ptmx $N/dev/ptmx; ln -s /proc/self/fd $N/dev/fd
