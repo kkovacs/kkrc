@@ -339,6 +339,8 @@ for p in "$HOME/.local/bin" /home/linuxbrew/.linuxbrew/{bin,sbin} "$HOME/.bun/bi
 
 # Pi statistics from session files
 function pis() { ~/.kkrc/other/pi-stats.py "$@" ; }
+# Our userland, no-install sandbox
+function sb() { ~/.kkrc/other/sandbox.sh "$@" ; }
 
 # Commands which are not required in remote inject
 alias tmux="tmux -2"
