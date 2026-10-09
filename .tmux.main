@@ -549,7 +549,7 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "" \
 "Download (p)i ..........................." "p" setup_pi \
 "Bun install pi ........................" "c-p" setup_pi_bun \
-"Transfer pi-ext/ ........................" "e" "send-keys ' mkdir -p ~/.pi/agent/extensions && (base64 -d | tar zxv -C ~/.pi/agent/extensions/) <<\"EOF\"' enter ; pipe-pane -I 'COPYFILE_DISABLE=1 tar cf - --no-xattrs -C ~/.kkrc/pi-ext/ . | gzip -c | base64 -w0 && echo EOF'" \
+"Transfer pi-ext/ ........................" "e" "send-keys ' mkdir -p ~/.pi/agent/extensions && base64 -d | tar zxv -C ~/.pi/agent/extensions/' enter ; pipe-pane -I 'COPYFILE_DISABLE=1 tar cf - --no-xattrs -C ~/.kkrc/pi-ext/ . | gzip -c | base64 | fold -w76; echo; printf \"\\004\"'" \
 "Clean up pi ............................." "" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi' enter" \
 "" \
 "Download (o)pencode......................" "o" setup_opencode \
@@ -615,13 +615,14 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 # Submenu: sandbox
 # Note: Not adding `--user "$(id -u):$(id -g)"` because no sudo :-/
 bind -T menus "s" display-menu -T " Sandbox... " \
-"su 1000 ............................" "1" "send-keys 'runuser -u \"\$(id -nu 1000)\" -- sh -c \"cd \$PWD; HOME=/tmp exec bash -i\"' enter" \
-"" \
+"Inject sandbox.sh .................." "s" "send-keys ' bash -c \"\$(base64 -d | gunzip)\" sandbox.sh' enter ; pipe-pane -I 'gzip -c ~/.kkrc/other/sandbox.sh | base64 | fold -w76; echo; printf \"\\004\"'" \
 "Start bwrap on 26.04 ..............." "6" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-26.txt'" \
 "Start bwrap on 24.04 ..............." "4" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-24.txt'" \
 "Start podman ......................." "p" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-podman.txt'" \
 "Start docker ......................." "d" "send-keys 'docker run -e HOME=/tmp -v \"\$PWD\":\"\$PWD\" -m 4g --rm -it ubuntu bash -c \"cd \$PWD; HOME=/tmp exec bash\"' enter" \
-"Start apple containers ............." "a" "send-keys 'container run -e HOME=/tmp -v \"\$PWD\":\"\$PWD\" -m 4g --ssh --rm -it ubuntu bash -c \"cd \$PWD; HOME=/tmp exec bash\"' enter"
+"Start apple containers ............." "a" "send-keys 'container run -e HOME=/tmp -v \"\$PWD\":\"\$PWD\" -m 4g --ssh --rm -it ubuntu bash -c \"cd \$PWD; HOME=/tmp exec bash\"' enter" \
+"" \
+"su 1000 ............................" "1" "send-keys 'runuser -u \"\$(id -nu 1000)\" -- sh -c \"cd \$PWD; HOME=/tmp exec bash -i\"' enter"
 
 # Submenu: vim
 bind -T menus "v" display-menu -T " vim... " \
