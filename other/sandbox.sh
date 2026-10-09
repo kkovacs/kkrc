@@ -31,4 +31,5 @@ pivot_root . .old; umount -l /.old           # lazy on purpose: recursive umount
 cd "$H"
 # nested userns: become the original uid. It owns no mount namespace, so it has no caps over the
 # mounts above and cannot undo them. XXX never add --map-root-user here: that would re-grant caps.
-HOME=/tmp exec unshare --map-user=$U --map-group=$G "$@"' bash "$@"
+# env -i: scrub the environment (API keys etc.), pass only a minimal allowlist
+exec env -i HOME=/tmp PATH="$PATH" ${TERM+"TERM=$TERM"} ${COLORTERM+"COLORTERM=$COLORTERM"} ${LANG+"LANG=$LANG"} ${LC_ALL+"LC_ALL=$LC_ALL"} ${TZ+"TZ=$TZ"} unshare --map-user=$U --map-group=$G "$@"' bash "$@"
