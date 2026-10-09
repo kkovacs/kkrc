@@ -325,11 +325,12 @@ function sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 # END of better systemd.
 
 # Isolated pi agent (attachments and prompt only). See inject-ai-subagent.md
-function pi0() { pi -ne -ns -nt -nc "$@" ; } ; export -f pi0
-# Read-only pi agent (read/grep/find/ls tools only).
-function pir() { pi -ne -ns --tools read,grep,find,ls "$@" ; } ; export -f pir
+function pi0() { command pi -ne -ns -nt -nc -na --no-mcp "$@" ; } ; export -f pi0
+# Read-only pi agent (limited by tools).
+# XXX "-ne" should also be there, but it seems to disable codemode
+function pir() { command pi -ns --no-mcp -t read,grep,find,ls,codemode "$@" ; } ; export -f pir
 # Shortcut to enable codemode
-function pii() { pi --tools read,bash,edit,write,codemode "$@" ; } ; export -f pii
+function pp() { command pi -t +codemode "$@" ; } ; export -f pp
 
 # ~/.local/bin is in the XDG Base Directory Specification: https://specifications.freedesktop.org/basedir/latest/
 # Use linuxbrew if installed. Pi installs rg and fd even on older systems, why not use them.
