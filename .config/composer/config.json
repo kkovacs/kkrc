@@ -1,0 +1,10 @@
+{
+    "config": {
+        "policy": {
+            "cooldown": {
+                "period": "2 days",
+                "block": true
+            }
+        }
+    }
+}
