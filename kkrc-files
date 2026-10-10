@@ -26,6 +26,7 @@ if [[ "$ID" != "omarchy" ]]; then
 	mysoftlink .config/opencode ~/.config/opencode
 	mysoftlink .config/Code ~/.config/Code
 	mysoftlink .config/uv ~/.config/uv
+	mysoftlink .config/composer ~/.config/composer
 fi
 
 # Damn you Microsoft for not being able to keep everything in one place
