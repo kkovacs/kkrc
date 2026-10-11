@@ -549,6 +549,7 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "" \
 "Download (p)i ..........................." "p" setup_pi \
 "Bun install pi ........................" "c-p" setup_pi_bun \
+"Mistral EU endpoint for pi..............." "E" "send-keys ' echo \"{ \\\"providers\\\": { \\\"mistral\\\": { \\\"baseUrl\\\": \\\"https://api.eu.mistral.ai\\\" } } }\" >~/.pi/agent/models.json' enter" \
 "Transfer pi-ext/ ........................" "e" "send-keys ' mkdir -p ~/.pi/agent/extensions && base64 -d | tar zxv -C ~/.pi/agent/extensions/' enter ; pipe-pane -I 'COPYFILE_DISABLE=1 tar cf - --no-xattrs -C ~/.kkrc/pi-ext/ . | gzip -c | base64 | fold -w76; echo; printf \"\\004\"'" \
 "Clean up pi ............................." "" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi' enter" \
 "" \
