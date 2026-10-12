@@ -13,7 +13,7 @@
  *   ./other/opencode-status.ts
  */
 
-const DOCS_URL = "https://opencode.ai/docs/go/";
+const DOCS_URL = "https://opencode.ai/v2/docs/console/go/";
 
 // ─── Terminal colors ───────────────────────────────────────────────────────
 
