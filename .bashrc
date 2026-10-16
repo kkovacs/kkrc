@@ -338,8 +338,8 @@ for p in "$HOME/.local/bin" /home/linuxbrew/.linuxbrew/{bin,sbin} "$HOME/.bun/bi
 
 # END of part to be injected
 
-# Pi statistics from session files
-function pis() { ~/.kkrc/other/pi-stats.py "$@" ; }
+# Session cost stats across harnesses (pi, claude, codex, opencode)
+function pis() { ~/.kkrc/other/session-stats.py "$@" ; }
 # Our userland, no-install sandbox
 function sb() { ~/.kkrc/other/sandbox.sh "$@" ; }
 
