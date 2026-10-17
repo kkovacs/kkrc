@@ -14,7 +14,7 @@ Converts webpage to markdown for LLMs. 500 requests per day per IP address. If y
 ### Jina Reader (slower, free, rate-limited, has "links" and "images-summary")
 
 ```bash
-curl -s "https://r.jina.ai/<url>" \
+curl -s "https://r.jina.ai/https://example.com/" \
   -H "Accept: text/markdown" \
   -H "X-No-Cache: true" \
   # ,"X-Target-Selector": "h1, p:first-of-type"   # CSS-selector targeting
