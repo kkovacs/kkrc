@@ -362,7 +362,7 @@ set -s command-alias[134] setup_python_uv="send-keys ' mkdir -p ~/.local/bin ; c
 set -s command-alias[124] setup_brew="send-keys ' NONINTERACTIVE=1 /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"' enter"
 # IMPORTANT: Uses the INJECT_AI_... env vars. Use some throw-away key because it gets exposed easily, for example an OpenRouter key restricted to $5/month.
 set -Fs command-alias[117] inject_ai_snippet="send-keys \" python3 -c \\\"import sys,json,urllib.request,os;u='#{INJECT_AI_URL}';h={'Authorization':'Bearer #{INJECT_AI_KEY}','Content-Type':'application/json'};d=json.dumps({'model':sys.argv[1],'messages':[{'role':'system','content':sys.argv[2]},{'role':'user','content':sys.stdin.read()or sys.argv[2]}]}).encode();o=urllib.request.build_opener(urllib.request.ProxyHandler());print(json.loads(o.open(urllib.request.Request(u,data=d,headers=h)).read())['choices'][0]['message']['content'])\\\""
-set -s command-alias[112] setup_opencode="send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv -C ~/.local/bin/ opencode' enter"
+set -s command-alias[112] setup_opencode="send-keys ' mkdir -p ~/.local/bin ; curl -fsSL \$(curl -fsSL https://registry.npmjs.org/@opencode/cli-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")/latest | grep -o \"https:[^,]*[.]tgz\") | tar -xzO package/bin/opencode > ~/.local/bin/opencode && chmod 755 ~/.local/bin/opencode' enter"
 set -s command-alias[136] setup_pi="send-keys ' mkdir -p ~/.pi ~/.local/bin ; curl -L https://github.com/badlogic/pi-mono/releases/latest/download/pi-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")\.tar\.gz | tar zxv --strip-components=1 -C ~/.pi/; ln -s ~/.pi/pi ~/.local/bin/pi' enter"
 set -s command-alias[137] setup_pi_bun="send-keys ' bun install --minimum-release-age=1 -g @earendil-works/pi-coding-agent' enter"
 
@@ -551,10 +551,9 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "Bun install pi ........................" "c-p" setup_pi_bun \
 "Mistral EU endpoint for pi..............." "E" "send-keys ' echo \"{ \\\"providers\\\": { \\\"mistral\\\": { \\\"baseUrl\\\": \\\"https://api.eu.mistral.ai\\\" } } }\" >~/.pi/agent/models.json' enter" \
 "Transfer pi-ext/ ........................" "e" "send-keys ' mkdir -p ~/.pi/agent/extensions && base64 -d | tar zxv -C ~/.pi/agent/extensions/' enter ; pipe-pane -I 'COPYFILE_DISABLE=1 tar cf - --no-xattrs -C ~/.kkrc/pi-ext/ . | gzip -c | base64 | fold -w76; echo; printf \"\\004\"'" \
-"Clean up pi ............................." "" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi' enter" \
+"Clean up pi ............................." "" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi ~/.bun' enter" \
 "" \
 "Download (o)pencode......................" "o" setup_opencode \
-"Download opencode(2) ...................." "2" "send-keys ' mkdir -p ~/.local/bin ; curl -fsSL \$(curl -fsSL https://registry.npmjs.org/@opencode/cli-linux-\$(uname -m | sed \"s/x86_64/x64/; s/aarch64/arm64/\")/latest | grep -o \"https:[^,]*[.]tgz\") | tar -xzO package/bin/opencode > ~/.local/bin/opencode2 && chmod 755 ~/.local/bin/opencode2' enter" \
 "bun install opencode .................." "c-o" "send-keys ' bun install -g --minimum-release-age 1 --trust @opencode-ai/cli' enter" \
 "config reset ............................" "O" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\", \\\"permission\\\": { \\\"external_directory\\\": { \\\"/tmp/**\\\": \\\"allow\\\" } } }\" >#{opencode_config}' enter" \
 "install MCP Chrome CDP .................." "" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
