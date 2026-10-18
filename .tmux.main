@@ -551,18 +551,16 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "Bun install pi ........................" "c-p" setup_pi_bun \
 "Mistral EU endpoint for pi..............." "E" "send-keys ' echo \"{ \\\"providers\\\": { \\\"mistral\\\": { \\\"baseUrl\\\": \\\"https://api.eu.mistral.ai\\\" } } }\" >~/.pi/agent/models.json' enter" \
 "Transfer pi-ext/ ........................" "e" "send-keys ' mkdir -p ~/.pi/agent/extensions && base64 -d | tar zxv -C ~/.pi/agent/extensions/' enter ; pipe-pane -I 'COPYFILE_DISABLE=1 tar cf - --no-xattrs -C ~/.kkrc/pi-ext/ . | gzip -c | base64 | fold -w76; echo; printf \"\\004\"'" \
-"Clean up pi ............................." "" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi ~/.bun' enter" \
+"Clean up pi ............................." "P" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi ~/.bun' enter" \
 "" \
 "Download (o)pencode......................" "o" setup_opencode \
 "bun install opencode .................." "c-o" "send-keys ' bun install -g --minimum-release-age 1 --trust @opencode-ai/cli' enter" \
-"config reset ............................" "O" "send-keys ' mkdir -p ~/.config/opencode; echo \"{ \\\"\\\$schema\\\": \\\"https://opencode.ai/config.json\\\", \\\"permission\\\": { \\\"external_directory\\\": { \\\"/tmp/**\\\": \\\"allow\\\" } } }\" >#{opencode_config}' enter" \
-"install MCP Chrome CDP .................." "" "send-keys ' tmp=\$(mktemp); jq \".mcp[\\\"chrome-devtools\\\"] = {\\\"type\\\": \\\"local\\\", \\\"command\\\": [\\\"npx\\\", \\\"-y\\\", \\\"chrome-devtools-mcp@latest\\\", \\\"--browser-url=http://127.0.0.1:9222\\\"]}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
 "config \"any\" LLM on :9931 ..............." "" "send-keys ' tmp=\$(mktemp); jq \".provider[\\\"local\\\"] = {\\\"npm\\\": \\\"@ai-sdk/openai-compatible\\\", \\\"name\\\": \\\"local\\\", \\\"options\\\": {\\\"baseURL\\\": \\\"http://127.0.0.1:9931/v1\\\"}, \\\"models\\\": {\\\"any\\\": {\\\"name\\\": \\\"any\\\"}}}\" #{opencode_config} > \"\$tmp\" && mv \"\$tmp\" #{opencode_config}' enter" \
-"Clean up opencode ......................." "" "send-keys ' rm -rf ~/{.config,.local/state,.local/share,.cache}/opencode ~/.bun ; rm -rf ~/.local/bin/opencode ~/.local/bin/opencode2 ' enter" \
+"Clean up opencode ......................." "O" "send-keys ' rm -rf ~/{.config,.local/state,.local/share,.cache}/opencode ~/.bun ; rm -rf ~/.local/bin/opencode ~/.local/bin/opencode2 ' enter" \
 "" \
+"Install Codex CLI (yolo) ................" "y" "send-keys ' curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh; mkdir -p ~/.codex; [ -e ~/.codex/config.toml ] || printf \"approval_policy = \\\"never\\\"\\nsandbox_mode = \\\"danger-full-access\\\"\\n\" >~/.codex/config.toml' enter" \
+"Install Claude Code (yolo) .............." "Y" "send-keys ' curl -fsSL https://claude.ai/install.sh | bash; mkdir -p ~/.claude; [ -e ~/.claude/settings.json ] || echo \"{ \\\"permissions\\\": { \\\"defaultMode\\\": \\\"bypassPermissions\\\" } }\" >~/.claude/settings.json' enter" \
 "Download Vercel fx ......................" "" "send-keys ' mkdir -p ~/.local/bin && curl -fsSL \"https://releases.fx.sh/\$(curl -fsSL https://releases.fx.sh/latest.txt)/fx-linux-\$(uname -m).tar.gz\" | tar -xz -C ~/.local/bin/ fx' enter" \
-"Install Claude Code ....................." "" "send-keys ' curl -fsSL https://claude.ai/install.sh | bash; mkdir -p ~/.claude; [ -e ~/.claude/settings.json ] || echo \"{ \\\"permissions\\\": { \\\"defaultMode\\\": \\\"bypassPermissions\\\" } }\" >~/.claude/settings.json' enter" \
-"Install Codex CLI ......................." "" "send-keys ' curl -fsSL https://chatgpt.com/codex/install.sh | sh' enter" \
 "" \
 "uv tool mlx_lm.server … ................." "x" "send-keys 'uv tool install mlx-lm && mlx_lm.server --port 9931 --model '" \
 "llama cli … ............................." "c" "send-keys \"llama cli -st --offline -p \\\"OCR\\\" --image \\\"\\\" -hf \"" \
