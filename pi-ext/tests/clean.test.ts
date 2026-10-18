@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach, afterEach } from "bun:test";
 import { mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { HAVE_PI, startPi } from "./rpc";
+import { startPi } from "./rpc";
 
 const CLEAN = join(import.meta.dir, "..", "clean.ts");
 
@@ -24,7 +24,7 @@ afterEach(() => {
 
 const sessionId = async () => (await pi!.send({ type: "get_state" })).data?.sessionId as string;
 
-describe.skipIf(!HAVE_PI)("/clean", () => {
+describe("/clean", () => {
     it("seeds the editor of a fresh session with the compacted branch", async () => {
         pi = startPi([CLEAN], { cwd: dir });
         for (const m of ["one", "TOOLS", "THINK"]) await pi.turn(m);
