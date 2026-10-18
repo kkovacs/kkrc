@@ -6,7 +6,7 @@ import { describe, it, expect, afterEach } from "bun:test";
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { HAVE_PI, startPi } from "./rpc";
+import { startPi } from "./rpc";
 
 const UNDO = join(import.meta.dir, "..", "undo.ts");
 
@@ -19,7 +19,7 @@ async function withTurns(...messages: string[]) {
     return pi;
 }
 
-describe.skipIf(!HAVE_PI)("/undo", () => {
+describe("/undo", () => {
     it("undoes the last user message; the LLM no longer sees it", async () => {
         const pi = await withTurns("one", "two", "three");
 

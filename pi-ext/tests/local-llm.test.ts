@@ -4,7 +4,7 @@
 
 import { describe, it, expect, afterEach } from "bun:test";
 import { join } from "node:path";
-import { HAVE_PI, startPi } from "./rpc";
+import { startPi } from "./rpc";
 
 const LOCAL_LLM = join(import.meta.dir, "..", "local-llm.ts");
 
@@ -33,7 +33,7 @@ async function localModels(url: string) {
     return (resp.data?.models as any[]).filter((m) => m.provider === "local-llm");
 }
 
-describe.skipIf(!HAVE_PI)("local-llm", () => {
+describe("local-llm", () => {
     it("merges llama.cpp's data and models lists by id", async () => {
         const url = serve({
             "/v1/models": {

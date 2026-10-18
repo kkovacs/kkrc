@@ -5,7 +5,7 @@
 
 import { describe, it, expect, afterEach } from "bun:test";
 import { join } from "node:path";
-import { HAVE_PI, startPi } from "./rpc";
+import { startPi } from "./rpc";
 
 const PINGME = join(import.meta.dir, "..", "pingme.ts");
 
@@ -32,7 +32,7 @@ function counter() {
 // The ping is fire-and-forget after agent_settled, so give it a moment
 const pingWindow = () => Bun.sleep(300);
 
-describe.skipIf(!HAVE_PI)("pingme", () => {
+describe("pingme", () => {
     it("pings after a run longer than --pingme-after", async () => {
         const { url, hits } = counter();
         pi = startPi([PINGME], { args: ["--no-session", "--pingme", url, "--pingme-after", "1"] });

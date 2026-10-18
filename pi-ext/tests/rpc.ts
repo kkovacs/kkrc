@@ -4,15 +4,13 @@
  * startPi() spawns `pi --mode rpc` with the faux LLM (faux-llm.ts) plus the
  * given extensions. No network, no tokens. `args` default to --no-session;
  * `cwd` is where Pi (and its tools) run; `env` is added to the environment.
+ * Pi is $PI_PATH or `pi` from PATH; without it the tests fail.
  * Used by: *.test.ts in this directory.
  */
 
-import { existsSync } from "node:fs";
-import { homedir } from "node:os";
 import { join } from "node:path";
 
-export const PI_PATH = (process.env.PI_PATH ?? join(homedir(), ".pi", "pi")).replace(/^~/, homedir());
-export const HAVE_PI = existsSync(PI_PATH);
+const PI_PATH = process.env.PI_PATH ?? "pi";
 
 type Event = Record<string, any>;
 
