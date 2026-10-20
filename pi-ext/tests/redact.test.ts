@@ -1,4 +1,4 @@
-// pi-redact.ts tests: secret classification, parent .env discovery, and
+// redact.ts tests: secret classification, parent .env discovery, and
 // end-to-end Pi RPC redaction for user prompts and tool results.
 // Run: PI_PATH=$(which pi) bun test ~/.kkrc/pi-ext/tests
 
@@ -7,9 +7,9 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { startPi } from "./rpc";
-import { extractSecret, isSecret, loadSecrets } from "../pi-redact";
+import { extractSecret, isSecret, loadSecrets } from "../redact";
 
-const PI_REDACT = join(import.meta.dir, "..", "pi-redact.ts");
+const REDACT_EXT = join(import.meta.dir, "..", "redact.ts");
 const REDACTED = "<REDACTED--PLEASE-DO-NOT-READ-SECRETS>";
 
 let pi: ReturnType<typeof startPi> | undefined;
@@ -131,7 +131,7 @@ describe("loadSecrets", () => {
     });
 });
 
-describe("pi-redact extension", () => {
+describe("redact extension", () => {
     it("redacts raw, base64, URL-encoded, and PEM secrets in outbound context and emits a warning", async () => {
         const sub = join(dir, "nested");
         mkdirSync(sub);
@@ -148,7 +148,7 @@ describe("pi-redact extension", () => {
         const b64 = Buffer.from("deadbeefcafebabe01").toString("base64");
         const urlEnc = encodeURIComponent("D7s(bn`Z''/1bQFI");
 
-        pi = startPi([PI_REDACT], { cwd: sub });
+        pi = startPi([REDACT_EXT], { cwd: sub });
         await pi.turn(
             `urlEnc=${urlEnc} b64=${b64} uuid=550e8400-e29b-41d4-a716-446655440000 url=https://user:UrlSecr3t99@domain.com/uri pem=b3BlbnNzaC1rZXktdjEAAAAABG5vbmU= port=8080 mode=production`,
         );
@@ -157,13 +157,13 @@ describe("pi-redact extension", () => {
             `SEEN: urlEnc=${REDACTED} b64=${REDACTED} uuid=${REDACTED} url=https://user:${REDACTED}@domain.com/uri pem=${REDACTED} port=8080 mode=production`,
         );
         expect(pi.notifies).toEqual([
-            { message: "pi-redact: Protecting 5 secrets", notifyType: "info" },
-            { message: "pi-redact: Redacted secret in outbound LLM context", notifyType: "warning" },
+            { message: "redact: Protecting 5 secrets", notifyType: "info" },
+            { message: "redact: Redacted secret in outbound LLM context", notifyType: "warning" },
         ]);
     });
 
     it("reloads .env* secrets on session_start (fired by /reload and new_session)", async () => {
-        pi = startPi([PI_REDACT], { cwd: dir });
+        pi = startPi([REDACT_EXT], { cwd: dir });
         await pi.turn("before=NewSecretAddedLater99");
         expect(await pi.lastText()).toBe("SEEN: before=NewSecretAddedLater99");
 
@@ -173,7 +173,7 @@ describe("pi-redact extension", () => {
 
         expect(await pi.lastText()).toBe(`SEEN: after=${REDACTED}`);
         expect(pi.notifies).toContainEqual({
-            message: "pi-redact: Protecting 1 secret",
+            message: "redact: Protecting 1 secret",
             notifyType: "info",
         });
     });
@@ -182,7 +182,7 @@ describe("pi-redact extension", () => {
         writeFileSync(join(dir, ".env"), "SECRET_TOKEN=MyTopSecret99\n");
         writeFileSync(join(dir, "README.md"), "token is MyTopSecret99 here\n");
 
-        pi = startPi([PI_REDACT], { cwd: dir });
+        pi = startPi([REDACT_EXT], { cwd: dir });
         await pi.turn("TOOLS"); // triggers bash `echo hi` and read `README.md`
 
         const msgs = (await pi.send({ type: "get_messages" })).data?.messages as any[];
@@ -191,8 +191,8 @@ describe("pi-redact extension", () => {
         expect(text).toContain(`token is ${REDACTED} here`);
         expect(text).not.toContain("MyTopSecret99");
         expect(pi.notifies).toEqual([
-            { message: "pi-redact: Protecting 1 secret", notifyType: "info" },
-            { message: "pi-redact: Redacted secret in read tool output", notifyType: "warning" },
+            { message: "redact: Protecting 1 secret", notifyType: "info" },
+            { message: "redact: Redacted secret in read tool output", notifyType: "warning" },
         ]);
     });
 });
