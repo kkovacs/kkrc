@@ -187,7 +187,7 @@ describe("redact extension", () => {
         );
         expect(pi.notifies).toEqual([
             { message: "🕵️ redact: Protecting 4 secrets", notifyType: "warning" },
-            { message: "redact: Redacted secret in outbound LLM context", notifyType: "warning" },
+            { message: "🕵️ redact: Redacted 5 secrets in outbound LLM context", notifyType: "warning" },
         ]);
     });
 
@@ -197,7 +197,7 @@ describe("redact extension", () => {
         expect(await pi.lastText()).toBe(`SEEN: before=NewSecretAddedLater99 head=${REDACTED}`);
         expect(pi.notifies).toEqual([
             { message: "🕵️ redact: Protecting 0 secrets", notifyType: "warning" },
-            { message: "redact: Redacted secret in outbound LLM context", notifyType: "warning" },
+            { message: "🕵️ redact: Redacted 1 secret in outbound LLM context", notifyType: "warning" },
         ]);
 
         writeFileSync(join(dir, ".env.local"), "LATE_KEY=NewSecretAddedLater99\n");
@@ -225,7 +225,7 @@ describe("redact extension", () => {
         expect(text).not.toContain("MyTopSecret99");
         expect(pi.notifies).toEqual([
             { message: "🕵️ redact: Protecting 1 secret", notifyType: "warning" },
-            { message: "redact: Redacted secret in read tool output", notifyType: "warning" },
+            { message: "🕵️ redact: Redacted 1 secret in read tool output", notifyType: "warning" },
         ]);
     });
 });

@@ -82,16 +82,16 @@ export function loadSecrets(cwd: string, env: NodeJS.ProcessEnv = process.env): 
 }
 
 // Recursively replace all secret occurrences and PEM private key blocks in strings/arrays/plain objects.
-function scrub<T>(value: T, secrets: string[], onRedact: () => void): T {
+function scrub<T>(value: T, secrets: string[], onRedact: (s: string) => void): T {
     if (typeof value === "string") {
-        let out = value.replace(PEM_BLOCK_RE, () => {
-            onRedact();
+        let out = value.replace(PEM_BLOCK_RE, (m) => {
+            onRedact(m);
             return REDACTED;
         });
         for (const s of secrets) {
             if (out.includes(s)) {
                 out = out.replaceAll(s, REDACTED);
-                onRedact();
+                onRedact(s);
             }
         }
         return out as T;
@@ -112,13 +112,11 @@ function scrub<T>(value: T, secrets: string[], onRedact: () => void): T {
 export default function (pi: ExtensionAPI) {
     const { secrets, count } = collectSecrets(process.cwd());
 
-    const redact = <T>(value: T, warning: string, ctx: ExtensionContext): T | undefined => {
-        let hit = false;
-        const out = scrub(value, secrets, () => {
-            hit = true;
-        });
-        if (!hit) return undefined;
-        ctx.ui.notify(`redact: ${warning}`, "warning");
+    const redact = <T>(value: T, where: string, ctx: ExtensionContext): T | undefined => {
+        const hits = new Set<string>();
+        const out = scrub(value, secrets, (s) => hits.add(s));
+        if (!hits.size) return undefined;
+        ctx.ui.notify(`🕵️ redact: Redacted ${hits.size} secret${hits.size === 1 ? "" : "s"} in ${where}`, "warning");
         return out;
     };
 
@@ -131,14 +129,12 @@ export default function (pi: ExtensionAPI) {
     pi.on("tool_result", (e, ctx) =>
         redact(
             { content: e.content, structuredContent: e.structuredContent, details: e.details },
-            `Redacted secret in ${e.toolName} tool output`,
+            `${e.toolName} tool output`,
             ctx,
         ),
     );
 
     // Scrub full outbound transcript (system prompt, user prompts, !bash, tool results)
     // right before each LLM call.
-    pi.on("context_with_system", (e, ctx) =>
-        redact({ messages: e.messages }, "Redacted secret in outbound LLM context", ctx),
-    );
+    pi.on("context_with_system", (e, ctx) => redact({ messages: e.messages }, "outbound LLM context", ctx));
 }
