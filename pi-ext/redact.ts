@@ -1,5 +1,5 @@
 /**
- * pi-redact.ts — Redact local .env secrets before they reach the LLM
+ * redact.ts — Redact local .env secrets before they reach the LLM
  *
  * Walks from cwd up to /, parses every .env* file found, and holds nontrivial
  * secret values in memory. Scrubs tool results and outbound LLM context so
@@ -10,7 +10,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { parseEnv } from "node:util";
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 const REDACTED = "<REDACTED--PLEASE-DO-NOT-READ-SECRETS>";
 const PEM_RE = /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----/;
@@ -57,7 +57,6 @@ function addSecretVariants(found: Set<string>, secret: string): void {
 // Longest-first order prevents a prefix secret from partially eating a longer one.
 function collectSecrets(cwd: string): { secrets: string[]; count: number } {
     const raw = new Set<string>();
-    const found = new Set<string>();
     let dir = resolve(cwd);
     while (true) {
         try {
@@ -65,12 +64,8 @@ function collectSecrets(cwd: string): { secrets: string[]; count: number } {
                 if (!entry.name.startsWith(".env") || (!entry.isFile() && !entry.isSymbolicLink())) continue;
                 const parsed = parseEnv(readFileSync(join(dir, entry.name), "utf8"));
                 for (const [key, val] of Object.entries(parsed)) {
-                    if (typeof val !== "string") continue;
-                    const secret = extractSecret(val, key);
-                    if (secret) {
-                        raw.add(secret);
-                        addSecretVariants(found, secret);
-                    }
+                    const secret = typeof val === "string" ? extractSecret(val, key) : null;
+                    if (secret) raw.add(secret);
                 }
             }
         } catch {
@@ -80,6 +75,9 @@ function collectSecrets(cwd: string): { secrets: string[]; count: number } {
         if (parent === dir) break;
         dir = parent;
     }
+
+    const found = new Set<string>();
+    for (const secret of raw) addSecretVariants(found, secret);
     return { secrets: [...found].sort((a, b) => b.length - a.length), count: raw.size };
 }
 
@@ -88,14 +86,13 @@ export function loadSecrets(cwd: string): string[] {
 }
 
 // Recursively replace all secret occurrences in strings/arrays/plain objects.
-function scrub<T>(value: T, secrets: string[], onRedact?: () => void): T {
-    if (secrets.length === 0 || value === null || value === undefined) return value;
+function scrub<T>(value: T, secrets: string[], onRedact: () => void): T {
     if (typeof value === "string") {
         let out: string = value;
         for (const s of secrets) {
             if (out.includes(s)) {
                 out = out.replaceAll(s, REDACTED);
-                onRedact?.();
+                onRedact();
             }
         }
         return out as T;
@@ -103,7 +100,7 @@ function scrub<T>(value: T, secrets: string[], onRedact?: () => void): T {
     if (Array.isArray(value)) {
         return value.map((item) => scrub(item, secrets, onRedact)) as T;
     }
-    if (typeof value === "object") {
+    if (value && typeof value === "object") {
         const out: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(value)) {
             out[k] = scrub(v, secrets, onRedact);
@@ -114,56 +111,37 @@ function scrub<T>(value: T, secrets: string[], onRedact?: () => void): T {
 }
 
 export default function (pi: ExtensionAPI) {
-    let secrets: string[] | null = null;
-    const getSecrets = (cwd: string) => (secrets ??= loadSecrets(cwd));
+    let secrets: string[] = [];
+
+    const redact = <T>(value: T, warning: string, ctx: ExtensionContext): T | undefined => {
+        if (secrets.length === 0) return undefined;
+        let hit = false;
+        const out = scrub(value, secrets, () => {
+            hit = true;
+        });
+        if (!hit) return undefined;
+        ctx.ui.notify(`redact: ${warning}`, "warning");
+        return out;
+    };
 
     pi.on("session_start", (_event, ctx) => {
-        const { secrets: loaded, count } = collectSecrets(ctx.cwd);
-        secrets = loaded;
-        ctx.ui.notify(`pi-redact: Protecting ${count} secret${count === 1 ? "" : "s"}`, "info");
+        const loaded = collectSecrets(ctx.cwd);
+        secrets = loaded.secrets;
+        ctx.ui.notify(`redact: Protecting ${loaded.count} secret${loaded.count === 1 ? "" : "s"}`, "info");
     });
 
     // Scrub tool results immediately (covers bash `cat .env`, read, codemode, etc.).
-    pi.on("tool_result", (event, ctx) => {
-        const list = getSecrets(ctx.cwd);
-        if (list.length === 0) return;
-        let redacted = false;
-        const mark = () => {
-            redacted = true;
-        };
-        const content = scrub(event.content, list, mark);
-        const structuredContent =
-            event.structuredContent !== undefined ? scrub(event.structuredContent, list, mark) : undefined;
-        const details = event.details !== undefined ? scrub(event.details, list, mark) : undefined;
-        if (redacted) {
-            ctx.ui.notify(`pi-redact: Redacted secret in ${event.toolName} tool output`, "warning");
-        }
-        return {
-            content,
-            ...(structuredContent !== undefined ? { structuredContent } : {}),
-            ...(details !== undefined ? { details } : {}),
-        };
-    });
+    pi.on("tool_result", (e, ctx) =>
+        redact(
+            { content: e.content, structuredContent: e.structuredContent, details: e.details },
+            `Redacted secret in ${e.toolName} tool output`,
+            ctx,
+        ),
+    );
 
     // Scrub full outbound transcript (system prompt, user prompts, !bash, tool results)
     // right before each LLM call.
-    pi.on("context_with_system", (event, ctx) => {
-        const list = getSecrets(ctx.cwd);
-        if (list.length === 0) return;
-        let redacted = false;
-        const messages = scrub(event.messages, list, () => {
-            redacted = true;
-        });
-        if (redacted) {
-            ctx.ui.notify("pi-redact: Redacted secret in outbound LLM context", "warning");
-        }
-        return { messages };
-    });
-
-    // Final pass on serialized provider payloads.
-    pi.on("before_provider_request", (event, ctx) => {
-        const list = getSecrets(ctx.cwd);
-        if (list.length === 0) return;
-        return scrub(event.payload, list);
-    });
+    pi.on("context_with_system", (e, ctx) =>
+        redact({ messages: e.messages }, "Redacted secret in outbound LLM context", ctx),
+    );
 }
