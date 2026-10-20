@@ -41,7 +41,7 @@ describe("pingme", () => {
         await pingWindow();
 
         expect(hits).toEqual(["/done"]);
-        expect(pi.notifies).toEqual([{ message: "🔔 pingme: Active (>1s)", notifyType: "warning" }]);
+        expect(pi.notifies).toEqual([{ message: "🛎️ pingme: Active (>1s)", notifyType: "warning" }]);
     });
 
     it("does not ping after a shorter run", async () => {
@@ -52,7 +52,7 @@ describe("pingme", () => {
         await pingWindow();
 
         expect(hits).toEqual([]);
-        expect(pi.notifies).toEqual([{ message: "🔔 pingme: Active (>1s)", notifyType: "warning" }]);
+        expect(pi.notifies).toEqual([{ message: "🛎️ pingme: Active (>1s)", notifyType: "warning" }]);
     });
 
     it("does nothing without PINGME", async () => {

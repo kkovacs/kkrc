@@ -20,7 +20,7 @@ export default function (pi: ExtensionAPI) {
 
     // Use "warning" so Pi TUI doesn't coalesce consecutive session_start info lines.
     pi.on("session_start", (_event, ctx) => {
-        ctx.ui.notify(`🔔 pingme: Active (>${afterSec}s)`, "warning");
+        ctx.ui.notify(`🛎️ pingme: Active (>${afterSec}s)`, "warning");
     });
 
     pi.on("agent_start", () => {
