@@ -21,7 +21,7 @@ beforeEach(() => {
     // Strip host secret-named env vars so subprocess secret counts are deterministic.
     savedEnv = {};
     for (const k of Object.keys(process.env)) {
-        if (/(?:^|_)(?:KEY|PASS|PASSWORD|SECRET|TOKEN)$|_PWD$/i.test(k)) {
+        if (/(?:^|_)(?:KEY|PASS|PASSWORD|SECRET|TOKEN|URL|URI)$|_PWD$/i.test(k)) {
             savedEnv[k] = process.env[k];
             delete process.env[k];
         }
@@ -34,79 +34,83 @@ afterEach(() => {
 });
 
 describe("isSecret", () => {
-    it("accepts mixed alnum, hex, and UUID secrets >= 8 chars", () => {
-        expect(isSecret("SkLive99abcXYZ")).toBe(true);
-        expect(isSecret("PuiHeigiekoo6u")).toBe(true);
-        expect(isSecret("D7s(bn`Z''/1bQFI")).toBe(true);
-        expect(isSecret("}!UHCPw3$IY5z%AC")).toBe(true);
-        expect(isSecret("hD0jCRzMyyktNpE6o0ge")).toBe(true);
-        expect(isSecret("asbestos-hustle-splashed-thrills")).toBe(true);
-        expect(isSecret("Devon-telugu-energy-upsets-rake")).toBe(true);
-        expect(isSecret("a1b2c3d4e5f60718")).toBe(true); // lowercase hex
-        expect(isSecret("DEADBEEF01234567")).toBe(true); // uppercase hex
-        expect(isSecret("550e8400-e29b-41d4-a716-446655440000")).toBe(true); // UUID
-        expect(isSecret("sk_live_abcdefghijkl")).toBe(true); // sk_ prefix (all lowercase)
-        expect(isSecret("sk-ant-api03-abcdefgh")).toBe(true); // sk- prefix (no uppercase)
+    it("accepts known token prefixes >= 8 chars regardless of key name", () => {
+        expect(isSecret("sk_live_abcdefghijkl")).toBe(true);
+        expect(isSecret("sk-ant-api03-abcdefgh")).toBe(true);
+        expect(isSecret("rk_live_1234567890")).toBe(true);
+        expect(isSecret("whsec_1234567890abcdef")).toBe(true);
+        expect(isSecret("ghp_1234567890abcdef")).toBe(true);
+        expect(isSecret("github_pat_1234567890")).toBe(true);
+        expect(isSecret("glpat-1234567890abcdef")).toBe(true);
+        expect(isSecret("xoxb-1234567890-abcdef")).toBe(true);
+        expect(isSecret("xapp-1-A123-4567890")).toBe(true);
+        expect(isSecret("AKIAIOSFODNN7EXAMPLE")).toBe(true);
+        expect(isSecret("AIzaSyDaGmWKa4JsXZ-example")).toBe(true);
+        expect(isSecret("hf_1234567890abcdef")).toBe(true);
+        expect(isSecret("npm_1234567890abcdef")).toBe(true);
+        expect(isSecret("pypi-AgEIcHlwaS5vcmc")).toBe(true);
+        expect(isSecret("SG.1234567890abcdef")).toBe(true);
     });
 
-    it("ignores short, numeric, whitespace, or single-case non-hex strings", () => {
-        expect(isSecret("Ab1")).toBe(false); // < 8 chars
+    it("ignores unnamed generic values, short strings, whitespace, paths, and URLs", () => {
+        expect(isSecret("sk_123")).toBe(false); // < 8 chars
         expect(isSecret("")).toBe(false); // empty
         expect(isSecret("My cool application name")).toBe(false); // has spaces
         expect(isSecret("1234567890")).toBe(false); // purely numeric
-        expect(isSecret("Has Space 123")).toBe(false); // contains space
-        expect(isSecret("production")).toBe(false); // lowercase only (non-hex)
-        expect(isSecret("PRODUCTION")).toBe(false); // uppercase only (non-hex)
-        expect(isSecret("secret1234")).toBe(false); // no uppercase (non-hex)
-        expect(isSecret("SECRET1234")).toBe(false); // no lowercase (non-hex)
-        expect(isSecret("SecretOnly")).toBe(false); // no digits (non-hex)
-        expect(isSecret("https://example.com/")).toBe(false); // URL
-        expect(isSecret("https://example.com/ApiV1/2026")).toBe(false); // URL with mixed case + digits
+        expect(isSecret("production")).toBe(false); // plain word
+        expect(isSecret("a1b2c3d4e5f60718")).toBe(false); // unnamed hex (e.g. git SHA)
+        expect(isSecret("550e8400-e29b-41d4-a716-446655440000")).toBe(false); // unnamed UUID (e.g. tenant ID)
+        expect(isSecret("acme-prod-static-assets")).toBe(false); // unnamed kebab-case slug
+        expect(isSecret("gpt4oMini2024")).toBe(false); // unnamed mixed alnum
+        expect(isSecret("https://example.com/ApiV1/2026")).toBe(false); // URL
         expect(isSecret("https://user:MyPass123@domain.com/uri")).toBe(false); // full URL is not itself the secret
-        expect(isSecret("http://localhost")).toBe(false); // URL
+        expect(isSecret("/etc/ssl/private/key.pem")).toBe(false); // file path
         expect(isSecret("127.0.0.1")).toBe(false); // IP
         expect(isSecret("3306")).toBe(false); // port
         expect(isSecret("us-east-1")).toBe(false); // AWS zone
-        expect(isSecret("null")).toBe(false);
         expect(isSecret("false")).toBe(false);
-        expect(isSecret("False")).toBe(false);
     });
 
-    it("accepts simpler values when key name ends with KEY/PASS/PASSWORD/SECRET/TOKEN/_PWD", () => {
-        // Positive key-name cases (values that would fail without key name)
+    it("accepts values >= 8 chars when key name ends with KEY/PASS/PASSWORD/SECRET/TOKEN/_PWD", () => {
+        // Positive key-name cases
         expect(isSecret("onlylowercase", "API_KEY")).toBe(true);
-        expect(isSecret("tiger", "DB_PASS")).toBe(true);
+        expect(isSecret("tiger123", "DB_PASS")).toBe(true);
         expect(isSecret("12345678", "ADMIN_PASSWORD")).toBe(true);
-        expect(isSecret("secret", "JWT_SECRET")).toBe(true);
+        expect(isSecret("mysecret", "JWT_SECRET")).toBe(true);
         expect(isSecret("simpletoken", "AUTH_TOKEN")).toBe(true);
         expect(isSecret("mysqlpass", "MYSQL_PWD")).toBe(true);
+        expect(isSecret("550e8400-e29b-41d4-a716-446655440000", "SESSION_TOKEN")).toBe(true);
 
         // Negative key-name cases
-        expect(isSecret("rsa", "KEY_TYPE")).toBe(false); // KEY is prefix, not suffix
-        expect(isSecret("2048", "KEY_SIZE")).toBe(false); // KEY is prefix, not suffix
-        expect(isSecret("3600", "TOKEN_TTL")).toBe(false); // TOKEN is prefix, not suffix
-        expect(isSecret("true", "PASS_THROUGH")).toBe(false); // PASS is prefix + boolean
-        expect(isSecret("/home/user", "PWD")).toBe(false); // bare PWD (working dir) ignored
+        expect(isSecret("short77", "API_KEY")).toBe(false); // < 8 chars
+        expect(isSecret("rsa-key-type", "KEY_TYPE")).toBe(false); // KEY is prefix, not suffix
+        expect(isSecret("12345678", "KEY_SIZE")).toBe(false); // KEY is prefix, not suffix
+        expect(isSecret("12345678", "TOKEN_TTL")).toBe(false); // TOKEN is prefix, not suffix
+        expect(isSecret("enabled123", "PASS_THROUGH")).toBe(false); // PASS is prefix
+        expect(isSecret("workdirname", "PWD")).toBe(false); // bare PWD (working dir) ignored
         expect(isSecret("/etc/ssl/private/key.pem", "SSL_KEY")).toBe(false); // file path ignored even with _KEY
-        expect(isSecret("null", "API_KEY")).toBe(false); // trivial literal
-        expect(isSecret("false", "USE_KEY")).toBe(false); // trivial literal
-        expect(isSecret("ab", "API_KEY")).toBe(false); // < 4 chars
+        expect(isSecret("https://example.com/secret", "API_KEY")).toBe(false); // full URL ignored even with _KEY
+        expect(isSecret("null", "API_KEY")).toBe(false); // < 8 chars
+        expect(isSecret("false", "USE_KEY")).toBe(false); // < 8 chars
     });
 });
 
 describe("extractSecret", () => {
-    it("extracts strong passwords from URLs and ignores URLs without strong passwords", () => {
+    it("extracts non-trivial passwords from URLs and ignores URLs without strong passwords", () => {
         // Positive URL cases
         expect(extractSecret("https://user:MyPass123@domain.com/uri")).toBe("MyPass123");
-        expect(extractSecret("http://user:LocalPass123@127.0.0.1")).toBe("LocalPass123");
-        expect(extractSecret("postgres://dbuser:D7s(bn`Z''1bQFI@db.internal:5432/prod")).toBe("D7s(bn`Z''1bQFI");
-        expect(extractSecret("redis://:a1b2c3d4e5f60718@localhost:6379/0")).toBe("a1b2c3d4e5f60718");
+        expect(extractSecret("http://user:LocalPass123@127.0.0.1", "SERVICE_URL")).toBe("LocalPass123");
+        expect(extractSecret("postgres://dbuser:D7s(bn`Z''1bQFI@db.internal:5432/prod", "DATABASE_URL")).toBe("D7s(bn`Z''1bQFI");
+        expect(extractSecret("redis://:a1b2c3d4e5f60718@localhost:6379/0", "REDIS_URI")).toBe("a1b2c3d4e5f60718");
 
         // Negative URL cases
-        expect(extractSecret("https://example.com/ApiV1/2026")).toBeNull(); // no credentials
-        expect(extractSecret("https://user@domain.com/ApiV1/2026")).toBeNull(); // user only, no password
-        expect(extractSecret("https://domain.com:8443/PathWith@AtSign1")).toBeNull(); // port + @ in path, not userinfo
-        expect(extractSecret("postgres://postgres:postgres@localhost:5432/db")).toBeNull(); // trivial password
+        expect(extractSecret("https://example.com/ApiV1/2026", "PUBLIC_URL")).toBeNull(); // no credentials
+        expect(extractSecret("https://user@domain.com/ApiV1/2026", "PUBLIC_URL")).toBeNull(); // user only, no password
+        expect(extractSecret("https://domain.com:8443/PathWith@AtSign1", "PUBLIC_URL")).toBeNull(); // port + @ in path, not userinfo
+        expect(extractSecret("postgres://postgres:postgres@localhost:5432/db", "DATABASE_URL")).toBeNull(); // single-case alpha word
+        expect(extractSecret("redis://:password@localhost:6379/0", "REDIS_URL")).toBeNull(); // single-case alpha word
+        expect(extractSecret("postgres://user:Short1@localhost:5432/db", "DATABASE_URL")).toBeNull(); // < 8 chars
+        expect(extractSecret("https://user:MyPass123@domain.com/uri", "UNRELATED_VAR")).toBeNull(); // key is not URL/URI/secret
     });
 });
 
@@ -135,16 +139,21 @@ describe("loadSecrets", () => {
         }
     });
 
-    it("collects process env secrets only for matching key names and ignores paths", () => {
+    it("collects process env secrets for matching key names, URLs, and prefixes while ignoring system vars", () => {
         const loaded = loadSecrets(dir, {
             OPENAI_API_KEY: "envsecret",
             GITHUB_TOKEN: "ghp_1234567890abcdef",
+            DATABASE_URL: "postgres://admin:EnvDbPass99@localhost:5432/app",
+            UNNAMED_OPENAI: "sk-proj-1234567890abcdef",
             SSL_KEY: "/etc/ssl/private/server.key",
             TERM_SESSION_ID: "550e8400-e29b-41d4-a716-446655440000",
             GIT_COMMIT: "a1b2c3d4e5f60718",
+            PUBLIC_URL: "https://example.com/ApiV1/2026",
         });
         expect(loaded).toContain("envsecret");
         expect(loaded).toContain("ghp_1234567890abcdef");
+        expect(loaded).toContain("EnvDbPass99");
+        expect(loaded).toContain("sk-proj-1234567890abcdef");
         expect(loaded).not.toContain("/etc/ssl/private/server.key");
         expect(loaded).not.toContain("550e8400-e29b-41d4-a716-446655440000");
         expect(loaded).not.toContain("a1b2c3d4e5f60718");

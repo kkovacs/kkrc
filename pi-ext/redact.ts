@@ -14,30 +14,28 @@ import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-a
 
 const REDACTED = "<REDACTED--PLEASE-DO-NOT-READ-SECRETS>";
 const PEM_BLOCK_RE = /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----[\s\S]*?(?:-----END [A-Z0-9 ]*PRIVATE KEY-----|$)/g;
-const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-const HEX_RE = /^[0-9a-fA-F]+$/;
-const PASSPHRASE_RE = /^[a-zA-Z]{3,}(?:-[a-zA-Z]{3,}){3,}$/;
-const SK_PREFIX_RE = /^sk[_-]/;
+const TOKEN_PREFIX_RE =
+    /^(?:sk[_-]|rk_(?:live|test)_|whsec_|gh[pousr]_|github_pat_|glpat-|xox[bpars]-|xapp-|AKIA|ASIA|AIza|hf_|npm_|pypi-|SG\.)/;
 const URL_RE = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//;
 const URL_PASS_RE = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/[^/:?#\s]*:([^/?#\s]+)@/;
 const SECRET_KEY_NAME_RE = /(?:^|_)(?:KEY|PASS|PASSWORD|SECRET|TOKEN)$|_PWD$/i;
-const TRIVIAL_LITERAL_RE = /^(?:true|false|null|none)$/i;
+const URL_KEY_NAME_RE = /(?:^|_)(?:URL|URI)$/i;
+const SINGLE_CASE_WORD_RE = /^[a-z]+$|^[A-Z]+$/;
 
-// Filter out short/trivial config values (ports, booleans, plain words, sentences, full URLs, paths)
-// so we don't redact normal code or prose in the prompt. Env vars whose name ends with
-// KEY/PASS/PASSWORD/SECRET/TOKEN/_PWD relax the character-class rules.
+// Match values >= 8 chars by secret key name or known token prefix; ignore paths, URLs, and whitespace.
 export function isSecret(v: string, key = ""): boolean {
-    if (/\s/.test(v) || v.startsWith("/") || URL_RE.test(v) || TRIVIAL_LITERAL_RE.test(v)) return false;
-    if (SECRET_KEY_NAME_RE.test(key)) return v.length >= 4;
-    if (v.length < 8 || /^\d+$/.test(v)) return false;
-    const hasMixedAlnum = /[a-z]/.test(v) && /[A-Z]/.test(v) && /[0-9]/.test(v);
-    return hasMixedAlnum || HEX_RE.test(v) || UUID_RE.test(v) || PASSPHRASE_RE.test(v) || SK_PREFIX_RE.test(v);
+    if (v.length < 8 || /\s/.test(v) || v.startsWith("/") || URL_RE.test(v)) return false;
+    return SECRET_KEY_NAME_RE.test(key) || TOKEN_PREFIX_RE.test(v);
 }
 
-// Extract the secret to redact from a .env value (for URLs, only the embedded password).
+// Extract the secret to redact from an env value (for URLs, only a non-trivial embedded password).
 export function extractSecret(v: string, key = ""): string | null {
-    const candidate = URL_RE.test(v) ? URL_PASS_RE.exec(v)?.[1] : v;
-    return candidate && isSecret(candidate, key) ? candidate : null;
+    if (URL_RE.test(v)) {
+        if (key && !URL_KEY_NAME_RE.test(key) && !SECRET_KEY_NAME_RE.test(key)) return null;
+        const pass = URL_PASS_RE.exec(v)?.[1];
+        return pass && pass.length >= 8 && !SINGLE_CASE_WORD_RE.test(pass) ? pass : null;
+    }
+    return isSecret(v, key) ? v : null;
 }
 
 function addSecretVariants(found: Set<string>, secret: string): void {
@@ -46,7 +44,7 @@ function addSecretVariants(found: Set<string>, secret: string): void {
     found.add(Buffer.from(secret).toString("base64"));
 }
 
-// Walk from cwd up to / collecting secrets from every .env* file and matching process env vars.
+// Walk from cwd up to / collecting secrets from every .env* file and process.env.
 // Longest-first order prevents a prefix secret from partially eating a longer one.
 function collectSecrets(cwd: string, env: NodeJS.ProcessEnv = process.env): { secrets: string[]; count: number } {
     const raw = new Set<string>();
@@ -69,10 +67,8 @@ function collectSecrets(cwd: string, env: NodeJS.ProcessEnv = process.env): { se
         dir = parent;
     }
 
-    // Only inspect process env vars with secret-looking names to avoid false positives on system vars.
     for (const [key, val] of Object.entries(env)) {
-        if (!SECRET_KEY_NAME_RE.test(key) || typeof val !== "string") continue;
-        const secret = extractSecret(val, key);
+        const secret = typeof val === "string" ? extractSecret(val, key) : null;
         if (secret) raw.add(secret);
     }
 
