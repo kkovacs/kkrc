@@ -13,21 +13,50 @@ import { parseEnv } from "node:util";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 const REDACTED = "<REDACTED--PLEASE-DO-NOT-READ-SECRETS>";
+const PEM_RE = /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----/;
 const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 const HEX_RE = /^[0-9a-fA-F]+$/;
 const PASSPHRASE_RE = /^[a-zA-Z]{3,}(?:-[a-zA-Z]{3,}){3,}$/;
+const SK_PREFIX_RE = /^sk[_-]/;
+const URL_RE = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//;
+const URL_PASS_RE = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/[^/:?#\s]*:([^/?#\s]+)@/;
+const SECRET_KEY_NAME_RE = /(?:^|_)(?:KEY|PASS|PASSWORD|SECRET|TOKEN)$|_PWD$/i;
+const TRIVIAL_LITERAL_RE = /^(?:true|false|null|none)$/i;
 
-// Filter out short/trivial config values (ports, booleans, plain words, sentences)
-// so we don't redact normal code or prose in the prompt.
-export function isSecret(v: string): boolean {
-    if (v.length < 8 || /\s/.test(v) || /^\d+$/.test(v)) return false;
+// Filter out short/trivial config values (ports, booleans, plain words, sentences, full URLs)
+// so we don't redact normal code or prose in the prompt. Env vars whose name ends with
+// KEY/PASS/PASSWORD/SECRET/TOKEN/_PWD relax the character-class rules.
+export function isSecret(v: string, key = ""): boolean {
+    if (PEM_RE.test(v)) return true;
+    if (/\s/.test(v) || URL_RE.test(v) || TRIVIAL_LITERAL_RE.test(v)) return false;
+    if (SECRET_KEY_NAME_RE.test(key)) return v.length >= 4;
+    if (v.length < 8 || /^\d+$/.test(v)) return false;
     const hasMixedAlnum = /[a-z]/.test(v) && /[A-Z]/.test(v) && /[0-9]/.test(v);
-    return hasMixedAlnum || HEX_RE.test(v) || UUID_RE.test(v) || PASSPHRASE_RE.test(v);
+    return hasMixedAlnum || HEX_RE.test(v) || UUID_RE.test(v) || PASSPHRASE_RE.test(v) || SK_PREFIX_RE.test(v);
+}
+
+// Extract the secret to redact from a .env value (for URLs, only the embedded password).
+export function extractSecret(v: string, key = ""): string | null {
+    const candidate = URL_RE.test(v) ? URL_PASS_RE.exec(v)?.[1] : v;
+    return candidate && isSecret(candidate, key) ? candidate : null;
+}
+
+function addSecretVariants(found: Set<string>, secret: string): void {
+    found.add(secret);
+    found.add(encodeURIComponent(secret));
+    found.add(Buffer.from(secret).toString("base64"));
+    if (PEM_RE.test(secret)) {
+        for (const line of secret.split(/\\n|\r?\n/)) {
+            const trimmed = line.trim();
+            if (trimmed.length >= 8 && !trimmed.startsWith("-----")) found.add(trimmed);
+        }
+    }
 }
 
 // Walk from cwd up to / collecting secrets from every .env* file.
 // Longest-first order prevents a prefix secret from partially eating a longer one.
-export function loadSecrets(cwd: string): string[] {
+function collectSecrets(cwd: string): { secrets: string[]; count: number } {
+    const raw = new Set<string>();
     const found = new Set<string>();
     let dir = resolve(cwd);
     while (true) {
@@ -35,8 +64,13 @@ export function loadSecrets(cwd: string): string[] {
             for (const entry of readdirSync(dir, { withFileTypes: true })) {
                 if (!entry.name.startsWith(".env") || (!entry.isFile() && !entry.isSymbolicLink())) continue;
                 const parsed = parseEnv(readFileSync(join(dir, entry.name), "utf8"));
-                for (const val of Object.values(parsed)) {
-                    if (typeof val === "string" && isSecret(val)) found.add(val);
+                for (const [key, val] of Object.entries(parsed)) {
+                    if (typeof val !== "string") continue;
+                    const secret = extractSecret(val, key);
+                    if (secret) {
+                        raw.add(secret);
+                        addSecretVariants(found, secret);
+                    }
                 }
             }
         } catch {
@@ -46,26 +80,33 @@ export function loadSecrets(cwd: string): string[] {
         if (parent === dir) break;
         dir = parent;
     }
-    return [...found].sort((a, b) => b.length - a.length);
+    return { secrets: [...found].sort((a, b) => b.length - a.length), count: raw.size };
+}
+
+export function loadSecrets(cwd: string): string[] {
+    return collectSecrets(cwd).secrets;
 }
 
 // Recursively replace all secret occurrences in strings/arrays/plain objects.
-function scrub<T>(value: T, secrets: string[]): T {
+function scrub<T>(value: T, secrets: string[], onRedact?: () => void): T {
     if (secrets.length === 0 || value === null || value === undefined) return value;
     if (typeof value === "string") {
         let out: string = value;
         for (const s of secrets) {
-            if (out.includes(s)) out = out.replaceAll(s, REDACTED);
+            if (out.includes(s)) {
+                out = out.replaceAll(s, REDACTED);
+                onRedact?.();
+            }
         }
         return out as T;
     }
     if (Array.isArray(value)) {
-        return value.map((item) => scrub(item, secrets)) as T;
+        return value.map((item) => scrub(item, secrets, onRedact)) as T;
     }
     if (typeof value === "object") {
         const out: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(value)) {
-            out[k] = scrub(v, secrets);
+            out[k] = scrub(v, secrets, onRedact);
         }
         return out as T;
     }
@@ -77,21 +118,30 @@ export default function (pi: ExtensionAPI) {
     const getSecrets = (cwd: string) => (secrets ??= loadSecrets(cwd));
 
     pi.on("session_start", (_event, ctx) => {
-        secrets = loadSecrets(ctx.cwd);
+        const { secrets: loaded, count } = collectSecrets(ctx.cwd);
+        secrets = loaded;
+        ctx.ui.notify(`pi-redact: Protecting ${count} secret${count === 1 ? "" : "s"}`, "info");
     });
 
     // Scrub tool results immediately (covers bash `cat .env`, read, codemode, etc.).
     pi.on("tool_result", (event, ctx) => {
         const list = getSecrets(ctx.cwd);
         if (list.length === 0) return;
+        let redacted = false;
+        const mark = () => {
+            redacted = true;
+        };
+        const content = scrub(event.content, list, mark);
+        const structuredContent =
+            event.structuredContent !== undefined ? scrub(event.structuredContent, list, mark) : undefined;
+        const details = event.details !== undefined ? scrub(event.details, list, mark) : undefined;
+        if (redacted) {
+            ctx.ui.notify(`pi-redact: Redacted secret in ${event.toolName} tool output`, "warning");
+        }
         return {
-            content: scrub(event.content, list),
-            ...(event.structuredContent !== undefined
-                ? { structuredContent: scrub(event.structuredContent, list) }
-                : {}),
-            ...(event.details !== undefined
-                ? { details: scrub(event.details, list) }
-                : {}),
+            content,
+            ...(structuredContent !== undefined ? { structuredContent } : {}),
+            ...(details !== undefined ? { details } : {}),
         };
     });
 
@@ -100,7 +150,14 @@ export default function (pi: ExtensionAPI) {
     pi.on("context_with_system", (event, ctx) => {
         const list = getSecrets(ctx.cwd);
         if (list.length === 0) return;
-        return { messages: scrub(event.messages, list) };
+        let redacted = false;
+        const messages = scrub(event.messages, list, () => {
+            redacted = true;
+        });
+        if (redacted) {
+            ctx.ui.notify("pi-redact: Redacted secret in outbound LLM context", "warning");
+        }
+        return { messages };
     });
 
     // Final pass on serialized provider payloads.
