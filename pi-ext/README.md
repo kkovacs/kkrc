@@ -3,5 +3,5 @@ This directory is NOT linked to .pi/extensions/ on purpose, because I don't want
 Run tests with:
 
 ```bash
-PI_PATH=$(which pi) bun test ~/.kkrc/pi-ext/tests
+bun test ~/.kkrc/pi-ext/tests
 ```
