@@ -23,12 +23,12 @@ const URL_PASS_RE = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/[^/:?#\s]*:([^/?#\s]+)@/;
 const SECRET_KEY_NAME_RE = /(?:^|_)(?:KEY|PASS|PASSWORD|SECRET|TOKEN)$|_PWD$/i;
 const TRIVIAL_LITERAL_RE = /^(?:true|false|null|none)$/i;
 
-// Filter out short/trivial config values (ports, booleans, plain words, sentences, full URLs)
+// Filter out short/trivial config values (ports, booleans, plain words, sentences, full URLs, paths)
 // so we don't redact normal code or prose in the prompt. Env vars whose name ends with
 // KEY/PASS/PASSWORD/SECRET/TOKEN/_PWD relax the character-class rules.
 export function isSecret(v: string, key = ""): boolean {
     if (PEM_RE.test(v)) return true;
-    if (/\s/.test(v) || URL_RE.test(v) || TRIVIAL_LITERAL_RE.test(v)) return false;
+    if (/\s/.test(v) || v.startsWith("/") || URL_RE.test(v) || TRIVIAL_LITERAL_RE.test(v)) return false;
     if (SECRET_KEY_NAME_RE.test(key)) return v.length >= 4;
     if (v.length < 8 || /^\d+$/.test(v)) return false;
     const hasMixedAlnum = /[a-z]/.test(v) && /[A-Z]/.test(v) && /[0-9]/.test(v);
@@ -53,9 +53,9 @@ function addSecretVariants(found: Set<string>, secret: string): void {
     }
 }
 
-// Walk from cwd up to / collecting secrets from every .env* file.
+// Walk from cwd up to / collecting secrets from every .env* file and matching process env vars.
 // Longest-first order prevents a prefix secret from partially eating a longer one.
-function collectSecrets(cwd: string): { secrets: string[]; count: number } {
+function collectSecrets(cwd: string, env: NodeJS.ProcessEnv = process.env): { secrets: string[]; count: number } {
     const raw = new Set<string>();
     let dir = resolve(cwd);
     while (true) {
@@ -76,13 +76,20 @@ function collectSecrets(cwd: string): { secrets: string[]; count: number } {
         dir = parent;
     }
 
+    // Only inspect process env vars with secret-looking names to avoid false positives on system vars.
+    for (const [key, val] of Object.entries(env)) {
+        if (!SECRET_KEY_NAME_RE.test(key) || typeof val !== "string") continue;
+        const secret = extractSecret(val, key);
+        if (secret) raw.add(secret);
+    }
+
     const found = new Set<string>();
     for (const secret of raw) addSecretVariants(found, secret);
     return { secrets: [...found].sort((a, b) => b.length - a.length), count: raw.size };
 }
 
-export function loadSecrets(cwd: string): string[] {
-    return collectSecrets(cwd).secrets;
+export function loadSecrets(cwd: string, env: NodeJS.ProcessEnv = process.env): string[] {
+    return collectSecrets(cwd, env).secrets;
 }
 
 // Recursively replace all secret occurrences in strings/arrays/plain objects.
@@ -125,8 +132,9 @@ export default function (pi: ExtensionAPI) {
         return out;
     };
 
+    // Use "warning" so Pi TUI doesn't coalesce consecutive session_start info lines.
     pi.on("session_start", (_event, ctx) => {
-        ctx.ui.notify(`redact: Protecting ${count} secret${count === 1 ? "" : "s"}`, "info");
+        ctx.ui.notify(`🕵️ redact: Protecting ${count} secret${count === 1 ? "" : "s"}`, "warning");
     });
 
     // Scrub tool results immediately (covers bash `cat .env`, read, codemode, etc.).
