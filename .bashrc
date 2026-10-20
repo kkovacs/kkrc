@@ -113,7 +113,6 @@ alias mysql="INPUTRC=/dev/fd/9 mysql 9<<<'set editing-mode vi'"
 # This is getting even uglier, but must have on remote machines
 alias tig='TIGRC_USER=/dev/fd/9 tig 9<<<"set main-options = --all${IFS}set main-view = line-number:no,interval=5 id:yes date:relative author:abbreviated commit-title:yes,graph,refs,overflow=no${IFS}set blame-view-date-display = relative${IFS}bind generic } :toggle split-view-width -10%${IFS}bind generic { :toggle split-view-width +10%"'
 # Git shortcuts
-unalias ts gl gs gf gp 2>/dev/null # XXX temporary
 function ts(){ tig status "$@"; }
 function gl(){ git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative --all --date-order "$@"; }
 function gs(){ git status -sb "$@"; }
@@ -128,10 +127,10 @@ function gap() { gs ; git pull --rebase --autostash ; git add -A ; git commit -m
 function gat() { vimdiff "$1" <(git show "${2:-HEAD^}":"$1" ) ; }
 alias gclean="git reset --hard && git clean -f -d -x"
 # xxd alternative. Interestingly, "hexdump" is more widespread than "od"
-alias xxh="hexdump -v -e '\"%08.8_ax:\"' -e '16/1 \" %02x\"' -e '\"  \" 16/1 \"%_p\" \"\n\"'"
+#alias xxh="hexdump -v -e '\"%08.8_ax:\"' -e '16/1 \" %02x\"' -e '\"  \" 16/1 \"%_p\" \"\n\"'"
 
 # Highlight function, max 5 params. Use "." to skip parameters.
-function hl() { local GR="grep --line-buffered --color=always -E"; GREP_COLORS="mt=01;31" $GR "$1|$" | GREP_COLORS="mt=01;32" $GR "$2|$" | GREP_COLORS="mt=01;33" $GR "$3|$" | GREP_COLORS="mt=01;34" $GR "$4|$" | GREP_COLORS="mt=01;35" $GR "$5|$" ; } ; export -f hl
+#function hl() { local GR="grep --line-buffered --color=always -E"; GREP_COLORS="mt=01;31" $GR "$1|$" | GREP_COLORS="mt=01;32" $GR "$2|$" | GREP_COLORS="mt=01;33" $GR "$3|$" | GREP_COLORS="mt=01;34" $GR "$4|$" | GREP_COLORS="mt=01;35" $GR "$5|$" ; } ; export -f hl
 
 # Recursive git
 function G() { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
@@ -148,12 +147,12 @@ export GR_EXCLUDE=(-I --exclude-dir=.git --exclude=*.min.* --exclude=*.sql --exc
 function gr() { command grep --color=auto -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null ; }
 #function ggr() { command grep --color=force -r "${GR_EXCLUDE[@]}" "$@" . 2>/dev/null | less -FSXnr ; }
 # Better git grep
-function gg() { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
+#function gg() { git grep -I "$@" -- :^vendor/ :^public/vendor/ :^node_modules/ :^*.sql :^*.min.* ; }
 
 # tmux-first (NOTE: tmux show-environment is set automatically, no need for hack)
 function s() { tmux attach-session || tmux new-session \; set prefix2 c-a ; }
 # GNU screen idempotently start or attach
-function sx() { screen -xRS llm ; }
+function sx() { screen -xRS llm "$@" ; }
 
 # Avoid mandatory reconfiguration of git with user/email for hotfixes. File permission matching git does by itself since 2022 (was here earlier)
 function git() { command git -c user.email="${USER:-$(id -un)}@${HOSTNAME:-$(uname -n)}" -c user.name="${USER:-$(id -un)}" "$@" ; } ; export -f git
@@ -187,11 +186,8 @@ complete -F _docker_compose dc
 alias dc1="dc up -d; dcs"
 alias dc0="dc down"
 alias dcs="dc ps -a"
-#alias dcl="dc logs -f"
 # List docker and docker-compose images
 alias dci="dc images; echo; docker images"
-# Docker Swarm
-#alias S="docker service ls"
 # Kubernetes overview.
 alias K="sudo kubectl get all --output=wide"
 # Kubernetes overview, including system
@@ -200,8 +196,6 @@ alias KA="sudo kubectl get all --output=wide --all-namespaces"
 alias KN="sudo kubectl get nodes --output=wide"
 # nftables show all
 alias N="sudo nft list ruleset"
-# Firefox private window
-alias ff="firefox --new-instance --private-window &"
 # lsblk tree
 alias lb="lsblk -Mf"
 # LVM "du"
@@ -209,7 +203,7 @@ alias lvl="pvs; echo; vgs; echo; lvs -o lv_name,pool_lv,size,data_percent,metada
 # ZFS "du"
 alias zl="zfs list -t all -o space,compressratio"
 # Replicate zsh's "vared" command (with autocompletion)
-function vared() { read -r -e -p "$1=" -i "${!1}" "$1" ; } ; complete -v vared
+#function vared() { read -r -e -p "$1=" -i "${!1}" "$1" ; } ; complete -v vared
 
 # Only if not on busybox
 [ -L "$(type -p grep)" ] || alias grep="grep --color"
@@ -338,11 +332,6 @@ for p in "$HOME/.local/bin" /home/linuxbrew/.linuxbrew/{bin,sbin} "$HOME/.bun/bi
 
 # END of part to be injected
 
-# Session cost stats across harnesses (pi, claude, codex, opencode)
-function pis() { ~/.kkrc/other/session-stats.py "$@" ; }
-# Our userland, no-install sandbox
-function sb() { ~/.kkrc/other/sandbox.sh "$@" ; }
-
 # Commands which are not required in remote inject
 alias tmux="tmux -2"
 # Start tmux in "main" mode (on my local notebook)
@@ -350,7 +339,12 @@ function T() { tmux attach-session || tmux -f ~/.kkrc/.tmux.main new-session ; }
 # When I don't want to pollute my known_hosts file (temporary VMs, etc)
 alias sssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 # SSH reverse-compatible with RSA (routers with dropbear, etc)
-alias ssh-with-rsa-enabled="ssh -o PubkeyAcceptedAlgorithms=+ssh-rsa -o HostkeyAlgorithms=+ssh-rsa"
+alias ssh-rsa="ssh -o PubkeyAcceptedAlgorithms=+ssh-rsa -o HostkeyAlgorithms=+ssh-rsa"
+
+# Session cost stats across harnesses (pi, claude, codex, opencode)
+function pis() { ~/.kkrc/other/session-stats.py "$@" ; }
+# Our userland, no-install sandbox
+function sandbox() { ~/.kkrc/other/sandbox.sh "$@" ; }
 
 # Locally we don't need these (but leave them in the inject part)
 unalias tig
@@ -417,15 +411,6 @@ function ssh() {
 	stty sane
 	printf '\e[?47l\e[?25h\e[99B'
 }
-
-# Strictly NOT in inject, just LOCAL: open files from vim :term back in VIM.
-if [ -n "$VIM_TERMINAL" ]; then
-	unalias vim
-	function vim() {
-		printf '\e]51;["drop", "%s"]\g' "$(realpath "$1")"
-	}
-	export -f vim
-fi
 
 # Display tmux sessions if any, and we're not already running under tmux.
 if [[ ! -n "$TMUX" ]]; then
