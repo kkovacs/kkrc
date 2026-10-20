@@ -13,7 +13,7 @@ import { parseEnv } from "node:util";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 const REDACTED = "<REDACTED--PLEASE-DO-NOT-READ-SECRETS>";
-const PEM_RE = /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----/;
+const PEM_BLOCK_RE = /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z0-9 ]*PRIVATE KEY-----/g;
 const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 const HEX_RE = /^[0-9a-fA-F]+$/;
 const PASSPHRASE_RE = /^[a-zA-Z]{3,}(?:-[a-zA-Z]{3,}){3,}$/;
@@ -27,7 +27,6 @@ const TRIVIAL_LITERAL_RE = /^(?:true|false|null|none)$/i;
 // so we don't redact normal code or prose in the prompt. Env vars whose name ends with
 // KEY/PASS/PASSWORD/SECRET/TOKEN/_PWD relax the character-class rules.
 export function isSecret(v: string, key = ""): boolean {
-    if (PEM_RE.test(v)) return true;
     if (/\s/.test(v) || v.startsWith("/") || URL_RE.test(v) || TRIVIAL_LITERAL_RE.test(v)) return false;
     if (SECRET_KEY_NAME_RE.test(key)) return v.length >= 4;
     if (v.length < 8 || /^\d+$/.test(v)) return false;
@@ -45,12 +44,6 @@ function addSecretVariants(found: Set<string>, secret: string): void {
     found.add(secret);
     found.add(encodeURIComponent(secret));
     found.add(Buffer.from(secret).toString("base64"));
-    if (PEM_RE.test(secret)) {
-        for (const line of secret.split(/\\n|\r?\n/)) {
-            const trimmed = line.trim();
-            if (trimmed.length >= 8 && !trimmed.startsWith("-----")) found.add(trimmed);
-        }
-    }
 }
 
 // Walk from cwd up to / collecting secrets from every .env* file and matching process env vars.
@@ -92,10 +85,13 @@ export function loadSecrets(cwd: string, env: NodeJS.ProcessEnv = process.env): 
     return collectSecrets(cwd, env).secrets;
 }
 
-// Recursively replace all secret occurrences in strings/arrays/plain objects.
+// Recursively replace all secret occurrences and PEM private key blocks in strings/arrays/plain objects.
 function scrub<T>(value: T, secrets: string[], onRedact: () => void): T {
     if (typeof value === "string") {
-        let out: string = value;
+        let out = value.replace(PEM_BLOCK_RE, () => {
+            onRedact();
+            return REDACTED;
+        });
         for (const s of secrets) {
             if (out.includes(s)) {
                 out = out.replaceAll(s, REDACTED);
@@ -118,9 +114,7 @@ function scrub<T>(value: T, secrets: string[], onRedact: () => void): T {
 }
 
 export default function (pi: ExtensionAPI) {
-    // Scan at load time; if no secrets exist, hook nothing.
     const { secrets, count } = collectSecrets(process.cwd());
-    if (count === 0) return;
 
     const redact = <T>(value: T, warning: string, ctx: ExtensionContext): T | undefined => {
         let hit = false;
