@@ -2,29 +2,23 @@
  * pingme.ts - Pi Extension
  *
  * Calls a URL when the agent settles after running for more than 1 minute
- * (or --pingme-after <seconds>).
+ * (or PINGME_AFTER=<seconds>).
  *
- * Activate by giving the URL with --pingme <url> .
+ * Activate by setting PINGME=<url> in the environment.
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 export default function (pi: ExtensionAPI) {
-    pi.registerFlag("pingme", {
-        description: "URL to GET when a long agent run settles (>1 min)",
-        type: "string",
-    });
-    pi.registerFlag("pingme-after", {
-        description: "Seconds an agent run must take before --pingme fires (default 60)",
-        type: "string",
-    });
+    // Do not register any hooks if no ping URL is configured.
+    const url = process.env.PINGME;
+    if (!url) return;
 
+    const afterMs = Number(process.env.PINGME_AFTER ?? 60) * 1000;
     let agentStartTime: number | null = null;
 
     pi.on("agent_start", () => {
-        if (agentStartTime === null) {
-            agentStartTime = Date.now();
-        }
+        agentStartTime ??= Date.now();
     });
 
     pi.on("agent_settled", () => {
@@ -33,14 +27,10 @@ export default function (pi: ExtensionAPI) {
         const elapsed = Date.now() - agentStartTime;
         agentStartTime = null;
 
-        const after = Number(pi.getFlag("pingme-after") ?? 60);
-        if (elapsed > after * 1000) {
-            const url = pi.getFlag("pingme") as string | undefined;
-            if (url) {
-                fetch(url).catch((err) => {
-                    console.error("[pingme] fetch failed:", err.message);
-                });
-            }
+        if (elapsed > afterMs) {
+            fetch(url).catch((err) => {
+                console.error("[pingme] fetch failed:", err.message);
+            });
         }
     });
 }
