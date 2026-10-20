@@ -14,8 +14,14 @@ export default function (pi: ExtensionAPI) {
     const url = process.env.PINGME;
     if (!url) return;
 
-    const afterMs = Number(process.env.PINGME_AFTER ?? 60) * 1000;
+    const afterSec = Number(process.env.PINGME_AFTER ?? 60);
+    const afterMs = afterSec * 1000;
     let agentStartTime: number | null = null;
+
+    // Use "warning" so Pi TUI doesn't coalesce consecutive session_start info lines.
+    pi.on("session_start", (_event, ctx) => {
+        ctx.ui.notify(`🔔 pingme: Active (>${afterSec}s)`, "warning");
+    });
 
     pi.on("agent_start", () => {
         agentStartTime ??= Date.now();

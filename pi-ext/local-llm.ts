@@ -115,4 +115,10 @@ export default async function (pi: ExtensionAPI) {
       maxTokens: m.max_tokens,
     })),
   });
+
+  // Use "warning" so Pi TUI doesn't coalesce consecutive session_start info lines.
+  pi.on("session_start", (_event, ctx) => {
+    const n = result.models.length;
+    ctx.ui.notify(`🧠 local-llm: ${n} model${n === 1 ? "" : "s"} at ${baseUrl}`, "warning");
+  });
 }

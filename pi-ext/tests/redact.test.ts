@@ -14,13 +14,23 @@ const REDACTED = "<REDACTED--PLEASE-DO-NOT-READ-SECRETS>";
 
 let pi: ReturnType<typeof startPi> | undefined;
 let dir: string;
+let savedEnv: Record<string, string | undefined>;
 
 beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), "pi-ext-redact-"));
+    // Strip host secret-named env vars so subprocess secret counts are deterministic.
+    savedEnv = {};
+    for (const k of Object.keys(process.env)) {
+        if (/(?:^|_)(?:KEY|PASS|PASSWORD|SECRET|TOKEN)$|_PWD$/i.test(k)) {
+            savedEnv[k] = process.env[k];
+            delete process.env[k];
+        }
+    }
 });
 afterEach(() => {
     pi?.stop();
     rmSync(dir, { recursive: true, force: true });
+    Object.assign(process.env, savedEnv);
 });
 
 describe("isSecret", () => {
@@ -80,6 +90,7 @@ describe("isSecret", () => {
         expect(isSecret("3600", "TOKEN_TTL")).toBe(false); // TOKEN is prefix, not suffix
         expect(isSecret("true", "PASS_THROUGH")).toBe(false); // PASS is prefix + boolean
         expect(isSecret("/home/user", "PWD")).toBe(false); // bare PWD (working dir) ignored
+        expect(isSecret("/etc/ssl/private/key.pem", "SSL_KEY")).toBe(false); // file path ignored even with _KEY
         expect(isSecret("null", "API_KEY")).toBe(false); // trivial literal
         expect(isSecret("false", "USE_KEY")).toBe(false); // trivial literal
         expect(isSecret("ab", "API_KEY")).toBe(false); // < 4 chars
@@ -129,6 +140,21 @@ describe("loadSecrets", () => {
             expect(loaded[i - 1]!.length).toBeGreaterThanOrEqual(loaded[i]!.length);
         }
     });
+
+    it("collects process env secrets only for matching key names and ignores paths", () => {
+        const loaded = loadSecrets(dir, {
+            OPENAI_API_KEY: "envsecret",
+            GITHUB_TOKEN: "ghp_1234567890abcdef",
+            SSL_KEY: "/etc/ssl/private/server.key",
+            TERM_SESSION_ID: "550e8400-e29b-41d4-a716-446655440000",
+            GIT_COMMIT: "a1b2c3d4e5f60718",
+        });
+        expect(loaded).toContain("envsecret");
+        expect(loaded).toContain("ghp_1234567890abcdef");
+        expect(loaded).not.toContain("/etc/ssl/private/server.key");
+        expect(loaded).not.toContain("550e8400-e29b-41d4-a716-446655440000");
+        expect(loaded).not.toContain("a1b2c3d4e5f60718");
+    });
 });
 
 describe("redact extension", () => {
@@ -157,7 +183,7 @@ describe("redact extension", () => {
             `SEEN: urlEnc=${REDACTED} b64=${REDACTED} uuid=${REDACTED} url=https://user:${REDACTED}@domain.com/uri pem=${REDACTED} port=8080 mode=production`,
         );
         expect(pi.notifies).toEqual([
-            { message: "redact: Protecting 5 secrets", notifyType: "info" },
+            { message: "🕵️ redact: Protecting 5 secrets", notifyType: "warning" },
             { message: "redact: Redacted secret in outbound LLM context", notifyType: "warning" },
         ]);
     });
@@ -174,8 +200,8 @@ describe("redact extension", () => {
 
         expect(await pi.lastText()).toBe(`SEEN: after=${REDACTED}`);
         expect(pi.notifies).toContainEqual({
-            message: "redact: Protecting 1 secret",
-            notifyType: "info",
+            message: "🕵️ redact: Protecting 1 secret",
+            notifyType: "warning",
         });
     });
 
@@ -192,7 +218,7 @@ describe("redact extension", () => {
         expect(text).toContain(`token is ${REDACTED} here`);
         expect(text).not.toContain("MyTopSecret99");
         expect(pi.notifies).toEqual([
-            { message: "redact: Protecting 1 secret", notifyType: "info" },
+            { message: "🕵️ redact: Protecting 1 secret", notifyType: "warning" },
             { message: "redact: Redacted secret in read tool output", notifyType: "warning" },
         ]);
     });

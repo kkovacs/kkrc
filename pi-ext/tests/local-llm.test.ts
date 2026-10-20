@@ -48,6 +48,7 @@ describe("local-llm", () => {
             ["big", 32768, ["text", "image"], `${url}/v1`],
             ["small", 128_000, ["text"], `${url}/v1`], // defaults
         ]);
+        expect(pi!.notifies).toEqual([{ message: `🧠 local-llm: 2 models at ${url}`, notifyType: "warning" }]);
     });
 
     it("falls back to /models, then chats without /v1", async () => {
@@ -56,6 +57,7 @@ describe("local-llm", () => {
         const models = await localModels(url);
 
         expect(models.map((m) => [m.id, m.contextWindow, m.baseUrl])).toEqual([["m", 8192, url]]);
+        expect(pi!.notifies).toEqual([{ message: `🧠 local-llm: 1 model at ${url}`, notifyType: "warning" }]);
     });
 
     it("registers nothing when the server is unreachable, and Pi still starts", async () => {
@@ -63,5 +65,6 @@ describe("local-llm", () => {
         server!.stop(true); // port now refuses connections
 
         expect(await localModels(url)).toEqual([]);
+        expect(pi!.notifies).toEqual([]);
     });
 });
