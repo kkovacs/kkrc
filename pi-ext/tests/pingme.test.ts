@@ -1,5 +1,5 @@
 // pingme.ts against a real Pi with the faux LLM (see rpc.ts). A local HTTP
-// server counts the pings; --pingme-after 1 keeps the tests fast, and the
+// server counts the pings; PINGME_AFTER=1 keeps the tests fast, and the
 // faux "SLOW" turn takes 1.5s.
 // Run: bun test ~/.kkrc/pi-ext
 
@@ -33,9 +33,9 @@ function counter() {
 const pingWindow = () => Bun.sleep(300);
 
 describe("pingme", () => {
-    it("pings after a run longer than --pingme-after", async () => {
+    it("pings after a run longer than PINGME_AFTER", async () => {
         const { url, hits } = counter();
-        pi = startPi([PINGME], { args: ["--no-session", "--pingme", url, "--pingme-after", "1"] });
+        pi = startPi([PINGME], { env: { PINGME: url, PINGME_AFTER: "1" } });
 
         await pi.turn("SLOW");
         await pingWindow();
@@ -45,7 +45,7 @@ describe("pingme", () => {
 
     it("does not ping after a shorter run", async () => {
         const { url, hits } = counter();
-        pi = startPi([PINGME], { args: ["--no-session", "--pingme", url, "--pingme-after", "1"] });
+        pi = startPi([PINGME], { env: { PINGME: url, PINGME_AFTER: "1" } });
 
         await pi.turn("one");
         await pingWindow();
@@ -53,9 +53,9 @@ describe("pingme", () => {
         expect(hits).toEqual([]);
     });
 
-    it("does nothing without --pingme", async () => {
+    it("does nothing without PINGME", async () => {
         const { hits } = counter();
-        pi = startPi([PINGME], { args: ["--no-session", "--pingme-after", "1"] });
+        pi = startPi([PINGME], { env: { PINGME: "", PINGME_AFTER: "1" } });
 
         await pi.turn("SLOW");
         await pingWindow();

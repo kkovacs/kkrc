@@ -162,10 +162,11 @@ describe("redact extension", () => {
         ]);
     });
 
-    it("reloads .env* secrets on session_start (fired by /reload and new_session)", async () => {
+    it("stays silent with 0 secrets and reloads .env* secrets on new_session / reload", async () => {
         pi = startPi([REDACT_EXT], { cwd: dir });
         await pi.turn("before=NewSecretAddedLater99");
         expect(await pi.lastText()).toBe("SEEN: before=NewSecretAddedLater99");
+        expect(pi.notifies).toEqual([]);
 
         writeFileSync(join(dir, ".env.local"), "LATE_KEY=NewSecretAddedLater99\n");
         await pi.send({ type: "new_session" });
