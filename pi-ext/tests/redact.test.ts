@@ -47,9 +47,6 @@ describe("isSecret", () => {
         expect(isSecret("550e8400-e29b-41d4-a716-446655440000")).toBe(true); // UUID
         expect(isSecret("sk_live_abcdefghijkl")).toBe(true); // sk_ prefix (all lowercase)
         expect(isSecret("sk-ant-api03-abcdefgh")).toBe(true); // sk- prefix (no uppercase)
-        expect(
-            isSecret("-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA12345678\n-----END RSA PRIVATE KEY-----"),
-        ).toBe(true);
     });
 
     it("ignores short, numeric, whitespace, or single-case non-hex strings", () => {
@@ -121,8 +118,7 @@ describe("loadSecrets", () => {
         writeFileSync(join(sub, ".env.local"), "SUB_KEY=D7s(bn`Z''/1bQFI\n");
         writeFileSync(
             join(sub, ".env.prod"),
-            "DB_URL=postgres://admin:UrlPass99xyz@db.example.com:5432/app\nPUBLIC_URL=https://example.com/ApiV1/2026\n" +
-                "PEM=\"-----BEGIN PRIVATE KEY-----\\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgw\\n-----END PRIVATE KEY-----\"\n",
+            "DB_URL=postgres://admin:UrlPass99xyz@db.example.com:5432/app\nPUBLIC_URL=https://example.com/ApiV1/2026\n",
         );
 
         const loaded = loadSecrets(sub);
@@ -133,8 +129,6 @@ describe("loadSecrets", () => {
         // URL-encoded and base64 variants
         expect(loaded).toContain(encodeURIComponent("D7s(bn`Z''/1bQFI"));
         expect(loaded).toContain(Buffer.from("RootSecret123").toString("base64"));
-        // PEM body line
-        expect(loaded).toContain("MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgw");
         // Sorted longest-first
         for (let i = 1; i < loaded.length; i++) {
             expect(loaded[i - 1]!.length).toBeGreaterThanOrEqual(loaded[i]!.length);
@@ -167,32 +161,35 @@ describe("redact extension", () => {
         );
         writeFileSync(
             join(sub, ".env.local"),
-            "HEX_KEY=deadbeefcafebabe01\nPORT=8080\nMODE=production\nNOTE=\"has spaces Ab1\"\n" +
-                "SSH_KEY=\"-----BEGIN OPENSSH PRIVATE KEY-----\\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmU=\\n-----END OPENSSH PRIVATE KEY-----\"\n",
+            "HEX_KEY=deadbeefcafebabe01\nPORT=8080\nMODE=production\nNOTE=\"has spaces Ab1\"\n",
         );
 
         const b64 = Buffer.from("deadbeefcafebabe01").toString("base64");
         const urlEnc = encodeURIComponent("D7s(bn`Z''/1bQFI");
+        const pem = "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmU=\n-----END OPENSSH PRIVATE KEY-----";
 
         pi = startPi([REDACT_EXT], { cwd: sub });
         await pi.turn(
-            `urlEnc=${urlEnc} b64=${b64} uuid=550e8400-e29b-41d4-a716-446655440000 url=https://user:UrlSecr3t99@domain.com/uri pem=b3BlbnNzaC1rZXktdjEAAAAABG5vbmU= port=8080 mode=production`,
+            `urlEnc=${urlEnc} b64=${b64} uuid=550e8400-e29b-41d4-a716-446655440000 url=https://user:UrlSecr3t99@domain.com/uri pem=${pem} port=8080 mode=production`,
         );
 
         expect(await pi.lastText()).toBe(
             `SEEN: urlEnc=${REDACTED} b64=${REDACTED} uuid=${REDACTED} url=https://user:${REDACTED}@domain.com/uri pem=${REDACTED} port=8080 mode=production`,
         );
         expect(pi.notifies).toEqual([
-            { message: "🕵️ redact: Protecting 5 secrets", notifyType: "warning" },
+            { message: "🕵️ redact: Protecting 4 secrets", notifyType: "warning" },
             { message: "redact: Redacted secret in outbound LLM context", notifyType: "warning" },
         ]);
     });
 
-    it("stays silent with 0 secrets and reloads .env* secrets on new_session / reload", async () => {
+    it("notifies with 0 secrets, redacts truncated PEM blocks without END marker, and reloads .env* on new_session", async () => {
         pi = startPi([REDACT_EXT], { cwd: dir });
-        await pi.turn("before=NewSecretAddedLater99");
-        expect(await pi.lastText()).toBe("SEEN: before=NewSecretAddedLater99");
-        expect(pi.notifies).toEqual([]);
+        await pi.turn("before=NewSecretAddedLater99 head=-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA12345678");
+        expect(await pi.lastText()).toBe(`SEEN: before=NewSecretAddedLater99 head=${REDACTED}`);
+        expect(pi.notifies).toEqual([
+            { message: "🕵️ redact: Protecting 0 secrets", notifyType: "warning" },
+            { message: "redact: Redacted secret in outbound LLM context", notifyType: "warning" },
+        ]);
 
         writeFileSync(join(dir, ".env.local"), "LATE_KEY=NewSecretAddedLater99\n");
         await pi.send({ type: "new_session" });
