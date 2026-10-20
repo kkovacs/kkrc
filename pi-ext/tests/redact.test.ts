@@ -118,7 +118,19 @@ describe("loadSecrets", () => {
     it("walks from cwd up to parent directories, reads all .env* files, adds encoded variants, and sorts longest-first", () => {
         const sub = join(dir, "a", "b");
         mkdirSync(sub, { recursive: true });
-        writeFileSync(join(dir, ".env"), "ROOT_KEY=RootSecret123\nTRIVIAL=12345678\n");
+        writeFileSync(
+            join(dir, ".env"),
+            [
+                "ROOT_KEY=FirstRootSecret000",
+                "ROOT_KEY=RootSecret123",
+                "#ROOT_KEY=OldRootSecret456",
+                "#ROOT_KEY=EvenOlderRootSecret456",
+                "# GEMINI_API_KEY=CommentedGemini789",
+                "# just a normal comment without an assignment",
+                "#SHORT_KEY=short",
+                "TRIVIAL=12345678",
+            ].join("\n") + "\n",
+        );
         writeFileSync(join(sub, ".env.local"), "SUB_KEY=D7s(bn`Z''/1bQFI\n");
         writeFileSync(
             join(sub, ".env.prod"),
@@ -126,8 +138,13 @@ describe("loadSecrets", () => {
         );
 
         const loaded = loadSecrets(sub);
-        // Raw secrets
+        // Raw secrets (including duplicate active keys and commented-out secrets)
+        expect(loaded).toContain("FirstRootSecret000");
         expect(loaded).toContain("RootSecret123");
+        expect(loaded).toContain("OldRootSecret456");
+        expect(loaded).toContain("EvenOlderRootSecret456");
+        expect(loaded).toContain("CommentedGemini789");
+        expect(loaded).not.toContain("short");
         expect(loaded).toContain("D7s(bn`Z''/1bQFI");
         expect(loaded).toContain("UrlPass99xyz");
         // URL-encoded and base64 variants

@@ -53,10 +53,17 @@ function collectSecrets(cwd: string, env: NodeJS.ProcessEnv = process.env): { se
         try {
             for (const entry of readdirSync(dir, { withFileTypes: true })) {
                 if (!entry.name.startsWith(".env") || (!entry.isFile() && !entry.isSymbolicLink())) continue;
-                const parsed = parseEnv(readFileSync(join(dir, entry.name), "utf8"));
-                for (const [key, val] of Object.entries(parsed)) {
-                    const secret = typeof val === "string" ? extractSecret(val, key) : null;
-                    if (secret) raw.add(secret);
+                const content = readFileSync(join(dir, entry.name), "utf8");
+                // Also parse each line individually (stripping leading #) so duplicate and commented-out keys stay protected.
+                const parsed = [
+                    parseEnv(content),
+                    ...content.split("\n").map((line) => parseEnv(line.replace(/^\s*#+\s*/, ""))),
+                ];
+                for (const envObj of parsed) {
+                    for (const [key, val] of Object.entries(envObj)) {
+                        const secret = typeof val === "string" ? extractSecret(val, key) : null;
+                        if (secret) raw.add(secret);
+                    }
                 }
             }
         } catch {
