@@ -111,10 +111,11 @@ function scrub<T>(value: T, secrets: string[], onRedact: () => void): T {
 }
 
 export default function (pi: ExtensionAPI) {
-    let secrets: string[] = [];
+    // Scan at load time; if no secrets exist, hook nothing.
+    const { secrets, count } = collectSecrets(process.cwd());
+    if (count === 0) return;
 
     const redact = <T>(value: T, warning: string, ctx: ExtensionContext): T | undefined => {
-        if (secrets.length === 0) return undefined;
         let hit = false;
         const out = scrub(value, secrets, () => {
             hit = true;
@@ -125,9 +126,7 @@ export default function (pi: ExtensionAPI) {
     };
 
     pi.on("session_start", (_event, ctx) => {
-        const loaded = collectSecrets(ctx.cwd);
-        secrets = loaded.secrets;
-        ctx.ui.notify(`redact: Protecting ${loaded.count} secret${loaded.count === 1 ? "" : "s"}`, "info");
+        ctx.ui.notify(`redact: Protecting ${count} secret${count === 1 ? "" : "s"}`, "info");
     });
 
     // Scrub tool results immediately (covers bash `cat .env`, read, codemode, etc.).

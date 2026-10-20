@@ -7,7 +7,7 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 const DEFAULT_URL = "http://127.0.0.1:9931";
-const PROBE_TIMEOUT_MS = 2000;
+const PROBE_TIMEOUT_MS = 500;
 const DEFAULT_CONTEXT_WINDOW = 128_000;
 const DEFAULT_MAX_TOKENS = 16_384;
 
@@ -79,7 +79,8 @@ async function probe(baseUrl: string, apiKey?: string) {
       if (models.length === 0) continue;
       return { chatBase: t.chat, models };
     } catch {
-      // try next
+      // Server unreachable or timed out; don't retry another path on the same dead origin.
+      return null;
     }
   }
   return null;
