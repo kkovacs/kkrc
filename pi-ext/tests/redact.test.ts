@@ -217,6 +217,11 @@ describe("redact extension", () => {
             { message: "🕵️ redact: Redacted 1 secret in outbound LLM context", notifyType: "warning" },
         ]);
 
+        // PEM blocks have no env key name, so /redact shows the placeholder.
+        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.includes("so far:"));
+        await pi.send({ type: "prompt", message: "/redact" });
+        expect((await stats).message).toBe("🕵️ redact: 1 redaction so far: <PEM private key> (protecting 0 secrets)");
+
         writeFileSync(join(dir, ".env.local"), "LATE_KEY=NewSecretAddedLater99\n");
         await pi.send({ type: "new_session" });
         await pi.turn("after=NewSecretAddedLater99");
@@ -258,10 +263,10 @@ describe("redact extension", () => {
 
         // Extension commands run immediately (disposition "handled"), no LLM turn starts.
         // Waiter registered before sending so the notify cannot slip past it.
-        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.includes("redaction"));
+        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.includes("so far:"));
         const resp = await pi.send({ type: "prompt", message: "/redact" });
         expect(resp.data?.disposition).toBe("handled");
-        expect((await stats).message).toBe("🕵️ redact: 3 redactions so far (protecting 1 secret)");
+        expect((await stats).message).toBe("🕵️ redact: 3 redactions so far: SECRET_TOKEN (protecting 1 secret)");
     });
 
     it("/redact reports zero redactions when nothing was redacted", async () => {
