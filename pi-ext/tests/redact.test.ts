@@ -1,5 +1,5 @@
-// redact.ts tests: secret classification, parent .env discovery, and
-// end-to-end Pi RPC redaction for user prompts and tool results.
+// redact.ts tests: secret classification, parent .env discovery, end-to-end
+// Pi RPC redaction for user prompts and tool results, and the /redact command.
 // Run: PI_PATH=$(which pi) bun test ~/.kkrc/pi-ext/tests
 
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
@@ -244,5 +244,30 @@ describe("redact extension", () => {
             { message: "🕵️ redact: Protecting 1 secret", notifyType: "warning" },
             { message: "🕵️ redact: Redacted 1 secret in read tool output", notifyType: "warning" },
         ]);
+    });
+
+    it("/redact counts redactions across calls and resets only on reload", async () => {
+        writeFileSync(join(dir, ".env"), "SECRET_TOKEN=MyTopSecret99\n");
+        pi = startPi([REDACT_EXT], { cwd: dir });
+
+        // context_with_system scrubs the cumulative transcript: turn 1 hits 1
+        // occurrence, turn 2 re-hits turn 1's plus its own = 2, so 3 in total.
+        await pi.turn("leak1=MyTopSecret99");
+        await pi.turn("leak2=MyTopSecret99");
+        expect(pi.notifies.filter((n) => n.message.includes("Redacted")).length).toBe(2);
+
+        // Extension commands run immediately (disposition "handled"), no LLM turn starts.
+        // Waiter registered before sending so the notify cannot slip past it.
+        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.includes("redaction"));
+        const resp = await pi.send({ type: "prompt", message: "/redact" });
+        expect(resp.data?.disposition).toBe("handled");
+        expect((await stats).message).toBe("🕵️ redact: 3 redactions so far (protecting 1 secret)");
+    });
+
+    it("/redact reports zero redactions when nothing was redacted", async () => {
+        pi = startPi([REDACT_EXT], { cwd: dir });
+        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.includes("No redactions yet"));
+        await pi.send({ type: "prompt", message: "/redact" });
+        expect((await stats).message).toBe("🕵️ redact: No redactions yet (protecting 0 secrets)");
     });
 });
