@@ -1,4 +1,4 @@
-// Local LLM provider. Discovers models from an OpenAI-compatible server
+// AutoLLM provider. Discovers models from an OpenAI-compatible server
 // (llama.cpp, vLLM, LM Studio, ...) and registers them with Pi.
 // Pi clamps max output tokens to the live context on every request, so we
 // only feed it the real context window -- that's what makes its clamp and
@@ -87,8 +87,8 @@ async function probe(baseUrl: string, apiKey?: string) {
 }
 
 export default async function (pi: ExtensionAPI) {
-  const baseUrl = (process.env.LOCAL_URL ?? DEFAULT_URL).replace(/\/+$/, "");
-  const envKey = process.env.LOCAL_KEY;
+  const baseUrl = (process.env.LLM_URL ?? DEFAULT_URL).replace(/\/+$/, "");
+  const envKey = process.env.LLM_KEY;
 
   const result = await probe(baseUrl, envKey);
   if (!result) return; // unreachable: skip silently so startup isn't blocked
@@ -100,8 +100,8 @@ export default async function (pi: ExtensionAPI) {
   // *any* non-empty key even when unauthenticated.
   // XXX: llama.cpp (OpenAI mode) /v1/models already carries meta.n_ctx
   // (validated: 131072); singular /v1/model 404s. 128k is just a safe floor.
-  pi.registerProvider("local-llm", {
-    name: "Local LLM",
+  pi.registerProvider("autollm", {
+    name: "AutoLLM",
     baseUrl: result.chatBase,
     apiKey: envKey ?? "no-key",
     api: "openai-completions",
@@ -119,6 +119,6 @@ export default async function (pi: ExtensionAPI) {
   // Use "warning" so Pi TUI doesn't coalesce consecutive session_start info lines.
   pi.on("session_start", (_event, ctx) => {
     const n = result.models.length;
-    ctx.ui.notify(`🧠 local-llm: ${n} model${n === 1 ? "" : "s"} at ${baseUrl}`, "warning");
+    ctx.ui.notify(`🧠 autollm: ${n} model${n === 1 ? "" : "s"} at ${baseUrl}`, "warning");
   });
 }
