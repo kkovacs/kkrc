@@ -16,6 +16,14 @@ let pi: ReturnType<typeof startPi> | undefined;
 let dir: string;
 let savedEnv: Record<string, string | undefined>;
 
+// PEM fixtures are split so no contiguous "-----BEGIN ... PRIVATE KEY-----" marker
+// exists on disk in this file — with the redact extension loaded, reading this
+// source back would otherwise mangle it (truncated markers eat to end of file).
+// XXX: pasting an unsplit marker here re-arms the trap.
+const PEM_OPENSSH =
+    "-----BEGIN " + "OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmU=\n-----END OPENSSH PRIVATE KEY-----";
+const PEM_RSA_TRUNCATED = "-----BEGIN " + "RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA12345678";
+
 beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), "pi-ext-redact-"));
     // Strip host secret-named env vars so subprocess secret counts are deterministic.
@@ -192,7 +200,7 @@ describe("redact extension", () => {
 
         const b64 = Buffer.from("deadbeefcafebabe01").toString("base64");
         const urlEnc = encodeURIComponent("D7s(bn`Z''/1bQFI");
-        const pem = "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmU=\n-----END OPENSSH PRIVATE KEY-----";
+        const pem = PEM_OPENSSH;
 
         pi = startPi([REDACT_EXT], { cwd: sub });
         await pi.turn(
@@ -210,7 +218,7 @@ describe("redact extension", () => {
 
     it("notifies with 0 secrets, redacts truncated PEM blocks without END marker, and reloads .env* on new_session", async () => {
         pi = startPi([REDACT_EXT], { cwd: dir });
-        await pi.turn("before=NewSecretAddedLater99 head=-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA12345678");
+        await pi.turn("before=NewSecretAddedLater99 head=" + PEM_RSA_TRUNCATED);
         expect(await pi.lastText()).toBe(`SEEN: before=NewSecretAddedLater99 head=${REDACTED}`);
         expect(pi.notifies).toEqual([
             { message: "🕵️ redact: Protecting 0 secrets", notifyType: "warning" },
