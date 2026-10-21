@@ -119,9 +119,15 @@ function scrub<T>(value: T, secrets: string[], onRedact: (s: string) => void): T
 export default function (pi: ExtensionAPI) {
     const { secrets, count } = collectSecrets(process.cwd());
 
+    // Module-level so `/reload` (fresh runtime) doubles as the counter reset.
+    let redactions = 0;
+
     const redact = <T>(value: T, where: string, ctx: ExtensionContext): T | undefined => {
         const hits = new Set<string>();
-        const out = scrub(value, secrets, (s) => hits.add(s));
+        const out = scrub(value, secrets, (s) => {
+            hits.add(s);
+            redactions++;
+        });
         if (!hits.size) return undefined;
         ctx.ui.notify(`🕵️ redact: Redacted ${hits.size} secret${hits.size === 1 ? "" : "s"} in ${where}`, "warning");
         return out;
@@ -144,4 +150,17 @@ export default function (pi: ExtensionAPI) {
     // Scrub full outbound transcript (system prompt, user prompts, !bash, tool results)
     // right before each LLM call.
     pi.on("context_with_system", (e, ctx) => redact({ messages: e.messages }, "outbound LLM context", ctx));
+
+    // Redaction statistics command.
+    pi.registerCommand("redact", {
+        description: "Show redaction statistics",
+        handler: async (_args, ctx) => {
+            ctx.ui.notify(
+                redactions
+                    ? `🕵️ redact: ${redactions} redaction${redactions === 1 ? "" : "s"} so far (protecting ${count} secret${count === 1 ? "" : "s"})`
+                    : `🕵️ redact: No redactions yet (protecting ${count} secret${count === 1 ? "" : "s"})`,
+                "info",
+            );
+        },
+    });
 }
