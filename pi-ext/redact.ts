@@ -21,7 +21,7 @@ const TOKEN_PREFIX_RE =
     /^(?:sk[_-]|rk_(?:live|test)_|whsec_|gh[pousr]_|github_pat_|glpat-|xox[bpars]-|xapp-|AKIA|ASIA|AIza|hf_|npm_|pypi-|SG\.)/;
 const URL_RE = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//;
 const URL_PASS_RE = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/[^/:?#\s]*:([^/?#\s]+)@/;
-const SECRET_KEY_NAME_RE = /(?:^|_)(?:KEY|PASS|PASSWORD|SECRET|TOKEN)$|_PWD$/i;
+const SECRET_KEY_NAME_RE = /(?:^|_)(?:KEY|PASS|PASSWORD|SECRET|TOKEN|PSWD)$|_PWD$/i;
 const URL_KEY_NAME_RE = /(?:^|_)(?:URL|URI)$/i;
 const SINGLE_CASE_WORD_RE = /^[a-z]+$|^[A-Z]+$/;
 
