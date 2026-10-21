@@ -38,16 +38,17 @@ export function extractSecret(v: string, key = ""): string | null {
     return isSecret(v, key) ? v : null;
 }
 
-function addSecretVariants(found: Set<string>, secret: string): void {
-    found.add(secret);
-    found.add(encodeURIComponent(secret));
-    found.add(Buffer.from(secret).toString("base64"));
+function addSecretVariants(found: Map<string, string>, secret: string, key: string): void {
+    for (const variant of [secret, encodeURIComponent(secret), Buffer.from(secret).toString("base64")]) {
+        if (!found.has(variant)) found.set(variant, key);
+    }
 }
 
 // Walk from cwd up to / collecting secrets from every .env* file and process.env.
 // Longest-first order prevents a prefix secret from partially eating a longer one.
-function collectSecrets(cwd: string, env: NodeJS.ProcessEnv = process.env): { secrets: string[]; count: number } {
+function collectSecrets(cwd: string, env: NodeJS.ProcessEnv = process.env): { secrets: string[]; count: number; keys: Map<string, string> } {
     const raw = new Set<string>();
+    const rawKeys = new Map<string, string>();
     let dir = resolve(cwd);
     while (true) {
         try {
@@ -62,6 +63,7 @@ function collectSecrets(cwd: string, env: NodeJS.ProcessEnv = process.env): { se
                 for (const envObj of parsed) {
                     for (const [key, val] of Object.entries(envObj)) {
                         const secret = typeof val === "string" ? extractSecret(val, key) : null;
+                        if (secret && !rawKeys.has(secret)) rawKeys.set(secret, key);
                         if (secret) raw.add(secret);
                     }
                 }
@@ -76,12 +78,18 @@ function collectSecrets(cwd: string, env: NodeJS.ProcessEnv = process.env): { se
 
     for (const [key, val] of Object.entries(env)) {
         const secret = typeof val === "string" ? extractSecret(val, key) : null;
+        if (secret && !rawKeys.has(secret)) rawKeys.set(secret, key);
         if (secret) raw.add(secret);
     }
 
-    const found = new Set<string>();
-    for (const secret of raw) addSecretVariants(found, secret);
-    return { secrets: [...found].sort((a, b) => b.length - a.length), count: raw.size };
+    // Map variant → first key name; secret may appear under several keys (first wins).
+    const found = new Map<string, string>();
+    for (const [secret, key] of rawKeys) addSecretVariants(found, secret, key);
+    return {
+        secrets: [...found.keys()].sort((a, b) => b.length - a.length),
+        keys: found,
+        count: raw.size,
+    };
 }
 
 export function loadSecrets(cwd: string, env: NodeJS.ProcessEnv = process.env): string[] {
@@ -117,16 +125,19 @@ function scrub<T>(value: T, secrets: string[], onRedact: (s: string) => void): T
 }
 
 export default function (pi: ExtensionAPI) {
-    const { secrets, count } = collectSecrets(process.cwd());
+    const { secrets, keys, count } = collectSecrets(process.cwd());
 
     // Module-level so `/reload` (fresh runtime) doubles as the counter reset.
     let redactions = 0;
+    const redactedKeys = new Set<string>();
 
     const redact = <T>(value: T, where: string, ctx: ExtensionContext): T | undefined => {
         const hits = new Set<string>();
         const out = scrub(value, secrets, (s) => {
             hits.add(s);
             redactions++;
+            // Map lookup covers raw/encoded/base64 variants; PEM blocks have no key.
+            redactedKeys.add(keys.get(s) ?? "<PEM private key>");
         });
         if (!hits.size) return undefined;
         ctx.ui.notify(`🕵️ redact: Redacted ${hits.size} secret${hits.size === 1 ? "" : "s"} in ${where}`, "warning");
@@ -157,7 +168,7 @@ export default function (pi: ExtensionAPI) {
         handler: async (_args, ctx) => {
             ctx.ui.notify(
                 redactions
-                    ? `🕵️ redact: ${redactions} redaction${redactions === 1 ? "" : "s"} so far (protecting ${count} secret${count === 1 ? "" : "s"})`
+                    ? `🕵️ redact: ${redactions} redaction${redactions === 1 ? "" : "s"} so far: ${[...redactedKeys].sort().join(", ")} (protecting ${count} secret${count === 1 ? "" : "s"})`
                     : `🕵️ redact: No redactions yet (protecting ${count} secret${count === 1 ? "" : "s"})`,
                 "info",
             );
