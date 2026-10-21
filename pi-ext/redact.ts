@@ -13,6 +13,9 @@ import { parseEnv } from "node:util";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 const REDACTED = "<REDACTED--PLEASE-DO-NOT-READ-SECRETS>";
+// Regex must not match its own literal: "["/"*" are outside [A-Z0-9 ].
+// XXX: keep it that way — a self-matching marker here would make the redact
+// extension mangle this file's content when it is read back in a loaded session.
 const PEM_BLOCK_RE = /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----[\s\S]*?(?:-----END [A-Z0-9 ]*PRIVATE KEY-----|$)/g;
 const TOKEN_PREFIX_RE =
     /^(?:sk[_-]|rk_(?:live|test)_|whsec_|gh[pousr]_|github_pat_|glpat-|xox[bpars]-|xapp-|AKIA|ASIA|AIza|hf_|npm_|pypi-|SG\.)/;
