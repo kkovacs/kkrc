@@ -421,6 +421,7 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "Setup PROD (w)arn .................." "w" "send-keys ' printf \"\\033[00;31mPRODUCTION SERVER\\033[00m\" | sudo tee /etc/debian_chroot ; . ~/.bashrc' enter" \
 "Remove PROD (W)arn ................." "W" "send-keys ' sudo rm /etc/debian_chroot; unset debian_chroot' enter" \
 "" \
+"mkdir (f)oo & git init ............." "f" "send-keys ' mkdir foo && cd foo && git init -b main && touch .gitignore && git add .gitignore && git -c user.email=\\\"$USER@$HOSTNAME\\\" -c user.name=\\\"$USER\\\" commit -m init && git status -sb' enter" \
 "sudo (t)ouch /snapshotme ..........." "t" "send-keys ' sudo touch /snapshotme; echo -n Commencing in ~\$(( 60 - \$( date +%-S ) )) secs; while [[ -f /snapshotme ]]; do echo -n .; sleep 1; done; echo' enter" \
 "" \
 "kk+uv+bun+pi ......................." "1" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_kkrc ; setup_bun ; setup_python_uv ; setup_pi ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
@@ -497,7 +498,6 @@ bind -T menus "n" display-menu -T " NodeJS... " \
 
 # Submenu: tools
 bind -T menus "t" display-menu -T " Tools / platforms... " \
-"mkdir foo & git init ..............." "g" "send-keys ' mkdir foo && cd foo && git init -b main && touch .gitignore && git add .gitignore && git -c user.email=\\\"$USER@$HOSTNAME\\\" -c user.name=\\\"$USER\\\" commit -m init && git status -sb' enter" \
 "Inject fancy 'set -x' .............." "x" "send-keys \"export PS4=\$'+\\\\t\$(date -Iseconds) L\\\$LINENO:\\\\t '\" enter" \
 "" \
 "Install (o)bscura .................." "o" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/h4ckf0r0day/obscura/releases/latest/download/obscura-\$(uname -m)-linux.tar.gz | tar zxv -C ~/.local/bin/' enter" \
