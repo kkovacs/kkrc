@@ -118,7 +118,8 @@ function gl(){ git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Crese
 function gs(){ git status -sb "$@"; }
 function gf(){ git fetch --all -v "$@"; }
 function gp(){ git pull --ff-only -v "$@"; }
-export -f ts gl gs gf gp
+function ga(){ git commit --amend "$@"; }
+export -f ts gl gs gf gp ga
 # W: "git add + commit" changed files (not untracked).
 function W() { git add -u ; git commit -m wip ; gs ; } ; export -f W
 # gap: "git pull + add + push": sync, to be used with a notes directory
