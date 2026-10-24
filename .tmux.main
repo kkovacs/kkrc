@@ -557,7 +557,7 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "Clean up opencode ......................." "O" "send-keys ' rm -rf ~/{.config,.local/state,.local/share,.cache}/opencode ~/.bun ; rm -rf ~/.local/bin/opencode ~/.local/bin/opencode2 ' enter" \
 "" \
 "Install Codex CLI (yolo) ................" "y" "send-keys ' curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh; mkdir -p ~/.codex; [ -e ~/.codex/config.toml ] || printf \"approval_policy = \\\"never\\\"\\nsandbox_mode = \\\"danger-full-access\\\"\\n\" >~/.codex/config.toml' enter" \
-"Install Claude Code (yolo) .............." "Y" "send-keys ' curl -fsSL https://claude.ai/install.sh | bash; mkdir -p ~/.claude; [ -e ~/.claude/settings.json ] || echo \"{ \\\"permissions\\\": { \\\"defaultMode\\\": \\\"bypassPermissions\\\" } }\" >~/.claude/settings.json' enter" \
+"Install Claude Code (yolo) .............." "Y" "send-keys ' curl -fsSL https://claude.ai/install.sh | bash; mkdir -p ~/.claude; [ -e ~/.claude/settings.json ] || echo \"{ \\\"permissions\\\": { \\\"defaultMode\\\": \\\"bypassPermissions\\\" }, \\\"theme\\\": \\\"auto\\\", \\\"skipDangerousModePermissionPrompt\\\": true }\" >~/.claude/settings.json' enter" \
 "Download Vercel fx ......................" "" "send-keys ' mkdir -p ~/.local/bin && curl -fsSL \"https://releases.fx.sh/\$(curl -fsSL https://releases.fx.sh/latest.txt)/fx-linux-\$(uname -m).tar.gz\" | tar -xz -C ~/.local/bin/ fx' enter" \
 "" \
 "uv tool mlx_lm.server … ................." "x" "send-keys 'uv tool install mlx-lm && mlx_lm.server --port 9931 --model '" \
