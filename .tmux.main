@@ -119,7 +119,7 @@ bind -T copy-mode-vi C-v send -X rectangle-toggle
 bind -T copy-mode-vi Enter send -X copy-selection-and-cancel
 bind -T copy-mode-vi y send -X copy-selection-and-cancel
 bind -T copy-mode-vi Y send -X append-selection-and-cancel
-bind -T copy-mode-vi c-y send -X copy-pipe-and-cancel 'cat >>~/Desktop/tmux-copy.#S.#I.#P.#W.txt'
+bind -T copy-mode-vi c-y send -X copy-pipe-and-cancel 'cat >>~/Desktop/tmux-copy.#{q:session_name}.#I.#P.#{q:window_name}.txt'
 
 # Set word separators for word selection
 set -g word-separators " `'\"{}()[],;<>"
@@ -252,7 +252,7 @@ bind r send-keys -R \; clear-history \; refresh-client \; send-keys ^L
 bind x confirm-before -p "kill-pane #P? (y/n)" kill-pane
 
 # Log pane output to file (toggle)
-bind | pipe-pane -o 'cat >>~/Desktop/tmux-output.#S.#I.#P.#W.txt'
+bind | pipe-pane -o 'cat >>~/Desktop/tmux-output.#{q:session_name}.#I.#P.#{q:window_name}.txt'
 
 # Hardcopy pane visible
 bind y command-prompt -1 -p "Hardcopy VISIBLE pane in (a)scii or (c)olor?" "if-shell -F '#{==:%%,a}' 'capture-pane -J -b hardcopy' 'capture-pane -e -b hardcopy' ; save-buffer -b hardcopy '$HOME/Desktop/tmux-visible.#S.#I.#P.#W.#{client_activity}.txt' ; delete-buffer -b hardcopy ; display Saved"
@@ -503,7 +503,7 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "Install (o)bscura .................." "o" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/h4ckf0r0day/obscura/releases/latest/download/obscura-\$(uname -m)-linux.tar.gz | tar zxv -C ~/.local/bin/' enter" \
 "… (m)cp add obscura ................" "m" "send-keys ' mcp add browser -- obscura mcp --allow-private-network' enter" \
 "… (M)cp add chrome npx ............." "M" "send-keys ' mcp add chrome -- bun x chrome-devtools-mcp@latest --browserUrl=http://127.0.0.1:9222' enter" \
-"Docker run chrome CDP .............." "c" "send-keys 'sudo docker run -u `id -u $USER` -it --rm --add-host host.docker.internal:host-gateway -p 9222:9222 chromedp/headless-shell:latest --no-sandbox --disable-web-security --disable-site-isolation-trials --window-size=1280,720' enter" \
+"Docker run chrome CDP .............." "c" "send-keys 'sudo docker run -u `id -u $USER` -it --rm --add-host host.docker.internal:host-gateway -p 127.0.0.1:9222:9222 chromedp/headless-shell:latest --no-sandbox --disable-web-security --disable-site-isolation-trials --window-size=1280,720' enter" \
 "… params for (c)hrome devtools ....." "D" "send-keys ' --remote-debugging-port=9222 --user-data-dir=/tmp/cdp/ --disable-web-security --disable-site-isolation-trials --no-first-run --no-default-browser-check --disable-signin-promo --disable-sync --disable-infobars https://example.com/ ; rm -rf /tmp/cdp' enter" \
 "" \
 "Install (t)ailcat .................." "t" "send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/tailscale/tailcat/releases/latest/download/tailcat_0.7.0_linux_\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | tar zxv -C ~/.local/bin/ tailcat' enter" \
@@ -579,7 +579,7 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$SSH_AUTH_SOCK ..................." "" 'send-keys " export SSH_AUTH_SOCK=$(tmux show-environment SSH_AUTH_SOCK | cut -d= -f2)" enter' \
 "" \
-"Load (e)nv.age to tmux .................." "E" "display-popup -T \"Load env.age to tmux\" -EE bash -c \"age -i ~/.ssh/age.key -d ~/.ssh/env.age | awk '!/^\s*(\\\$|#)/ { sub(/=/, \\\" \\\"); print \\\"set-environment -h\\\", \$0 }' | tmux source-file -\" ; source-file ~/.kkrc/.tmux.main" \
+"Load (e)nv.age to tmux .................." "E" "display-popup -T \"Load env.age to tmux\" -EE ~/.kkrc/other/load-env.sh ; source-file ~/.kkrc/.tmux.main" \
 "Inject \$AI_GATEWAY_API_KEY (Vercel) ....." "v" "send-keys ' stty -echo' enter ' export AI_GATEWAY_API_KEY=#{AI_GATEWAY_API_KEY}; stty echo' enter" \
 "Inject \$ANTHROPIC_API_KEY ..............." "a" "send-keys ' stty -echo' enter ' export ANTHROPIC_API_KEY=#{ANTHROPIC_API_KEY}; stty echo' enter" \
 "Inject \$CLAUDE_CODE_OAUTH_TOKEN ........." "Y" "send-keys ' stty -echo' enter ' export CLAUDE_CODE_OAUTH_TOKEN=#{CLAUDE_CODE_OAUTH_TOKEN}; stty echo' enter" \
