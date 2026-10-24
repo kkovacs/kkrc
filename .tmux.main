@@ -4,8 +4,6 @@ set -g prefix c-q
 
 # C-s is XOFF: if you don't know how to reset it (C-q q) then it freezes your screen
 bind -n c-s ""
-# But occasionally we need it anyway, so "c-q c-s" sends it:
-bind c-s send c-s
 
 # Design. Use only plain unicode, still look somewhat special. No powerline special font needed
 #sepa=''	# Design #0
@@ -298,7 +296,6 @@ bind c-e pipe-pane -I 'cat ~/.kkrc/inject-ash.txt'
 #bind "c-f" usable
 #bind "c-g" usable
 #bind "c-n" usable
-#bind "c-s" usable
 #bind "c-t" usable
 #bind "c-u" usable
 #bind "c-v" usable
