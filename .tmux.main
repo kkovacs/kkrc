@@ -353,7 +353,6 @@ set -s command-alias[128] setup_frankenphp="send-keys ' mkdir -p ~/.local/bin ; 
 set -s command-alias[129] setup_composer="send-keys ' mkdir -p ~/.local/bin ; curl -Lo ~/.local/bin/composer https://github.com/composer/composer/releases/latest/download/composer.phar && chmod 755 ~/.local/bin/composer' enter"
 set -s command-alias[130] setup_static_php_cli="send-keys ' mkdir -p ~/.local/bin ; curl -L https://dl.static-php.dev/static-php-cli/bulk/php-8.5.12-cli-linux-\$(uname -m).tar.gz | tar xz --no-same-owner -C ~/.local/bin/' enter"
 set -s command-alias[131] get_pgweb="send-keys ' mkdir -p ~/.local/bin ; v=\$(curl -sfLo /dev/null -w \"%{url_effective}\" https://github.com/sosedoff/pgweb/releases/latest | sed \"s|.*/tag/||\") && curl -fLo /tmp/pgweb.zip https://github.com/sosedoff/pgweb/releases/download/\$v/pgweb_linux_\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").zip && unzip -o /tmp/pgweb.zip -d ~/.local/bin/' enter"
-set -s command-alias[132] setup_jupyterlab="send-keys 'uv pip install jupyterlab jupysql itables psycopg2-binary jupyterlab-git plotly ipywidgets duckdb duckdb-engine magic-duckdb && while true; do jupyter lab --ip=0.0.0.0 --port=80; sleep 1; done' enter"
 set -s command-alias[134] setup_python_uv="send-keys ' mkdir -p ~/.local/bin ; curl -L https://github.com/astral-sh/uv/releases/latest/download/uv-\$(uname -m)-unknown-linux-gnu.tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1' enter"
 set -s command-alias[124] setup_brew="send-keys ' NONINTERACTIVE=1 /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"' enter"
 # IMPORTANT: Uses the INJECT_AI_... env vars. Use some throw-away key because it gets exposed easily, for example an OpenRouter key restricted to $5/month.
@@ -480,8 +479,7 @@ bind -T menus "p" display-menu -T " PHP... " \
 bind -T menus "y" display-menu -T " Python... " \
 "Setup (u)v ........................." "u" setup_python_uv \
 "Setup classic .venv ................" "V" setup_python_venv \
-"Setup jupyterlab ..................." "J" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_python_uv ; send-keys 'uv venv ; . .venv/bin/activate ;' ; setup_jupyterlab ; send-keys 'EOF' enter '" \
-"Setup (s)treamlit .................." "s" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_python_uv ; send-keys 'uv venv ; . .venv/bin/activate ; uv pip install streamlit[charts] ; streamlit hello ' ; send-keys enter 'EOF' enter '" \
+"Setup (s)treamlit .................." "s" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_python_uv ; send-keys 'uv venv ; . .venv/bin/activate ; uv pip install streamlit[charts] ; streamlit hello ' ; send-keys enter 'EOF' enter " \
 "" \
 ". ./.venv/bin/activate ............." "0" "send-keys '. .venv/bin/activate' enter"
 
