@@ -55,7 +55,7 @@ export EDITOR=vim
 #export PAGER=less
 export LC_ALL="C.UTF-8" # No, don't try export LC_ALL="C", will mess up your UTF-8
 export LANG="C.UTF-8"
-export LESS="--mouse -R"
+export LESS="--mouse -RFX"
 export LESSHISTFILE=/dev/null
 
 # Colors! :)
