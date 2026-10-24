@@ -123,7 +123,7 @@ export -f ts gl gs gf gp ga
 # W: "git add + commit" changed files (not untracked).
 function W() { git add -u ; git commit -m wip ; gs ; } ; export -f W
 # unwip: fold the contiguous tip of "wip" commits into the index. Never move a commit any remote branch already contains.
-function unwip() { git diff --quiet HEAD || return 1; local c=$(git rev-parse HEAD); while [ "$(git log -1 --format=%s $c)" = wip ] && git rev-parse -q --verify $c^ >/dev/null && [ -z "$(git branch -r --contains $c)" ]; do c=$(git rev-parse $c^) || return 1; done; [ "$(git rev-list --count $c..HEAD)" -gt 1 ] || return 0; git reset --soft $c && gs; } ; export -f unwip
+function unwip() { git diff --quiet HEAD || return 1; local c=$(git rev-parse HEAD); while [ "$(git log -1 --format=%s $c)" = wip ] && git rev-parse -q --verify $c^ >/dev/null && [ -z "$(git branch -r --contains $c)" ]; do c=$(git rev-parse $c^) || return 1; done; git reset --soft $c && gs; } ; export -f unwip
 # gap: "git pull + add + push": sync, to be used with a notes directory
 function gap() { gs ; git pull --rebase --autostash ; git add -A ; git commit -m wip ; git push ; } ; export -f gap
 # gat: "git at": diff a file with itself at a given ref
