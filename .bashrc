@@ -127,7 +127,7 @@ function unwip() { git diff --quiet HEAD || return 1; local c=$(git rev-parse HE
 # gap: "git pull + add + push": sync, to be used with a notes directory
 function gap() { gs ; git pull --rebase --autostash ; git add -A ; git commit -m wip ; git push ; } ; export -f gap
 # gat: "git at": diff a file with itself at a given ref
-function gat() { vimdiff "$1" <(git show "${2:-HEAD^}":"$1" ) ; }
+function gat() { vimdiff "$1" <(git show "${2:-HEAD^}":./"$1" ) ; }
 alias gclean="git reset --hard && git clean -f -d -x"
 # xxd alternative. Interestingly, "hexdump" is more widespread than "od"
 #alias xxh="hexdump -v -e '\"%08.8_ax:\"' -e '16/1 \" %02x\"' -e '\"  \" 16/1 \"%_p\" \"\n\"'"
@@ -135,10 +135,8 @@ alias gclean="git reset --hard && git clean -f -d -x"
 # Highlight function: each argument is a regex, colored 31, 32, ... in order. Use "." to skip one. Needs GNU sed.
 function hl() { local c=31 a e=(); for a; do [ "$a" = . ] || e+=(-e "s#$a#\x1b[1;${c}m&\x1b[0m#g"); ((c++)); done; sed -E -u "${e[@]}"; } ; export -f hl
 
-# Recursive git
-function G() { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "\n$a"; tput rmso; if [ "$#" -lt 1 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; done ; }
-# Recursive git status. This is to quickly find uncommitted changes, not a detailed view
-function GS() { find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo -e "$a"; tput rmso; if ! command git -C "$a" diff-index --quiet --ignore-submodules HEAD --; then if [ "$#" -lt 3 ]; then command git -C "$a" status -sb; else command git -C "$a" "$@"; fi; fi ; done ; }
+# Recursive git. No args: "git status -sb" for repos with uncommitted changes to tracked files; unchanged repos are listed as a single line (safe to pull). With args: run that git command on ALL repos.
+function G() { local only_dirty=; [ "$#" -lt 1 ] && { only_dirty=1; set -- status -sb; }; find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo "$a"; tput rmso; if [ -z "$only_dirty" ] || ! command git -C "$a" diff-index --quiet --ignore-submodules HEAD --; then command git -C "$a" "$@"; fi; done ; }
 
 # Show .gitignore-d files, all of them
 alias gii="git ls-files --exclude-standard --ignored --others"
