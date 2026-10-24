@@ -353,7 +353,7 @@ function ssh() {
 		[[ $NAME == *[^0-9.]* ]] && NAME="${NAME%.${NAME#*.*.}}"
 		[ -n "$NAME" ] && tmux rename-window "$NAME" >/dev/null 2>&1
 	fi
-	command ssh -q "$@"
+	command ssh -o LogLevel=ERROR "$@"
 	local RC=$?
 	# 47l exits alt screen (no cursor restore), 25h re-shows the cursor that a
 	# remote full-screen app may have hidden before the connection died, and 99B
