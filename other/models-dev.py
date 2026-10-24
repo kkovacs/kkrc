@@ -7,16 +7,16 @@
 Generate a markdown price-comparison table from models.dev.
 
 Usage:
-    uv run models-dev.py                 # defaults to -p opencode-go
-    uv run models-dev.py -a              # all models, all providers
-    ./models-dev.py -p opencode-go -i aud
-    ./models-dev.py -m deepseek-v4-flash -M 0.3   # defaults to -p openrouter
-    ./models-dev.py -m '.*gpt.*' -M 10            # cap the Over ~1.75M input tokens bar
-    ./models-dev.py -p openrouter -O               # sort by output price (desc)
-    ./models-dev.py -p openrouter -I               # sort by input price (desc)
-    ./models-dev.py -p openrouter -c               # context column, sorted asc by context
-    ./models-dev.py -p openrouter -C               # cache write column
-    ./models-dev.py -p openrouter -P               # sort by effective blended price (desc)
+    uv run models-dev.py                    # defaults to -p opencode-go
+    uv run models-dev.py -a                 # all models, all providers
+    ./models-dev.py -p opencode-go -i aud   # filter for modality
+    ./models-dev.py -m hy3 -M 0.3           # defaults to -p openrouter
+    ./models-dev.py -m '.*gpt.*' -M 10      # cap the Over ~1.75M input tokens bar
+    ./models-dev.py -p openrouter -O        # sort by output price (desc)
+    ./models-dev.py -p openrouter -I        # sort by input price (desc)
+    ./models-dev.py -p openrouter -c        # context column, sorted asc by context
+    ./models-dev.py -p openrouter -C        # cache write column
+    ./models-dev.py -p openrouter -P        # sort by effective blended price (desc)
 """
 
 from __future__ import annotations
