@@ -321,12 +321,12 @@ function sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
 . /usr/share/bash-completion/completions/journalctl 2>/dev/null
 # END of better systemd.
 
-# Isolated pi agent (attachments and prompt only). See inject-ai-subagent.md
-function pi0() { command pi -ne -ns -nt -nc -na --no-mcp "$@" ; } ; export -f pi0
-# Read-only pi agent (limited by tools).
 # XXX "-ne" should also be there, but it seems to disable codemode
+# Isolated pi agent (attachments and prompt only). See inject-ai-subagent.md
+function pi0() { command pi -ns -nt -nc -na --no-mcp -t codemode "$@" ; } ; export -f pi0
+# Read-only pi agent (limited by tools).
 function pir() { command pi -ns --no-mcp -t read,grep,find,ls,codemode "$@" ; } ; export -f pir
-# Shortcut to enable codemode
+# Shortcut to enable codemode and load kkrc extensions
 function pp() { command pi -t +codemode "$@" $(printf -- '-e %s\n' ~/.kkrc/pi-ext/*.ts) "$@" ; } ; export -f pp
 
 # ~/.local/bin is in the XDG Base Directory Specification: https://specifications.freedesktop.org/basedir/latest/
