@@ -259,64 +259,31 @@ compopt -o bashdefault cd 2>/dev/null
 # - Unlike simple aliases, we still bash-complete.
 # - We use $SC to store (automatically) the unit we're working on, so no need for typing all the time, or history athletics. One rarely works on multiple services at once.
 # - Functions start, reload and restart show the status of how it went, and also tails the log/journal afterwards. Exit tail with CTRL-c.
-
-# Generic helper functions to set up bash-autocomplete for our aliases
-function _scx() { COMP_WORDS=("systemctl" "$1" "${COMP_WORDS[@]:1}") ; ((COMP_CWORD++)) ; _systemctl ; }
-function _jcx() { COMP_WORDS=("journalctl" "$1" "${COMP_WORDS[@]:1}") ; ((COMP_CWORD++)) ; _journalctl ; }
-
-# "SystemCtl", generic alias, because who has time to type THAT much?
+# "systemctl", generic alias, because who has time to type THAT much?
 function sc() { SC="${*: -1}" ; systemctl "$@" ; }
 complete -F _systemctl sc
-# "User-level SystemCtl" alias, becuase, there's NOT even a short-option or something...
-function usc() { SC="${*: -1}" ; systemctl --user "$@" ; }
-function _usc() { _scx --user ; }
-complete -F _usc usc
-# "SystemCtl List" services, because it should be simple
+# "systemctl list" services, because it should be simple
 function scl() { systemctl list-units --type service --all ; }
-# Systemctl Daemon-Reload", because systemd can't do it on its own... Do user or system depending on UID
-function sdr() { if [ $UID -eq 0 ]; then systemctl daemon-reload; else systemctl --user daemon-reload; fi ; }
-
 # JournalCtl for Unit
 function jc() { SC="${1:-${SC}}" ; journalctl -xu "$SC" ; }
-function _jc() { _jcx "--unit" ; }
-complete -F _jc jc
 # ...with "tail -f"
 function jcf() { SC="${1:-${SC}}" ; journalctl -xefu "$SC" ; }
-complete -F _jc jcf
-# User-level JournalCtrl for Unit
-function ujc() { SC="${1:-${SC}}" ; journalctl -x --user-unit "$SC" ; }
-function _ujc() { _jcx "--user-unit" ; }
-complete -F _ujc ujc
-
 # Reusable command to show status afterwards, and tail the log during reload. Exit with CTRL-c
 # - We use daemon-reload automatically, because very often the thing you modified for a restart is the unit file.
 # - We use reset-failed, because for some incomprehensible reason, the restart-count limit imposed by StartLimitInterval[Sec] also affects manual restarts.
-function stail() { SC="${2:-${SC}}" ; sdr ; systemctl reset-failed "$SC" ; journalctl -n 0 -xfu "$SC" & systemctl "$1" "$SC" ; scs ; fg %journalctl ; }
-# Param #1: desired function name
-# Param #2: command to call
-# Param #3: command action to call
-# Param #4+: any further options to pass to action
-function _mksc() {
-	eval "$1() { SC=\"\${1:-\${SC}}\" ; $2 $3 ${*:4} \"\$SC\" ; }"
-	eval "_$1() { _scx \"$3\" ; }"
-	eval "complete -F _$1 $1"
-}
-# Definitions:
-_mksc scs systemctl status -l --no-pager # status, but don't trim lines
-_mksc sc0 systemctl stop
-_mksc sc1 stail start
-_mksc scr stail reload-or-restart
-_mksc scR stail restart
-# Override sc0 to add an additional `scs` to show status afterwards
+function stail() { SC="${2:-${SC}}" ; systemctl daemon-reload ; systemctl reset-failed "$SC" ; journalctl -n 0 -xfu "$SC" & systemctl "$1" "$SC" ; scs ; fg %journalctl ; }
+function scs() { SC="${1:-${SC}}" ; systemctl status -l --no-pager "$SC" ; } # status, but don't trim lines
 function sc0() { SC="${1:-${SC}}" ; systemctl stop "$SC" ; scs ; }
-
-# Now fix bash competion for our systemd aliases.
-# Even without bash-completion, most linux package managers put these there from the systemd packages - take advantage.
-# Display no error if not found, since it's not fully standard.
+function sc1() { stail start "$@" ; }
+function scr() { stail reload-or-restart "$@" ; }
+function scR() { stail restart "$@" ; }
+# One completion function for all of them: complete as "systemctl <action> ...", the action picked by the typed command name
+declare -A _SCA=([scs]=status [sc0]=stop [sc1]=start [scr]=reload-or-restart [scR]=restart [jc]=status [jcf]=status)
+function _scc() { COMP_WORDS=("systemctl" "${_SCA[${COMP_WORDS[0]}]}" "${COMP_WORDS[@]:1}") ; ((COMP_CWORD++)) ; _systemctl ; }
+complete -F _scc "${!_SCA[@]}"
+# _scc needs _systemctl, which bash-completion loads only lazily. No error if not found, since it's not fully standard.
 # shellcheck disable=SC1091
 . /usr/share/bash-completion/completions/systemctl 2>/dev/null
-# shellcheck disable=SC1091
-. /usr/share/bash-completion/completions/journalctl 2>/dev/null
 # END of better systemd.
 
 # XXX "-ne" should also be there, but it seems to disable codemode
