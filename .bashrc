@@ -377,40 +377,23 @@ function do-ssh() { ( HN="${1:-tmp1}"; shift; ssh -o UserKnownHostsFile=/dev/nul
 function do-ls() { doctl compute droplet list --format Name,ID,PublicIPv4,Memory,VCPUs,Disk,Region,Status; doctl account get --format Email,DropletLimit,Status ; }
 function do-rm() { doctl compute droplet delete "$(doctl compute droplet list --format=ID --no-header "${1:-tmp1}")" ; }
 
-# Automatically set TMUX window title on SSH
+# Automatically set TMUX window title on SSH, and restore the terminal afterwards
 function ssh() {
-	# Only if running under TMUX
 	if [ -n "$TMUX" ]; then
-		# Store current window name
-		#local SAVED=$(tmux display-message -p '#W')
-		local ARGS=("$@")
-		local NAME="ssh"
-		local I
-		# Try to find the server name
-		for I in "${ARGS[@]}" ; do
-			[[ $I == "--" ]] && break
-			NAME="$I"
-		done
-		# Strip username
-		NAME="${NAME#*@}"
+		# Let ssh parse its own arguments: the "host" line is the name as typed (without user@)
+		local NAME; NAME=$(command ssh -G "$@" 2>/dev/null | sed -n 's/^host //p')
 		# Shorten to the first two parts (from a.b.c.d => a.b) except if it's an IP
-		if [[ $NAME == *[^0-9.]* ]]; then
-			NAME="${NAME%.${NAME#*.*.}}"
-		fi
-		# Set window name
-		tmux rename-window "${NAME}" >/dev/null 2>&1
+		[[ $NAME == *[^0-9.]* ]] && NAME="${NAME%.${NAME#*.*.}}"
+		[ -n "$NAME" ] && tmux rename-window "$NAME" >/dev/null 2>&1
 	fi
-	# Do it
 	command ssh -q "$@"
-	# To Restore window name automatically:
-	#tmux rename-window "$SAVED" >/dev/null 2>/dev/null
-	# To switch back to auto-renaming after disconnection:
-	#tmux set-window-option automatic-rename "on" >/dev/null 2>/dev/null
+	local RC=$?
 	# 47l exits alt screen (no cursor restore), 25h re-shows the cursor that a
 	# remote full-screen app may have hidden before the connection died, and 99B
 	# moves to the last line (so we don't type in the middle of leftover screen text).
-	stty sane
-	printf '\e[?47l\e[?25h\e[99B'
+	# Only on a terminal: otherwise this would corrupt redirected/piped output.
+	[ -t 1 ] && { stty sane; printf '\e[?47l\e[?25h\e[99B'; }
+	return $RC
 }
 
 # Display tmux sessions if any, and we're not already running under tmux.
