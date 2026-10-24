@@ -65,9 +65,6 @@ export LSCOLORS=ExFxCxDxBxegedabagacad
 # Linux colors -- set always because of zsh's list-colors
 export LS_COLORS="di=1;34:ln=1;35:so=1;32:pi=1;33:ex=1;31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43"
 
-# Most useful quoting style, because you can copy/paste it
-export QUOTING_STYLE=shell-escape
-
 # Debian/Ubuntu should just restart things during upgrade.
 # It's pointless and dangerous to ask the user (because the update gets stuck).
 export NEEDRESTART_MODE=a
@@ -97,7 +94,7 @@ unalias ll 2>/dev/null # Many systems has an ll alias, THIS IS NOT TEMPORARY
 # No, we WANT to use ls, so:
 # XXX Mysteriously, this ONE has to start with "function", or else inject gets an error. Also, psql ones SOMETIMES cause an error???
 # shellcheck disable=2012
-function ll() { ls -lrtAp --color "$@" | less -FXRn +G ; }
+function ll() { ls -lrtAp --color --quoting-style=shell-escape "$@" | less -FXRn +G ; }
 # Display progress
 alias dd="dd status=progress"
 alias rsync="rsync --info=progress2"
