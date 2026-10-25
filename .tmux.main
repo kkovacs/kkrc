@@ -353,6 +353,7 @@ set -s command-alias[128] setup_frankenphp="send-keys ' mkdir -p ~/.local/bin ; 
 set -s command-alias[129] setup_composer="send-keys ' mkdir -p ~/.local/bin ; curl -fLo ~/.local/bin/composer https://github.com/composer/composer/releases/latest/download/composer.phar && chmod 755 ~/.local/bin/composer' enter"
 set -s command-alias[130] setup_static_php_cli="send-keys ' mkdir -p ~/.local/bin ; curl -fL https://dl.static-php.dev/static-php-cli/bulk/php-8.5.12-cli-linux-\$(uname -m).tar.gz | tar xz --no-same-owner -C ~/.local/bin/' enter"
 set -s command-alias[131] get_pgweb="send-keys ' mkdir -p ~/.local/bin ; v=\$(curl -sfLo /dev/null -w \"%{url_effective}\" https://github.com/sosedoff/pgweb/releases/latest | sed \"s|.*/tag/||\") && curl -fLo /tmp/pgweb.zip https://github.com/sosedoff/pgweb/releases/download/\$v/pgweb_linux_\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").zip && unzip -o /tmp/pgweb.zip -d ~/.local/bin/' enter"
+set -s command-alias[132] git_init="send-keys ' if [ ! -d .git ]; then git init -b main && touch .gitignore && git add .gitignore && git -c user.email=\"$USER@$HOSTNAME\" -c user.name=\"$USER\" commit -m init; fi && git status -sb' enter"
 set -s command-alias[134] setup_python_uv="send-keys ' mkdir -p ~/.local/bin ; curl -fL https://github.com/astral-sh/uv/releases/latest/download/uv-\$(uname -m)-unknown-linux-gnu.tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1' enter"
 set -s command-alias[124] setup_brew="send-keys ' NONINTERACTIVE=1 /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"' enter"
 # IMPORTANT: Uses the INJECT_AI_... env vars. Use some throw-away key because it gets exposed easily, for example an OpenRouter key restricted to $5/month.
@@ -417,7 +418,8 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "Setup PROD (w)arn .................." "w" "send-keys ' printf \"\\033[00;31mPRODUCTION SERVER\\033[00m\" | sudo tee /etc/debian_chroot ; . ~/.bashrc' enter" \
 "Remove PROD (W)arn ................." "W" "send-keys ' sudo rm /etc/debian_chroot; unset debian_chroot' enter" \
 "" \
-"mkdir (f)oo & git init ............." "f" "send-keys ' mkdir -p foo && cd foo && if [ ! -d .git ]; then git init -b main && touch .gitignore && git add .gitignore && git -c user.email=\\\"$USER@$HOSTNAME\\\" -c user.name=\\\"$USER\\\" commit -m init; fi && git status -sb' enter" \
+"git init (current dir) ............." "g" git_init \
+"mkdir (f)oo & git init ............." "f" "send-keys ' mkdir -p foo && cd foo && ' ; git_init" \
 "sudo (t)ouch /snapshotme ..........." "t" "send-keys ' sudo touch /snapshotme; echo -n Commencing in ~\$(( 60 - \$( date +%-S ) )) secs; while [[ -f /snapshotme ]]; do echo -n .; sleep 1; done; echo' enter" \
 "" \
 "kk+uv+bun+pi ......................." "1" "send-keys ' time cat <<\"EOF\" | bash' enter ; setup_kkrc ; setup_bun ; setup_python_uv ; setup_pi ; send-keys 'EOF' enter '. ~/.bashrc' enter" \
