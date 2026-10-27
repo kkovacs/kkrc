@@ -24,10 +24,17 @@ const URL_PASS_RE = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/[^/:?#\s]*:([^/?#\s]+)@/;
 const SECRET_KEY_NAME_RE = /(?:^|_)(?:KEY|PASS|PASSWORD|SECRET|TOKEN|PSWD)$|_PWD$/i;
 const URL_KEY_NAME_RE = /(?:^|_)(?:URL|URI)$/i;
 const SINGLE_CASE_WORD_RE = /^[a-z]+$|^[A-Z]+$/;
+// Variable references are placeholders, not secrets. Redacting them would
+// rewrite interpolation in code/config that tools print or write. Anchored:
+// the whole value must be one reference ("${SOMETHING}" or "$SOMETHING"), so
+// real secrets containing dollar signs ("P@$$w0rd99") stay protected.
+const BARE_REF_RE = /^\$(?:\{[A-Za-z_]\w*\}|[A-Za-z_]\w*)$/;
 
-// Match values >= 8 chars by secret key name or known token prefix; ignore paths, URLs, and whitespace.
+const isReference = (v: string): boolean => BARE_REF_RE.test(v);
+
+// Match values >= 8 chars by secret key name or known token prefix; ignore paths, URLs, whitespace, and variable references.
 export function isSecret(v: string, key = ""): boolean {
-    if (v.length < 8 || /\s/.test(v) || v.startsWith("/") || URL_RE.test(v)) return false;
+    if (v.length < 8 || /\s/.test(v) || v.startsWith("/") || URL_RE.test(v) || isReference(v)) return false;
     return SECRET_KEY_NAME_RE.test(key) || TOKEN_PREFIX_RE.test(v);
 }
 
@@ -36,7 +43,7 @@ export function extractSecret(v: string, key = ""): string | null {
     if (URL_RE.test(v)) {
         if (key && !URL_KEY_NAME_RE.test(key) && !SECRET_KEY_NAME_RE.test(key)) return null;
         const pass = URL_PASS_RE.exec(v)?.[1];
-        return pass && pass.length >= 8 && !SINGLE_CASE_WORD_RE.test(pass) ? pass : null;
+        return pass && pass.length >= 8 && !SINGLE_CASE_WORD_RE.test(pass) && !isReference(pass) ? pass : null;
     }
     return isSecret(v, key) ? v : null;
 }
