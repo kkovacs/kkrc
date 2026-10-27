@@ -211,8 +211,8 @@ describe("redact extension", () => {
             `SEEN: urlEnc=${REDACTED} b64=${REDACTED} uuid=${REDACTED} url=https://user:${REDACTED}@domain.com/uri pem=${REDACTED} port=8080 mode=production`,
         );
         expect(pi.notifies).toEqual([
-            { message: "🕵️ redact: Protecting 4 secrets from 4 keys", notifyType: "warning" },
-            { message: "🕵️ redact: Redacted 5 secrets in your prompt", notifyType: "warning" },
+            { message: "🤐 redact: Protecting 4 secrets from 4 keys", notifyType: "warning" },
+            { message: "🤐 redact: Redacted 5 secrets in your prompt", notifyType: "warning" },
         ]);
     });
 
@@ -221,14 +221,14 @@ describe("redact extension", () => {
         await pi.turn("before=NewSecretAddedLater99 head=" + PEM_RSA_TRUNCATED);
         expect(await pi.lastText()).toBe(`SEEN: before=NewSecretAddedLater99 head=${REDACTED}`);
         expect(pi.notifies).toEqual([
-            { message: "🕵️ redact: Protecting 0 secrets from 0 keys", notifyType: "warning" },
-            { message: "🕵️ redact: Redacted 1 secret in your prompt", notifyType: "warning" },
+            { message: "🤐 redact: Protecting 0 secrets from 0 keys", notifyType: "warning" },
+            { message: "🤐 redact: Redacted 1 secret in your prompt", notifyType: "warning" },
         ]);
 
         // PEM blocks have no env key name, so /redact shows the placeholder.
-        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact:\n"));
+        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🤐 redact:\n"));
         await pi.send({ type: "prompt", message: "/redact" });
-        expect((await stats).message).toBe("🕵️ redact:\n<PEM private key> 1 (+1)");
+        expect((await stats).message).toBe("🤐 redact:\n<PEM private key> 1 (+1)");
 
         writeFileSync(join(dir, ".env.local"), "LATE_KEY=NewSecretAddedLater99\n");
         await pi.send({ type: "new_session" });
@@ -236,7 +236,7 @@ describe("redact extension", () => {
 
         expect(await pi.lastText()).toBe(`SEEN: after=${REDACTED}`);
         expect(pi.notifies).toContainEqual({
-            message: "🕵️ redact: Protecting 1 secret from 1 key",
+            message: "🤐 redact: Protecting 1 secret from 1 key",
             notifyType: "warning",
         });
     });
@@ -254,8 +254,8 @@ describe("redact extension", () => {
         expect(text).toContain(`token is ${REDACTED} here`);
         expect(text).not.toContain("MyTopSecret99");
         expect(pi.notifies).toEqual([
-            { message: "🕵️ redact: Protecting 1 secret from 1 key", notifyType: "warning" },
-            { message: "🕵️ redact: Redacted 1 secret in read tool output", notifyType: "warning" },
+            { message: "🤐 redact: Protecting 1 secret from 1 key", notifyType: "warning" },
+            { message: "🤐 redact: Redacted 1 secret in read tool output", notifyType: "warning" },
         ]);
     });
 
@@ -286,24 +286,24 @@ describe("redact extension", () => {
 
         // Extension commands run immediately (disposition "handled"), no LLM turn starts.
         // Waiter registered before sending so the notify cannot slip past it.
-        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact:\n"));
+        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🤐 redact:\n"));
         const resp = await pi.send({ type: "prompt", message: "/redact" });
         expect(resp.data?.disposition).toBe("handled");
-        expect((await stats).message).toBe("🕵️ redact:\nSECRET_TOKEN 2 (+2)");
+        expect((await stats).message).toBe("🤐 redact:\nSECRET_TOKEN 2 (+2)");
 
         // The third turn adds one more redaction.
         await pi.turn("leak3=MyTopSecret99");
-        const updated = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact:\n"));
+        const updated = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🤐 redact:\n"));
         await pi.send({ type: "prompt", message: "/redact" });
-        expect((await updated).message).toBe("🕵️ redact:\nSECRET_TOKEN 3 (+1)");
+        expect((await updated).message).toBe("🤐 redact:\nSECRET_TOKEN 3 (+1)");
     });
 
     it("/redact includes protected keys with zero redactions", async () => {
         writeFileSync(join(dir, ".env"), "DB_PASSWORD=DbSecret99\nAPI_KEY=ApiSecret99\n");
         pi = startPi([REDACT_EXT], { cwd: dir });
-        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact:\n"));
+        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🤐 redact:\n"));
         await pi.send({ type: "prompt", message: "/redact" });
-        expect((await stats).message).toBe("🕵️ redact:\nAlso protecting (0 redacts yet): API_KEY, DB_PASSWORD.");
+        expect((await stats).message).toBe("🤐 redact:\nAlso protecting (0 redacts yet): API_KEY, DB_PASSWORD.");
     });
 
     it("/redact shows redacted keys as a table above the untouched-keys summary line", async () => {
@@ -314,7 +314,7 @@ describe("redact extension", () => {
         const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.includes("Also protecting"));
         await pi.send({ type: "prompt", message: "/redact" });
         expect((await stats).message).toBe(
-            "🕵️ redact:\nDB_PASSWORD  1 (+1)\nSECRET_TOKEN 1 (+1)\nAlso protecting (0 redacts yet): API_KEY.",
+            "🤐 redact:\nDB_PASSWORD  1 (+1)\nSECRET_TOKEN 1 (+1)\nAlso protecting (0 redacts yet): API_KEY.",
         );
     });
 
@@ -324,18 +324,18 @@ describe("redact extension", () => {
         writeFileSync(join(dir, ".env"), "APP_KEY=RealKeyValue99\n");
         writeFileSync(join(dir, ".env.example"), "APP_KEY=StaleValueCopy99\n");
         pi = startPi([REDACT_EXT], { cwd: dir });
-        const welcome = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact: Protecting"));
+        const welcome = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🤐 redact: Protecting"));
         expect((await welcome).notifyType).toBe("warning");
-        expect((await welcome).message).toBe("🕵️ redact: Protecting 2 secrets from 1 key");
-        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact:\n"));
+        expect((await welcome).message).toBe("🤐 redact: Protecting 2 secrets from 1 key");
+        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🤐 redact:\n"));
         await pi.send({ type: "prompt", message: "/redact" });
-        expect((await stats).message).toBe("🕵️ redact:\nAlso protecting (0 redacts yet): APP_KEY.");
+        expect((await stats).message).toBe("🤐 redact:\nAlso protecting (0 redacts yet): APP_KEY.");
     });
 
     it("/redact reports zero redactions when nothing is protected", async () => {
         pi = startPi([REDACT_EXT], { cwd: dir });
         const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.includes("No protected keys found"));
         await pi.send({ type: "prompt", message: "/redact" });
-        expect((await stats).message).toBe("🕵️ redact: No protected keys found");
+        expect((await stats).message).toBe("🤐 redact: No protected keys found");
     });
 });

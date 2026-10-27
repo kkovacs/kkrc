@@ -143,7 +143,7 @@ export default function (pi: ExtensionAPI) {
             counts.set(key, (counts.get(key) ?? 0) + 1);
         });
         if (!hits.size) return undefined;
-        ctx.ui.notify(`🕵️ redact: Redacted ${hits.size} secret${hits.size === 1 ? "" : "s"} in ${where}`, "warning");
+        ctx.ui.notify(`🤐 redact: Redacted ${hits.size} secret${hits.size === 1 ? "" : "s"} in ${where}`, "warning");
         return out;
     };
 
@@ -153,7 +153,7 @@ export default function (pi: ExtensionAPI) {
     pi.on("session_start", (_event, ctx) => {
         const keyCount = new Set(keys.values()).size;
         ctx.ui.notify(
-            `🕵️ redact: Protecting ${count} secret${count === 1 ? "" : "s"} from ${keyCount} key${keyCount === 1 ? "" : "s"}`,
+            `🤐 redact: Protecting ${count} secret${count === 1 ? "" : "s"} from ${keyCount} key${keyCount === 1 ? "" : "s"}`,
             "warning",
         );
     });
@@ -195,7 +195,7 @@ export default function (pi: ExtensionAPI) {
             if (untouched.length) body.push(`Also protecting (0 redacts yet): ${untouched.join(", ")}.`);
             lastCounts = new Map(counts);
             ctx.ui.notify(
-                body.length ? `🕵️ redact:\n${body.join("\n")}` : "🕵️ redact: No protected keys found",
+                body.length ? `🤐 redact:\n${body.join("\n")}` : "🤐 redact: No protected keys found",
                 "info",
             );
         },

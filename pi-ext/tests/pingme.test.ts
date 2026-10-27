@@ -49,7 +49,7 @@ describe("pingme", () => {
         await pingWindow();
 
         expect(hits).toEqual(["/done"]);
-        expect(pi.notifies).toEqual([{ message: "🛎️ pingme: Active (>1s)", notifyType: "warning" }]);
+        expect(pi.notifies).toEqual([{ message: "📟 pingme: Active (>1s)", notifyType: "warning" }]);
     });
 
     it("does not ping after a shorter run", async () => {
@@ -60,7 +60,7 @@ describe("pingme", () => {
         await pingWindow();
 
         expect(hits).toEqual([]);
-        expect(pi.notifies).toEqual([{ message: "🛎️ pingme: Active (>1s)", notifyType: "warning" }]);
+        expect(pi.notifies).toEqual([{ message: "📟 pingme: Active (>1s)", notifyType: "warning" }]);
     });
 
     it("sets, shows, and disables the URL with /pingme", async () => {
@@ -78,9 +78,9 @@ describe("pingme", () => {
         await pingWindow();
         expect(hits).toEqual(["/done"]);
         expect(pi.notifies).toEqual([
-            { message: "🛎️ pingme: Active (>1s)", notifyType: "info" },
-            { message: `🛎️ pingme: ${url} (use /pingme off to disable)`, notifyType: "info" },
-            { message: "🛎️ pingme: Off", notifyType: "info" },
+            { message: "📟 pingme: Active (>1s)", notifyType: "info" },
+            { message: `📟 pingme: ${url} (use /pingme off to disable)`, notifyType: "info" },
+            { message: "📟 pingme: Off", notifyType: "info" },
         ]);
     });
 
