@@ -4,7 +4,7 @@
  * Calls a URL when the agent settles after running for more than 1 minute
  * (or PINGME_AFTER=<seconds>).
  *
- * Activate with PINGME=<url> or /pingme <url>. Use /pingme to clear it.
+ * Activate with PINGME=<url> or /pingme <url>. Use /pingme off to disable it.
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -22,11 +22,16 @@ export default function (pi: ExtensionAPI) {
     let agentStartTime: number | null = null;
 
     pi.registerCommand("pingme", {
-        description: "Set the ping URL, or clear it (usage: /pingme [url])",
+        description: "Show, set, or disable the ping URL (usage: /pingme [url|off])",
         handler: async (args, ctx) => {
-            url = normalizePingmeUrl(args);
+            const value = args.trim();
+            if (!value) {
+                ctx.ui.notify(url ? `🛎️ pingme: ${url} (use /pingme off to disable)` : "🛎️ pingme: Off", "info");
+                return;
+            }
+            url = value.toLowerCase() === "off" ? undefined : normalizePingmeUrl(value);
             agentStartTime = null;
-            ctx.ui.notify(url ? `🛎️ pingme: Active (>${afterSec}s)` : "🛎️ pingme: Cleared", "info");
+            ctx.ui.notify(url ? `🛎️ pingme: Active (>${afterSec}s)` : "🛎️ pingme: Off", "info");
         },
     });
 
