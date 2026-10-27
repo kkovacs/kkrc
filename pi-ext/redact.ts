@@ -175,14 +175,18 @@ export default function (pi: ExtensionAPI) {
     pi.registerCommand("redact", {
         description: "Show redaction statistics",
         handler: async (_args, ctx) => {
-            const entries = [...counts].sort(([a], [b]) => a.localeCompare(b));
-            const width = Math.max(0, ...entries.map(([key]) => key.length));
-            const report = entries
-                .map(([key, n]) => `${key.padEnd(width)} ${n} (+${n - (lastCounts.get(key) ?? 0)})`)
-                .join("\n");
+            // Redacted keys keep the count table (count DESC); keys with no
+            // redactions yet collapse into a single summary line.
+            const rows = [...counts].filter(([, n]) => n > 0);
+            const width = Math.max(0, ...rows.map(([key]) => key.length));
+            const body = rows
+                .sort(([a, na], [b, nb]) => nb - na || a.localeCompare(b))
+                .map(([key, n]) => `${key.padEnd(width)} ${n} (+${n - (lastCounts.get(key) ?? 0)})`);
+            const untouched = [...counts].filter(([, n]) => n === 0).map(([key]) => key).sort();
+            if (untouched.length) body.push(`Also protecting (0 redacts yet): ${untouched.join(", ")}.`);
             lastCounts = new Map(counts);
             ctx.ui.notify(
-                report ? `🕵️ redact:\n${report}` : "🕵️ redact: No redactions yet",
+                body.length ? `🕵️ redact:\n${body.join("\n")}` : "🕵️ redact: No protected keys found",
                 "info",
             );
         },

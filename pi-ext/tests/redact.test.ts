@@ -288,7 +288,19 @@ describe("redact extension", () => {
         pi = startPi([REDACT_EXT], { cwd: dir });
         const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact:\n"));
         await pi.send({ type: "prompt", message: "/redact" });
-        expect((await stats).message).toBe("🕵️ redact:\nAPI_KEY     0 (+0)\nDB_PASSWORD 0 (+0)");
+        expect((await stats).message).toBe("🕵️ redact:\nAlso protecting (0 redacts yet): API_KEY, DB_PASSWORD.");
+    });
+
+    it("/redact shows redacted keys as a table above the untouched-keys summary line", async () => {
+        writeFileSync(join(dir, ".env"), "SECRET_TOKEN=MyTopSecret99\nAPI_KEY=ApiSecret99\nDB_PASSWORD=DbSecret99\n");
+        pi = startPi([REDACT_EXT], { cwd: dir });
+        await pi.turn("leak=MyTopSecret99 leak2=DbSecret99 DbSecret99");
+        // One scrub pass per secret per turn: both hit once; API_KEY untouched.
+        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.includes("Also protecting"));
+        await pi.send({ type: "prompt", message: "/redact" });
+        expect((await stats).message).toBe(
+            "🕵️ redact:\nDB_PASSWORD  1 (+1)\nSECRET_TOKEN 1 (+1)\nAlso protecting (0 redacts yet): API_KEY.",
+        );
     });
 
     it("counts duplicate key names as one key: N secrets from 1 key", async () => {
@@ -302,13 +314,13 @@ describe("redact extension", () => {
         expect((await welcome).message).toBe("🕵️ redact: Protecting 2 secrets from 1 key");
         const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact:\n"));
         await pi.send({ type: "prompt", message: "/redact" });
-        expect((await stats).message).toBe("🕵️ redact:\nAPP_KEY 0 (+0)");
+        expect((await stats).message).toBe("🕵️ redact:\nAlso protecting (0 redacts yet): APP_KEY.");
     });
 
     it("/redact reports zero redactions when nothing is protected", async () => {
         pi = startPi([REDACT_EXT], { cwd: dir });
-        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.includes("No redactions yet"));
+        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.includes("No protected keys found"));
         await pi.send({ type: "prompt", message: "/redact" });
-        expect((await stats).message).toBe("🕵️ redact: No redactions yet");
+        expect((await stats).message).toBe("🕵️ redact: No protected keys found");
     });
 });
