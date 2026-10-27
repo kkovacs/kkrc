@@ -63,7 +63,7 @@ describe("pingme", () => {
         expect(pi.notifies).toEqual([{ message: "🛎️ pingme: Active (>1s)", notifyType: "warning" }]);
     });
 
-    it("sets and clears the URL with /pingme", async () => {
+    it("sets, shows, and disables the URL with /pingme", async () => {
         const { url, hits } = counter();
         pi = startPi([PINGME], { env: { PINGME: "", PINGME_AFTER: "1" } });
 
@@ -73,12 +73,14 @@ describe("pingme", () => {
         expect(hits).toEqual(["/done"]);
 
         await pi.turn("/pingme");
+        await pi.turn("/pingme off");
         await pi.turn("SLOW");
         await pingWindow();
         expect(hits).toEqual(["/done"]);
         expect(pi.notifies).toEqual([
             { message: "🛎️ pingme: Active (>1s)", notifyType: "info" },
-            { message: "🛎️ pingme: Cleared", notifyType: "info" },
+            { message: `🛎️ pingme: ${url} (use /pingme off to disable)`, notifyType: "info" },
+            { message: "🛎️ pingme: Off", notifyType: "info" },
         ]);
     });
 
