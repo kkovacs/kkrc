@@ -4,23 +4,35 @@
  * Calls a URL when the agent settles after running for more than 1 minute
  * (or PINGME_AFTER=<seconds>).
  *
- * Activate by setting PINGME=<url> in the environment.
+ * Activate with PINGME=<url> or /pingme <url>. Use /pingme to clear it.
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
-export default function (pi: ExtensionAPI) {
-    // Do not register any hooks if no ping URL is configured.
-    const url = process.env.PINGME;
-    if (!url) return;
+export function normalizePingmeUrl(value: string): string | undefined {
+    const url = value.trim();
+    return !url ? undefined : /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
 
+export default function (pi: ExtensionAPI) {
+    // The command overrides the environment for this extension runtime only.
+    let url = process.env.PINGME;
     const afterSec = Number(process.env.PINGME_AFTER ?? 60);
     const afterMs = afterSec * 1000;
     let agentStartTime: number | null = null;
 
+    pi.registerCommand("pingme", {
+        description: "Set the ping URL, or clear it (usage: /pingme [url])",
+        handler: async (args, ctx) => {
+            url = normalizePingmeUrl(args);
+            agentStartTime = null;
+            ctx.ui.notify(url ? `🛎️ pingme: Active (>${afterSec}s)` : "🛎️ pingme: Cleared", "info");
+        },
+    });
+
     // Use "warning" so Pi TUI doesn't coalesce consecutive session_start info lines.
     pi.on("session_start", (_event, ctx) => {
-        ctx.ui.notify(`🛎️ pingme: Active (>${afterSec}s)`, "warning");
+        if (url) ctx.ui.notify(`🛎️ pingme: Active (>${afterSec}s)`, "warning");
     });
 
     pi.on("agent_start", () => {
@@ -28,7 +40,7 @@ export default function (pi: ExtensionAPI) {
     });
 
     pi.on("agent_settled", () => {
-        if (agentStartTime === null) return;
+        if (!url || agentStartTime === null) return;
 
         const elapsed = Date.now() - agentStartTime;
         agentStartTime = null;
