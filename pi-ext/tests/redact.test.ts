@@ -3,7 +3,7 @@
 // Run: PI_PATH=$(which pi) bun test ~/.kkrc/pi-ext/tests
 
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { startPi } from "./rpc";
@@ -186,7 +186,7 @@ describe("loadSecrets", () => {
 });
 
 describe("redact extension", () => {
-    it("redacts raw, base64, URL-encoded, and PEM secrets in outbound context and emits a warning", async () => {
+    it("redacts raw, base64, URL-encoded, and PEM secrets in prompts at intake", async () => {
         const sub = join(dir, "nested");
         mkdirSync(sub);
         writeFileSync(
@@ -212,7 +212,7 @@ describe("redact extension", () => {
         );
         expect(pi.notifies).toEqual([
             { message: "🕵️ redact: Protecting 4 secrets from 4 keys", notifyType: "warning" },
-            { message: "🕵️ redact: Redacted 5 secrets in outbound LLM context", notifyType: "warning" },
+            { message: "🕵️ redact: Redacted 5 secrets in your prompt", notifyType: "warning" },
         ]);
     });
 
@@ -222,7 +222,7 @@ describe("redact extension", () => {
         expect(await pi.lastText()).toBe(`SEEN: before=NewSecretAddedLater99 head=${REDACTED}`);
         expect(pi.notifies).toEqual([
             { message: "🕵️ redact: Protecting 0 secrets from 0 keys", notifyType: "warning" },
-            { message: "🕵️ redact: Redacted 1 secret in outbound LLM context", notifyType: "warning" },
+            { message: "🕵️ redact: Redacted 1 secret in your prompt", notifyType: "warning" },
         ]);
 
         // PEM blocks have no env key name, so /redact shows the placeholder.
@@ -259,12 +259,27 @@ describe("redact extension", () => {
         ]);
     });
 
+    it("keeps secrets out of the session JSONL (prompts and tool results)", async () => {
+        writeFileSync(join(dir, ".env"), "SECRET_TOKEN=MyTopSecret99\n");
+        writeFileSync(join(dir, "README.md"), "token is MyTopSecret99 here\n");
+        const sessDir = join(dir, "sessions");
+        pi = startPi([REDACT_EXT], { cwd: dir, args: ["--session-dir", sessDir] });
+        await pi.turn("leak=MyTopSecret99"); // prompt containing the secret
+        await pi.turn("TOOLS"); // bash + read tool results containing the secret
+
+        const sessFile = readdirSync(sessDir).find((f) => f.endsWith(".jsonl"));
+        expect(sessFile).toBeDefined();
+        const raw = readFileSync(join(sessDir, sessFile!), "utf8");
+        expect(raw).toContain(REDACTED);
+        expect(raw).not.toContain("MyTopSecret99");
+    });
+
     it("/redact counts redactions across calls and resets only on reload", async () => {
         writeFileSync(join(dir, ".env"), "SECRET_TOKEN=MyTopSecret99\n");
         pi = startPi([REDACT_EXT], { cwd: dir });
 
-        // context_with_system scrubs the cumulative transcript: turn 1 hits 1
-        // occurrence, turn 2 re-hits turn 1's plus its own = 2, so 3 in total.
+        // The input hook scrubs each prompt before the user message is created,
+        // so each turn counts exactly one redaction (no cumulative re-scrubs).
         await pi.turn("leak1=MyTopSecret99");
         await pi.turn("leak2=MyTopSecret99");
         expect(pi.notifies.filter((n) => n.message.includes("Redacted")).length).toBe(2);
@@ -274,13 +289,13 @@ describe("redact extension", () => {
         const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact:\n"));
         const resp = await pi.send({ type: "prompt", message: "/redact" });
         expect(resp.data?.disposition).toBe("handled");
-        expect((await stats).message).toBe("🕵️ redact:\nSECRET_TOKEN 3 (+3)");
+        expect((await stats).message).toBe("🕵️ redact:\nSECRET_TOKEN 2 (+2)");
 
-        // The third turn re-hits the first two plus its own: three additional redactions.
+        // The third turn adds one more redaction.
         await pi.turn("leak3=MyTopSecret99");
         const updated = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact:\n"));
         await pi.send({ type: "prompt", message: "/redact" });
-        expect((await updated).message).toBe("🕵️ redact:\nSECRET_TOKEN 6 (+3)");
+        expect((await updated).message).toBe("🕵️ redact:\nSECRET_TOKEN 3 (+1)");
     });
 
     it("/redact includes protected keys with zero redactions", async () => {

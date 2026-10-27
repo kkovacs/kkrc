@@ -169,7 +169,16 @@ export default function (pi: ExtensionAPI) {
 
     // Scrub full outbound transcript (system prompt, user prompts, !bash, tool results)
     // right before each LLM call.
+    // XXX: !bash commands get redacted as going to the LLM, but not redacted
+    // in the session JSONL.
     pi.on("context_with_system", (e, ctx) => redact({ messages: e.messages }, "outbound LLM context", ctx));
+
+    // Scrub prompts at intake (interactive, RPC, steer, followUp) so the user
+    // message is persisted to the session JSONL already redacted.
+    pi.on("input", (e, ctx) => {
+        const out = redact(e.text, "your prompt", ctx);
+        return out === undefined ? undefined : { action: "transform", text: out };
+    });
 
     // Redaction statistics command.
     pi.registerCommand("redact", {
