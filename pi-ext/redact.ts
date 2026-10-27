@@ -148,8 +148,14 @@ export default function (pi: ExtensionAPI) {
     };
 
     // Use "warning" so Pi TUI doesn't coalesce consecutive session_start info lines.
+    // Key count = distinct names, matching how /redact groups rows; a duplicated
+    // key name (e.g. stale value in .env.example) makes secrets > keys.
     pi.on("session_start", (_event, ctx) => {
-        ctx.ui.notify(`🕵️ redact: Protecting ${count} secret${count === 1 ? "" : "s"}`, "warning");
+        const keyCount = new Set(keys.values()).size;
+        ctx.ui.notify(
+            `🕵️ redact: Protecting ${count} secret${count === 1 ? "" : "s"} from ${keyCount} key${keyCount === 1 ? "" : "s"}`,
+            "warning",
+        );
     });
 
     // Scrub tool results immediately (covers bash `cat .env`, read, codemode, etc.).
