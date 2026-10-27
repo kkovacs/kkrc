@@ -26,18 +26,18 @@ export default function (pi: ExtensionAPI) {
         handler: async (args, ctx) => {
             const value = args.trim();
             if (!value) {
-                ctx.ui.notify(url ? `🛎️ pingme: ${url} (use /pingme off to disable)` : "🛎️ pingme: Off", "info");
+                ctx.ui.notify(url ? `📟 pingme: ${url} (use /pingme off to disable)` : "📟 pingme: Off", "info");
                 return;
             }
             url = value.toLowerCase() === "off" ? undefined : normalizePingmeUrl(value);
             agentStartTime = null;
-            ctx.ui.notify(url ? `🛎️ pingme: Active (>${afterSec}s)` : "🛎️ pingme: Off", "info");
+            ctx.ui.notify(url ? `📟 pingme: Active (>${afterSec}s)` : "📟 pingme: Off", "info");
         },
     });
 
     // Use "warning" so Pi TUI doesn't coalesce consecutive session_start info lines.
     pi.on("session_start", (_event, ctx) => {
-        if (url) ctx.ui.notify(`🛎️ pingme: Active (>${afterSec}s)`, "warning");
+        if (url) ctx.ui.notify(`📟 pingme: Active (>${afterSec}s)`, "warning");
     });
 
     pi.on("agent_start", () => {
