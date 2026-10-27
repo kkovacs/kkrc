@@ -120,6 +120,23 @@ describe("extractSecret", () => {
         expect(extractSecret("postgres://user:Short1@localhost:5432/db", "DATABASE_URL")).toBeNull(); // < 8 chars
         expect(extractSecret("https://user:MyPass123@domain.com/uri", "UNRELATED_VAR")).toBeNull(); // key is not URL/URI/secret
     });
+
+    it("ignores variable references (${...} / $X) so redaction cannot mangle code", () => {
+        // Whole-value references: common in committed .env templates
+        expect(extractSecret("${SOMETHING}", "SOME_KEY")).toBeNull();
+        expect(extractSecret("${DB_PASSWORD}", "DB_PASSWORD")).toBeNull();
+        expect(extractSecret("$SOMETHING", "SOME_KEY")).toBeNull();
+        expect(extractSecret("$home", "HOME_KEY")).toBeNull();
+        expect(extractSecret("$HomeDir9", "SOME_KEY")).toBeNull();
+        // Real secrets containing dollar signs are unaffected (rule is anchored)
+        expect(extractSecret("P@$$w0rd99", "DB_PASS")).toBe("P@$$w0rd99"); // leetspeak $$ survives
+        expect(extractSecret("Abc$123def", "API_KEY")).toBe("Abc$123def");
+        expect(extractSecret("prefix-${MID}-suffix", "API_KEY")).toBe("prefix-${MID}-suffix"); // mid-value ref is protected as-is
+        // ...including in an embedded URL password (extraction isolates it first)
+        expect(extractSecret("https://user:${PASSWD1}@domain.com/uri", "DATABASE_URL")).toBeNull();
+        expect(extractSecret("https://user:$Pass99xx@domain.com/uri", "DATABASE_URL")).toBeNull();
+        expect(extractSecret("https://user:RealPass12@host/uri", "DATABASE_URL")).toBe("RealPass12");
+    });
 });
 
 describe("loadSecrets", () => {
@@ -162,6 +179,33 @@ describe("loadSecrets", () => {
         for (let i = 1; i < loaded.length; i++) {
             expect(loaded[i - 1]!.length).toBeGreaterThanOrEqual(loaded[i]!.length);
         }
+    });
+
+    it("strips surrounding quotes before secret checks (parseEnv) and still classifies correctly", () => {
+        // Quotes are stripped by parseEnv before extractSecret, so quoted values
+        // are classified by their unquoted content — refs stay refs, secrets stay
+        // secrets. Guards against a future parser change breaking that assumption.
+        writeFileSync(
+            join(dir, ".env"),
+            [
+                'REF_DQ="${SOMETHING}"',
+                "REF_SQ='$HOME'",
+                'DQ_SECRET="DoubleQuoted1"',
+                "SQ_SECRET='SingleQuote9'",
+                'DQ_URL="https://user:${PASSWD2}@host/uri"',
+            ].join("\n") + "\n",
+        );
+        const loaded = loadSecrets(dir);
+        // Quoted references are still skipped
+        expect(loaded).not.toContain("${SOMETHING}");
+        expect(loaded).not.toContain("$HOME");
+        expect(loaded).not.toContain("${PASSWD2}");
+        // Quoted secrets are still protected — by their unquoted value
+        expect(loaded).toContain("DoubleQuoted1");
+        expect(loaded).toContain("SingleQuote9");
+        // The quoted forms themselves never enter the list
+        expect(loaded).not.toContain('"DoubleQuoted1"');
+        expect(loaded).not.toContain("'SingleQuote9'");
     });
 
     it("collects process env secrets for matching key names, URLs, and prefixes while ignoring system vars", () => {
