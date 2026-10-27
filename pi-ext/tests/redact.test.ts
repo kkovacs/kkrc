@@ -226,9 +226,9 @@ describe("redact extension", () => {
         ]);
 
         // PEM blocks have no env key name, so /redact shows the placeholder.
-        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.includes("so far:"));
+        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact:\n"));
         await pi.send({ type: "prompt", message: "/redact" });
-        expect((await stats).message).toBe("🕵️ redact: 1 redaction so far: <PEM private key> (protecting 0 secrets)");
+        expect((await stats).message).toBe("🕵️ redact:\n<PEM private key> 1 (+1)");
 
         writeFileSync(join(dir, ".env.local"), "LATE_KEY=NewSecretAddedLater99\n");
         await pi.send({ type: "new_session" });
@@ -271,16 +271,30 @@ describe("redact extension", () => {
 
         // Extension commands run immediately (disposition "handled"), no LLM turn starts.
         // Waiter registered before sending so the notify cannot slip past it.
-        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.includes("so far:"));
+        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact:\n"));
         const resp = await pi.send({ type: "prompt", message: "/redact" });
         expect(resp.data?.disposition).toBe("handled");
-        expect((await stats).message).toBe("🕵️ redact: 3 redactions so far: SECRET_TOKEN (protecting 1 secret)");
+        expect((await stats).message).toBe("🕵️ redact:\nSECRET_TOKEN 3 (+3)");
+
+        // The third turn re-hits the first two plus its own: three additional redactions.
+        await pi.turn("leak3=MyTopSecret99");
+        const updated = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact:\n"));
+        await pi.send({ type: "prompt", message: "/redact" });
+        expect((await updated).message).toBe("🕵️ redact:\nSECRET_TOKEN 6 (+3)");
     });
 
-    it("/redact reports zero redactions when nothing was redacted", async () => {
+    it("/redact includes protected keys with zero redactions", async () => {
+        writeFileSync(join(dir, ".env"), "DB_PASSWORD=DbSecret99\nAPI_KEY=ApiSecret99\n");
+        pi = startPi([REDACT_EXT], { cwd: dir });
+        const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.startsWith("🕵️ redact:\n"));
+        await pi.send({ type: "prompt", message: "/redact" });
+        expect((await stats).message).toBe("🕵️ redact:\nAPI_KEY     0 (+0)\nDB_PASSWORD 0 (+0)");
+    });
+
+    it("/redact reports zero redactions when nothing is protected", async () => {
         pi = startPi([REDACT_EXT], { cwd: dir });
         const stats = pi.until((e) => e.type === "extension_ui_request" && e.method === "notify" && e.message.includes("No redactions yet"));
         await pi.send({ type: "prompt", message: "/redact" });
-        expect((await stats).message).toBe("🕵️ redact: No redactions yet (protecting 0 secrets)");
+        expect((await stats).message).toBe("🕵️ redact: No redactions yet");
     });
 });

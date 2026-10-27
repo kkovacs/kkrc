@@ -130,17 +130,17 @@ function scrub<T>(value: T, secrets: string[], onRedact: (s: string) => void): T
 export default function (pi: ExtensionAPI) {
     const { secrets, keys, count } = collectSecrets(process.cwd());
 
-    // Module-level so `/reload` (fresh runtime) doubles as the counter reset.
-    let redactions = 0;
-    const redactedKeys = new Set<string>();
+    // Runtime-only counters; the last snapshot supplies the per-key deltas.
+    const counts = new Map([...new Set(keys.values())].map((key) => [key, 0] as const));
+    let lastCounts = new Map<string, number>();
 
     const redact = <T>(value: T, where: string, ctx: ExtensionContext): T | undefined => {
         const hits = new Set<string>();
         const out = scrub(value, secrets, (s) => {
             hits.add(s);
-            redactions++;
             // Map lookup covers raw/encoded/base64 variants; PEM blocks have no key.
-            redactedKeys.add(keys.get(s) ?? "<PEM private key>");
+            const key = keys.get(s) ?? "<PEM private key>";
+            counts.set(key, (counts.get(key) ?? 0) + 1);
         });
         if (!hits.size) return undefined;
         ctx.ui.notify(`🕵️ redact: Redacted ${hits.size} secret${hits.size === 1 ? "" : "s"} in ${where}`, "warning");
@@ -169,10 +169,14 @@ export default function (pi: ExtensionAPI) {
     pi.registerCommand("redact", {
         description: "Show redaction statistics",
         handler: async (_args, ctx) => {
+            const entries = [...counts].sort(([a], [b]) => a.localeCompare(b));
+            const width = Math.max(0, ...entries.map(([key]) => key.length));
+            const report = entries
+                .map(([key, n]) => `${key.padEnd(width)} ${n} (+${n - (lastCounts.get(key) ?? 0)})`)
+                .join("\n");
+            lastCounts = new Map(counts);
             ctx.ui.notify(
-                redactions
-                    ? `🕵️ redact: ${redactions} redaction${redactions === 1 ? "" : "s"} so far: ${[...redactedKeys].sort().join(", ")} (protecting ${count} secret${count === 1 ? "" : "s"})`
-                    : `🕵️ redact: No redactions yet (protecting ${count} secret${count === 1 ? "" : "s"})`,
+                report ? `🕵️ redact:\n${report}` : "🕵️ redact: No redactions yet",
                 "info",
             );
         },
