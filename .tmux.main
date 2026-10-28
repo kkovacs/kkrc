@@ -576,8 +576,6 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 # Load age-encrypted environment variables in tmux session, so they can be injected.
 # -h means hidden: variables don't get automatically added to new windows' environments and not shown by :show-environment
 # NOTE: ENV loading needs to reload .tmux.main so "#{..}" variables in "set command-alias..."-es are expanded
-# FOR FUTURE REFENCE, switcher:
-# "Inject \$OPENCODE_API_KEY (x2)............" "o" "send-keys ' stty -echo' enter ' export OPENCODE_API_KEY=#{?#{@api_key_index},#{OPENCODE_API_KEY1},#{OPENCODE_API_KEY0}}; stty echo; echo K#{@api_key_index};' enter ; set -F @api_key_index '#{?#{@api_key_index},0,1}'" \
 bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$SSH_AUTH_SOCK ..................." "" 'send-keys " export SSH_AUTH_SOCK=$(tmux show-environment SSH_AUTH_SOCK | cut -d= -f2)" enter' \
 "" \
