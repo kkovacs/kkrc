@@ -576,6 +576,8 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 # Load age-encrypted environment variables in tmux session, so they can be injected.
 # -h means hidden: variables don't get automatically added to new windows' environments and not shown by :show-environment
 # NOTE: ENV loading needs to reload .tmux.main so "#{..}" variables in "set command-alias..."-es are expanded
+# FOR FUTURE REFENCE, switcher:
+# "Inject \$OPENCODE_API_KEY (x2)............" "o" "send-keys ' stty -echo' enter ' export OPENCODE_API_KEY=#{?#{@api_key_index},#{OPENCODE_API_KEY1},#{OPENCODE_API_KEY0}}; stty echo; echo K#{@api_key_index};' enter ; set -F @api_key_index '#{?#{@api_key_index},0,1}'" \
 bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$SSH_AUTH_SOCK ..................." "" 'send-keys " export SSH_AUTH_SOCK=$(tmux show-environment SSH_AUTH_SOCK | cut -d= -f2)" enter' \
 "" \
@@ -589,11 +591,11 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "Inject \$GEMINI_API_KEY .................." "" "send-keys ' stty -echo' enter ' export GEMINI_API_KEY=#{GEMINI_API_KEY} GOOGLE_GENERATIVE_AI_API_KEY=#{GEMINI_API_KEY}; stty echo' enter" \
 "Inject \$GITHUB_TOKEN ...................." "" "send-keys ' stty -echo' enter ' export GITHUB_TOKEN=#{GITHUB_TOKEN}; stty echo' enter" \
 "Inject \$HUGGINGFACE_API_KEY ............." "h" "send-keys ' stty -echo' enter ' export HUGGINGFACE_API_KEY=#{HUGGINGFACE_API_KEY}; stty echo' enter" \
-"Inject \$LOCAL_KEY and \$LOCAL_URL........." "" "send-keys ' stty -echo' enter ' export LOCAL_KEY=#{LOCAL_KEY} LOCAL_URL=#{LOCAL_URL}; stty echo' enter" \
+"Inject \$LLM_KEY and \$LLM_URL ..........." "l" "send-keys ' stty -echo' enter ' export LLM_KEY=#{LLM_KEY} LLM_URL=#{LLM_URL}; stty echo' enter" \
 "Inject \$MISTRAL_API_KEY ................." "M" "send-keys ' stty -echo' enter ' export MISTRAL_API_KEY=#{MISTRAL_API_KEY}; stty echo' enter" \
 "Inject \$NVIDIA_API_KEY .................." "" "send-keys ' stty -echo' enter ' export NVIDIA_API_KEY=#{NVIDIA_API_KEY}; stty echo' enter" \
 "Inject \$OLLAMA_API_KEY .................." "" "send-keys ' stty -echo' enter ' export OLLAMA_API_KEY=#{OLLAMA_API_KEY}; stty echo' enter" \
-"Inject \$OPENCODE_API_KEY (x2)............" "o" "send-keys ' stty -echo' enter ' export OPENCODE_API_KEY=#{?#{@api_key_index},#{OPENCODE_API_KEY1},#{OPENCODE_API_KEY0}}; stty echo; echo K#{@api_key_index};' enter ; set -F @api_key_index '#{?#{@api_key_index},0,1}'" \
+"Inject \$OPENCODE_API_KEY ................" "o" "send-keys ' stty -echo' enter ' export OPENCODE_API_KEY=#{OPENCODE_API_KEY}; stty echo' enter" \
 "Inject \$OPENROUTER_API_KEY .............." "O" "send-keys ' stty -echo' enter ' export OPENROUTER_API_KEY=#{OPENROUTER_API_KEY}; stty echo' enter" \
 "Inject \$RADIUS_API_KEY .................." "" "send-keys ' stty -echo' enter ' export RADIUS_API_KEY=#{RADIUS_API_KEY}; stty echo' enter" \
 "Inject \$RECRAFT_API_KEY ................." "" "send-keys ' stty -echo' enter ' export RECRAFT_API_KEY=#{RECRAFT_API_KEY}; stty echo' enter" \
