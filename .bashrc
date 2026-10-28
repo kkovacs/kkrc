@@ -125,7 +125,8 @@ function unwip() { git diff --quiet HEAD || return 1; local c=$(git rev-parse HE
 function gap() { gs ; git pull --rebase --autostash ; git add -A ; git commit -m wip ; git push ; } ; export -f gap
 # gat: "git at": diff a file with itself at a given ref
 function gat() { vimdiff "$1" <(git show "${2:-HEAD^}":./"$1" ) ; }
-alias gclean="git reset --hard && git clean -f -d -x"
+# Reset as if freshly checked out, EXCEPT untracked .env* files
+alias gclean="git reset --hard && git clean -f -d -x -e '.env*'"
 # xxd alternative. Interestingly, "hexdump" is more widespread than "od"
 #alias xxh="hexdump -v -e '\"%08.8_ax:\"' -e '16/1 \" %02x\"' -e '\"  \" 16/1 \"%_p\" \"\n\"'"
 
