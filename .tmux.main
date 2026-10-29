@@ -111,6 +111,7 @@ bind P choose-buffer
 
 # Keys INSIDE copy-mode
 bind -T copy-mode-vi Escape send -X cancel
+bind -T copy-mode-vi Space send -X select-word
 bind -T copy-mode-vi v send -X begin-selection
 bind -T copy-mode-vi V send -X select-line
 bind -T copy-mode-vi C-v send -X rectangle-toggle
