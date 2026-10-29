@@ -229,7 +229,7 @@ unbind -n C-BSpace
 # Do not auto-copy on mouse drag end
 unbind -T copy-mode-vi MouseDragEnd1Pane
 # Drag start in normal mode also starts selection of word
-bind -n MouseDrag1Pane copy-mode -t= \; send-keys -X select-word
+bind -n MouseDrag1Pane copy-mode -M -t= \; send-keys -X select-word
 # Use "c-q M" to disable tmux's selection and pass through mouse drag.
 # XXX: reload config to reset, for now
 bind M bind -n MouseDrag1Pane send-keys -M
