@@ -571,8 +571,8 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "LFM3 1.7B ..............................." "" "send-keys 'LiquidAI/LFM3-1.7B-GGUF:Q4_K_M'" \
 "LFM3 VL-2B .............................." "" "send-keys 'LiquidAI/LFM3-VL-2B-GGUF:Q4_K_M'" \
 "LFM3 Audio-2B............................" "" "send-keys 'LiquidAI/LFM3-Audio-2B-GGUF:Q4_K_M'" \
+"LFM3 Omni-2B............................." "" "send-keys 'LiquidAI/LFM3-Omni-2B-GGUF:Q4_K_M'" \
 "LFM3 d1-2B (jev) ........................" "" "send-keys 'LiquidAI/d1-2B-GGUF:Q4_K_M -b 8192 -ub 8192'" \
-"LFM3 d1-Omni-2B (jev)...................." "" "send-keys 'LiquidAI/LFM3-Omni-2B-GGUF:Q4_K_M -b 8192 -ub 8192'" \
 "GLM-OCR ................................." "" "send-keys 'ggml-org/GLM-OCR-GGUF'"
 
 # Submenu: environment
