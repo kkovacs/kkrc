@@ -26,6 +26,7 @@ set -gs extended-keys on
 set -gs -q extended-keys-format csi-u
 # Tell tmux your outer terminal supports extended keys
 # Adjust the glob to match your terminal's $TERM value
+# XXX Keeps adding on each reload?
 set -as terminal-features 'xterm*:extkeys'
 set -as terminal-features 'tmux*:extkeys'
 
@@ -254,9 +255,9 @@ bind x confirm-before -p "kill-pane #P? (y/n)" kill-pane
 bind | pipe-pane -o 'cat >>~/Desktop/tmux-output.#{q:session_name}.#I.#P.#{q:window_name}.txt'
 
 # Hardcopy pane visible
-bind y command-prompt -1 -p "Hardcopy VISIBLE pane in (a)scii or (c)olor?" "if-shell -F '#{==:%%,a}' 'capture-pane -J -b hardcopy' 'capture-pane -e -b hardcopy' ; save-buffer -b hardcopy '$HOME/Desktop/tmux-visible.#S.#I.#P.#W.#{client_activity}.txt' ; delete-buffer -b hardcopy ; display Saved"
+bind y command-prompt -1 -p "Hardcopy VISIBLE pane in (a)scii or (c)olor?" "if-shell -F '#{==:%%,a}' 'capture-pane -J -b hardcopy' 'capture-pane -e -b hardcopy' ; save-buffer -b hardcopy '$HOME/Desktop/tmux-visible.#S.#I.#P.#{client_activity}.txt' ; delete-buffer -b hardcopy ; display Saved"
 # Hardcopy pane history
-bind Y command-prompt -1 -p "Hardcopy HISTORY of pane in (a)scii or (c)olor?" "if-shell -F '#{==:%%,a}' 'capture-pane -S - -J -b hardcopy' 'capture-pane -S - -e -J -b hardcopy' ; save-buffer -b hardcopy '$HOME/Desktop/tmux-history.#S.#I.#P.#W.#{client_activity}.txt' ; delete-buffer -b hardcopy ; display Saved"
+bind Y command-prompt -1 -p "Hardcopy HISTORY of pane in (a)scii or (c)olor?" "if-shell -F '#{==:%%,a}' 'capture-pane -S - -J -b hardcopy' 'capture-pane -S - -e -J -b hardcopy' ; save-buffer -b hardcopy '$HOME/Desktop/tmux-history.#S.#I.#P.#{client_activity}.txt' ; delete-buffer -b hardcopy ; display Saved"
 
 # Reload tmux config
 bind R 'source-file ~/.kkrc/.tmux.main ; display ".tmux.main reloaded!"'
@@ -265,7 +266,7 @@ bind R 'source-file ~/.kkrc/.tmux.main ; display ".tmux.main reloaded!"'
 bind c-w pipe-pane -I 'cat ~/.kkrc/inject-bash.txt'
 
 # Inject bash config as if BROADCAST to all panes of current window.
-bind W load-buffer -b staticsendbuf ~/.kkrc/inject-bash.txt \; run-shell -b 'for a in $(tmux list-panes -F \#\D); do tmux paste-buffer -t "$a" -b staticsendbuf; done; tmux delete-buffer staticsendbuf; exit 0'
+bind W load-buffer -b staticsendbuf ~/.kkrc/inject-bash.txt \; run-shell -b 'for a in $(tmux list-panes -F \#\D); do tmux paste-buffer -t "$a" -b staticsendbuf; done; tmux delete-buffer -b staticsendbuf; exit 0'
 # Inject minimalist ash config. Second easiest key, used a lot
 bind c-e pipe-pane -I 'cat ~/.kkrc/inject-ash.txt'
 
@@ -374,7 +375,7 @@ bind "c-r" display-menu -T " Inject... " \
 "Inject vim config .................." "v" "pipe-pane -I 'cat ~/.kkrc/inject-vim.txt'" \
 "Run tmux config ...................." "s" "pipe-pane -I 'cat ~/.kkrc/inject-tmux.txt'" \
 "Run tmux PROD warning .............." "S" "pipe-pane -I 'cat ~/.kkrc/inject-tmux-red.txt'" \
-"Reload .tmux.main .................." "R" "source-file ~/.kkrc/.tmux.main ; display '.tmux.conf reloaded!'" \
+"Reload .tmux.main .................." "R" "source-file ~/.kkrc/.tmux.main ; display '.tmux.main reloaded!'" \
 "Reload .tmux.local ................." "0" "source-file ~/.tmux.local ; display '.tmux.local reloaded!'" \
 "Reload .tmux.init .................." "-" "source-file ~/.tmux.init" \
 "Reload .tmux.conf (screen-like) ...." "" "source-file ~/.tmux.conf" \
