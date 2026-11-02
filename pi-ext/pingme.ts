@@ -30,7 +30,9 @@ export default function (pi: ExtensionAPI) {
                 return;
             }
             url = value.toLowerCase() === "off" ? undefined : normalizePingmeUrl(value);
-            agentStartTime = null;
+            // Arming mid-run must NOT clear agentStartTime, so the settle of THAT run can ping.
+            // Disarming does clear it, else a later re-arm would ping from a stale start time.
+            if (!url) agentStartTime = null;
             ctx.ui.notify(url ? `📟 pingme: Active (>${afterSec}s)` : "📟 pingme: Off", "info");
         },
     });

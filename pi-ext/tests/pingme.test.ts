@@ -84,6 +84,36 @@ describe("pingme", () => {
         ]);
     });
 
+    it("pings the run during which it was armed", async () => {
+        const { url, hits } = counter();
+        pi = startPi([PINGME], { env: { PINGME: "", PINGME_AFTER: "1" } });
+
+        // Start a SLOW turn, arm pingme mid-flight, expect the ping at its settle
+        const settled = pi.until((e) => e.type === "agent_settled");
+        const resp = await pi.send({ type: "prompt", message: "SLOW" });
+        expect(resp.data?.disposition).toBe("started");
+        await pi.send({ type: "prompt", message: `/pingme ${url}` });
+        await settled;
+        await pingWindow();
+        expect(hits).toEqual(["/done"]);
+    });
+
+    it("does not ping the current run after off then on mid-run", async () => {
+        const { url, hits } = counter();
+        pi = startPi([PINGME], { env: { PINGME: "", PINGME_AFTER: "1" } });
+
+        // SLOW turn: arm, disarm, re-arm mid-flight; the timestamp is dropped on off
+        const settled = pi.until((e) => e.type === "agent_settled");
+        const resp = await pi.send({ type: "prompt", message: "SLOW" });
+        expect(resp.data?.disposition).toBe("started");
+        await pi.send({ type: "prompt", message: `/pingme ${url}` });
+        await pi.send({ type: "prompt", message: "/pingme off" });
+        await pi.send({ type: "prompt", message: `/pingme ${url}` });
+        await settled;
+        await pingWindow();
+        expect(hits).toEqual([]);
+    });
+
     it("does nothing without PINGME", async () => {
         const { hits } = counter();
         pi = startPi([PINGME], { env: { PINGME: "", PINGME_AFTER: "1" } });
