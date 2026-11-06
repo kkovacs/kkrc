@@ -548,7 +548,7 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "" \
 "Download (p)i ..........................." "p" setup_pi \
 "Bun install pi ........................" "c-p" setup_pi_bun \
-"Mistral EU endpoint for pi..............." "E" "send-keys ' echo \"{ \\\"providers\\\": { \\\"mistral\\\": { \\\"baseUrl\\\": \\\"https://api.eu.mistral.ai\\\" } } }\" >~/.pi/agent/models.json' enter" \
+"Mistral EU endpoint for pi..............." "m" "send-keys ' echo \"{ \\\"providers\\\": { \\\"mistral\\\": { \\\"baseUrl\\\": \\\"https://api.eu.mistral.ai\\\" } } }\" >~/.pi/agent/models.json' enter" \
 "Transfer pi-ext/ ........................" "e" "send-keys ' mkdir -p ~/.pi/agent/extensions && base64 -d | tar zxv -C ~/.pi/agent/extensions/' enter ; pipe-pane -I 'COPYFILE_DISABLE=1 tar cf - --no-xattrs -C ~/.kkrc/pi-ext/ . | gzip -c | base64 | fold -w76; echo; printf \"\\004\"'" \
 "Clean up pi ............................." "P" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi ~/.bun' enter" \
 "" \
@@ -585,7 +585,7 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 "" \
 "Load (e)nv.age to tmux .................." "E" "display-popup -T \"Load env.age to tmux\" -EE ~/.kkrc/other/load-env.sh ; source-file ~/.kkrc/.tmux.main" \
 "Inject \$AI_GATEWAY_API_KEY (Vercel) ....." "v" "send-keys ' stty -echo' enter ' export AI_GATEWAY_API_KEY=#{AI_GATEWAY_API_KEY}; stty echo' enter" \
-"Inject \$ANTHROPIC_API_KEY ..............." "a" "send-keys ' stty -echo' enter ' export ANTHROPIC_API_KEY=#{ANTHROPIC_API_KEY}; stty echo' enter" \
+"Inject \$ANTHROPIC_API_KEY ..............." "" "send-keys ' stty -echo' enter ' export ANTHROPIC_API_KEY=#{ANTHROPIC_API_KEY}; stty echo' enter" \
 "Inject \$CLAUDE_CODE_OAUTH_TOKEN ........." "Y" "send-keys ' stty -echo' enter ' export CLAUDE_CODE_OAUTH_TOKEN=#{CLAUDE_CODE_OAUTH_TOKEN}; stty echo' enter" \
 "Inject \$CLOUDFLARE_… ...................." "" "send-keys ' stty -echo' enter ' export CLOUDFLARE_API_KEY=#{CLOUDFLARE_API_KEY} CLOUDFLARE_ACCOUNT_ID=#{CLOUDFLARE_ACCOUNT_ID} CLOUDFLARE_GATEWAY_ID=#{CLOUDFLARE_GATEWAY_ID}; stty echo' enter" \
 "Inject \$ELEVENLABS_API_KEY .............." "" "send-keys ' stty -echo' enter ' export ELEVENLABS_API_KEY=#{ELEVENLABS_API_KEY}; stty echo' enter" \
