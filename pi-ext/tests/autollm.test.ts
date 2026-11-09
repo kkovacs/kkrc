@@ -46,7 +46,26 @@ describe("autollm", () => {
 
         expect(models.map((m) => [m.id, m.contextWindow, m.input, m.baseUrl])).toEqual([
             ["big", 32768, ["text", "image"], `${url}/v1`],
-            ["small", 128_000, ["text"], `${url}/v1`], // defaults
+            ["small", 128_000, ["text", "image"], `${url}/v1`], // defaults, unknown => vision
+        ]);
+        expect(pi!.notifies).toEqual([{ message: `🧠 autollm: 2 models at ${url}`, notifyType: "warning" }]);
+    });
+
+    it("keeps text-only input when the server explicitly says no vision", async () => {
+        const url = serve({
+            "/v1/models": {
+                data: [
+                    { id: "caps-no", capabilities: ["completion"] }, // array present => explicit no
+                    { id: "detail-no", details: { multimodal: false } }, // explicit no flag
+                ],
+            },
+        });
+
+        const models = await autollmModels(url);
+
+        expect(models.map((m) => [m.id, m.input])).toEqual([
+            ["caps-no", ["text"]],
+            ["detail-no", ["text"]],
         ]);
         expect(pi!.notifies).toEqual([{ message: `🧠 autollm: 2 models at ${url}`, notifyType: "warning" }]);
     });
