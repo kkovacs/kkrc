@@ -290,7 +290,7 @@ function pi0() { command pi -ns -nt -nc -na --no-mcp -t codemode "$@" ; } ; expo
 # Read-only pi agent (limited by tools).
 function pir() { command pi -ns --no-mcp -t read,grep,find,ls,codemode "$@" ; } ; export -f pir
 # Shortcut to enable codemode and load kkrc extensions
-function pp() { command pi -t +codemode $([ -d ~/.kkrc/pi-ext ] && printf -- '-e %s ' ~/.kkrc/pi-ext) "$@" ; } ; export -f pp
+function pp() { command pi -t +codemode $(for ext in ~/.kkrc/pi-ext/*.ts; do printf -- '-e %s ' "$ext"; done) "$@" ; } ; export -f pp
 
 # ~/.local/bin is in the XDG Base Directory Specification: https://specifications.freedesktop.org/basedir/latest/
 # Use linuxbrew if installed. Pi installs rg and fd even on older systems, why not use them.
