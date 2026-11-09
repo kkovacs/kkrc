@@ -21,11 +21,13 @@ function getCtxWin(m: Record<string, unknown>): number | undefined {
   return undefined;
 }
 
-function isMultimodal(m: Record<string, unknown>): boolean {
-  const caps = m.capabilities as string[] | undefined;
-  if (caps?.includes("multimodal")) return true;
+// Tri-state; unknown => claim vision (servers often don't label)
+function getMultimodal(m: Record<string, unknown>): boolean | undefined {
+  const caps = m.capabilities;
+  if (Array.isArray(caps)) return caps.includes("multimodal");
   const details = m.details as Record<string, unknown> | undefined;
-  return details?.multimodal === true;
+  if (typeof details?.multimodal === "boolean") return details.multimodal;
+  return undefined;
 }
 
 // llama.cpp (OpenAI mode) returns two parallel arrays: `data` carries
@@ -72,7 +74,7 @@ async function probe(baseUrl: string, apiKey?: string) {
             context_window: getCtxWin(m) ?? DEFAULT_CONTEXT_WINDOW,
             // Pi clamps this to the live context per request; static default is fine.
             max_tokens: typeof m.max_tokens === "number" ? m.max_tokens : DEFAULT_MAX_TOKENS,
-            multimodal: isMultimodal(m),
+            multimodal: getMultimodal(m) ?? true,
           };
         })
         .filter((x): x is NonNullable<typeof x> => x !== null);
