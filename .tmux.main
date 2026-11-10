@@ -416,6 +416,7 @@ bind -T menus "c-r" display-menu -T " Modify... " \
 "Drop .screenrc ....................." "x" "send-keys ' cat >~/.screenrc' enter ; pipe-pane -I 'cat ~/.kkrc/.screenrc; printf \"\\004\"'" \
 "Drop .(e)ditorconfig ..............." "e" setup_editorconfig \
 "" \
+"(l)s non-package binaries .........." "l" "send-keys ' command -v brew list; ls -F --color=auto /usr/local/{bin,sbin}/ ~/.bun/bin ~/.pi/agent/bin ~/.local/bin/ 2>/dev/null' enter" \
 "Modify .(b)ashrc ..................." "b" setup_bashrc \
 "Setup PROD (w)arn .................." "w" "send-keys ' printf \"\\033[00;31mPRODUCTION SERVER\\033[00m\" | sudo tee /etc/debian_chroot ; . ~/.bashrc' enter" \
 "Remove PROD (W)arn ................." "W" "send-keys ' sudo rm /etc/debian_chroot; unset debian_chroot' enter" \
