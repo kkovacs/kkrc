@@ -154,6 +154,27 @@ else
     fail "[$U] outbound network reachable"
 fi
 
+# Environment must not leak host secrets.
+# To make this meaningful, export a canary BEFORE starting the sandbox, e.g.:
+#   SANDBOX_TEST_CANARY=leak MY_API_KEY=leak ./other/sandbox.sh sh other/test-sandbox.sh
+# (without it the secret-name scan below still runs, but can only catch vars that happen to exist)
+if [ -n "${SANDBOX_TEST_CANARY+x}" ]; then
+    fail "[$U] env: canary SANDBOX_TEST_CANARY leaked into the sandbox"
+else
+    pass "[$U] env: canary SANDBOX_TEST_CANARY not present"
+fi
+# Secret-looking names. SSH_AUTH_SOCK is allowed on apple only (--ssh is intentional there).
+leaked=$(env | cut -d= -f1 | grep -i -E 'KEY|TOKEN|SECRET|PASS|CRED|AUTH|COOKIE|SESSION' \
+         | { if [ "$IS_APPLE" -eq 1 ]; then grep -v '^SSH_AUTH_SOCK$'; else cat; fi; } | tr '\n' ' ')
+if [ -z "$leaked" ]; then
+    pass "[$U] env: no secret-looking variables"
+else
+    fail "[$U] env: secret-looking variables present: $leaked"
+fi
+# Informational: anything outside the expected minimal set (not a failure; containers add some).
+extra=$(env | cut -d= -f1 | grep -v -x -E 'HOME|PATH|TERM|COLORTERM|LANG|LC_ALL|TZ|PWD|OLDPWD|SHLVL|_|HOSTNAME|container|SSH_AUTH_SOCK' | tr '\n' ' ')
+[ -z "$extra" ] || echo "INFO: [$U] env: extra variables present: $extra"
+
 # Host SSH keys hidden
 if [ -z "$(ls -A /root/.ssh 2>/dev/null)" ]; then
     pass "[$U] /root/.ssh hidden"
