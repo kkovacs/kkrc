@@ -12,7 +12,10 @@ mount -t tmpfs t /mnt                        # scratch space (/run, /tmp may be 
 N=/mnt/new; mkdir $N; mount -t tmpfs t $N    # pivot_root needs a mount point
 for d in usr etc var opt; do                 # system dirs: read-only binds
   [ -d /$d ] || continue
-  mkdir $N/$d; mount --rbind /$d $N/$d; mount -o remount,bind,ro $N/$d
+  mkdir $N/$d; mount --rbind /$d $N/$d
+  # remount ro the bind AND every submount under it (a bind remount is not recursive)
+  while IFS= read -r m; do mount -o remount,bind,ro "$m"; done < <(
+    awk -v p="$N/$d" '"'"'$5==p || index($5,p"/")==1 {print $5}'"'"' /proc/self/mountinfo | while IFS= read -r m; do printf "%b\n" "$m"; done)
 done
 for l in bin sbin lib lib64; do ln -s usr/$l $N/$l; done
 mkdir -p "$N$H" $N/tmp $N/dev $N/proc $N/run
