@@ -3,14 +3,14 @@
 # Minimalist sandbox solution using only default Linux tools, no root needed on Ubuntu 26.04.
 #
 # sandbox [cmd...] - run cmd (default: bash -i) as the current uid in a fresh root:
-# only $PWD is real/writable; /usr /etc /var /opt are read-only; fresh /tmp; nothing else of the host.
+# only $PWD is real/writable; /usr /etc are read-only; fresh /tmp; nothing else of the host.
 H=$(pwd -P) R=$(readlink -f /etc/resolv.conf) U=$(id -u) G=$(id -g)
 [ $# -eq 0 ] && set -- bash -i
 exec unshare --map-root-user --mount --pid --fork --kill-child --uts --ipc --propagation private env H="$H" R="$R" U="$U" G="$G" bash -c '
 set -eu
 mount -t tmpfs t /mnt                        # scratch space (/run, /tmp may be unwritable)
 N=/mnt/new; mkdir $N; mount -t tmpfs t $N    # pivot_root needs a mount point
-for d in usr etc var opt; do                 # system dirs: read-only binds
+for d in usr etc; do                         # system dirs: read-only binds
   [ -d /$d ] || continue
   mkdir $N/$d; mount --rbind /$d $N/$d
   # remount ro the bind AND every submount under it (a bind remount is not recursive)
