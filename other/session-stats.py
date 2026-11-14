@@ -20,7 +20,9 @@ Directory overrides come from the environment (no CLI clutter):
     PI_SESSIONS_DIR, CLAUDE_PROJECTS_DIR, CODEX_HOME, OPENCODE_DB, XDG_DATA_HOME.
 
 OpenCode note: we trust OpenCode's own per-message cost as the authoritative
-total and derive the component split from its tokens (scaled to that total).
+total when it is non-zero (0 means the provider didn't report pricing; then we
+price from tokens via models.dev) and derive the component split from its
+tokens (scaled to that total).
 The provider it stores (per message and per session) is looked up in models.dev,
 so non-opencode-go models price correctly; providers absent from models.dev
 still show their total, just without a component shape.
@@ -599,7 +601,9 @@ def collect_opencode(catalog: dict) -> dict[str, Any] | None:
                 if c:
                     comps = opencode_usage_cost(c, tok)
                 stored = d.get("cost")
-                if isinstance(stored, (int, float)):
+                # OpenCode stores cost=0 as "provider didn't report pricing" - treat
+                # as no data and keep the token-based models.dev components instead.
+                if isinstance(stored, (int, float)) and stored > 0:
                     total = float(stored)
                     if comps and comps["total"] > 0:
                         factor = total / comps["total"]
