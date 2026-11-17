@@ -633,19 +633,20 @@ bind -T menus "v" display-menu -T " vim... " \
 
 # Submenu: zmodem-like (= binary-to-ascii and back)
 bind -T menus "z" display-menu -T " Zmodem... " \
-"tmodem send ......................" "z" "command-prompt -p 'Send path:' -I '/' \"send-keys ' base64 -d | tar zxv' enter ; run-shell '(COPYFILE_DISABLE=1 tar cf - --no-xattrs -C `dirname %1` `basename %1` | gzip -c | base64 -w76; echo) | tmux load-buffer -b sendbuf -' ; paste-buffer -r -d -b sendbuf ; send-keys C-d\"" \
+"kmodem: send to remote >./kmodem.bin " "s" "command-prompt -p 'kmodem send (path):' \"set @kmodem-path \\\"%%%\\\" ; pipe-pane -IO \\\"~/.kkrc/other/kmodem.py send ##{q:@kmodem-path}\\\" ; send-keys 'bash -c \\\"\\\$(printf KM%s READY >&2; base64 -d </dev/tty | gunzip)\\\" kmodem' Enter\"" \
+"kmodem: | from remote >~/.kmodem.bin " "r" "pipe-pane -IO '~/.kkrc/other/kmodem.py recv' ; send-keys End ' | bash -c \"\$(printf KM%s READY >&2; base64 -d </dev/tty | gunzip)\" kmodem' Enter" \
 "" \
-"gzip+base64 ingress .............." "i" "send-keys ' (base64 -di | gunzip) > '" \
-"gzip+base64 egress ..............." "e" "send-keys ' | gzip -c | base64 -w\${COLUMNS:-76}' Home" \
+"gzip+base64 ingress ................." "i" "send-keys ' (base64 -di | gunzip) > '" \
+"gzip+base64 egress .................." "e" "send-keys ' | gzip -c | base64 -w\${COLUMNS:-76}' Home" \
 "" \
-"tar+gzip+base64 ingress .........." "I" "send-keys ' (base64 -di | tar zxv)'" \
-"tar+gzip+base64 egress ..........." "E" "send-keys ' COPYFILE_DISABLE=1 tar cf - --no-xattrs . | gzip -c | base64 -w\${COLUMNS:-76}'" \
+"tar+gzip+base64 ingress ............." "I" "send-keys ' (base64 -di | tar zxv)'" \
+"tar+gzip+base64 egress .............." "E" "send-keys ' COPYFILE_DISABLE=1 tar cf - --no-xattrs . | gzip -c | base64 -w\${COLUMNS:-76}'" \
 "" \
-"Poor man's \"xxd\" with hexdump ...." "h" "send-keys \" | hexdump -v -e '\\\"%08.8_ax:\\\"' -e '16/1 \\\" %02x\\\"' -e '\\\"  \\\" 16/1 \\\"%_p\\\" \\\"\\\\n\\\"' \" Home" \
-"Poor man's \"xxd\" with od ........." "o" 'send-keys " | od -v -A x -t x1z "' \
+"Poor man's \"xxd\" with hexdump ......." "h" "send-keys \" | hexdump -v -e '\\\"%08.8_ax:\\\"' -e '16/1 \\\" %02x\\\"' -e '\\\"  \\\" 16/1 \\\"%_p\\\" \\\"\\\\n\\\"' \" Home" \
+"Poor man's \"xxd\" with od ............" "o" 'send-keys " | od -v -A x -t x1z "' \
 "" \
-"Bytestream with hexdump .........." "b" "send-keys \"hexdump -v -e '32/1 \\\" %02x\\\" \\\"\\\\n\\\"' \"" \
-"Bytestream reverse ..............." "r" "send-keys 'while read -r -d \" \" x; do [ -n \"\$x\" ] && printf \"\\x\${x}\"; done'"
+"Bytestream with hexdump ............." "b" "send-keys \"hexdump -v -e '32/1 \\\" %02x\\\" \\\"\\\\n\\\"' \"" \
+"Bytestream reverse .................." "r" "send-keys 'while read -r -d \" \" x; do [ -n \"\$x\" ] && printf \"\\x\${x}\"; done'"
 
 # Local commands:
 # Local menu - override this from ~/.tmux.local
