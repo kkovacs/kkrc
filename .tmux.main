@@ -633,8 +633,8 @@ bind -T menus "v" display-menu -T " vim... " \
 
 # Submenu: zmodem-like (= binary-to-ascii and back)
 bind -T menus "z" display-menu -T " Zmodem... " \
-"kmodem: send to remote >./kmodem.bin " "s" "command-prompt -p 'kmodem send (path):' \"set @kmodem-path \\\"%%%\\\" ; pipe-pane -IO \\\"~/.kkrc/other/kmodem.py send ##{q:@kmodem-path}\\\" ; send-keys 'bash -c \\\"\\\$(printf KM%s READY >&2; base64 -d </dev/tty | gunzip)\\\" kmodem' Enter\"" \
-"kmodem: | from remote >~/.kmodem.bin " "r" "pipe-pane -IO '~/.kkrc/other/kmodem.py recv' ; send-keys End ' | bash -c \"\$(printf KM%s READY >&2; base64 -d </dev/tty | gunzip)\" kmodem' Enter" \
+"kmodem send to remote > ./kmodem.bin" "s" "command-prompt -p 'kmodem send (path):' \"set @kmodem-path \\\"%%%\\\" ; pipe-pane -IO \\\"~/.kkrc/other/kmodem.py send ##{q:@kmodem-path}\\\" ; send-keys 'bash -c \\\"\\\$(printf KM%s READY >&2; base64 -d </dev/tty | gunzip)\\\" kmodem' Enter\"" \
+"kmodem | from remote > ~/kmodem.bin" "r" "pipe-pane -IO '~/.kkrc/other/kmodem.py recv' ; send-keys End ' | bash -c \"\$(printf KM%s READY >&2; base64 -d </dev/tty | gunzip)\" kmodem' Enter" \
 "" \
 "gzip+base64 ingress ................." "i" "send-keys ' (base64 -di | gunzip) > '" \
 "gzip+base64 egress .................." "e" "send-keys ' | gzip -c | base64 -w\${COLUMNS:-76}' Home" \
