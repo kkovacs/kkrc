@@ -116,22 +116,19 @@ function gs(){ git status -sb "$@"; }
 function gf(){ git fetch --all -v "$@"; }
 function gp(){ git pull --ff-only -v "$@"; }
 function ga(){ git commit --amend "$@"; }
-export -f ts gl gs gf gp ga
 # W: "git add + commit" changed files (not untracked).
-function W() { git add -u ; git commit -m wip ; gs ; } ; export -f W
+function W() { git add -u ; git commit -m wip ; gs ; }
 # unwip: fold the contiguous tip of "wip" commits into the index. Never move a commit any remote branch already contains.
-function unwip() { git diff --quiet HEAD || return 1; local c=$(git rev-parse HEAD); while [ "$(git log -1 --format=%s $c)" = wip ] && git rev-parse -q --verify $c^ >/dev/null && [ -z "$(git branch -r --contains $c)" ]; do c=$(git rev-parse $c^) || return 1; done; git reset --soft $c && gs; } ; export -f unwip
+function unwip() { git diff --quiet HEAD || return 1; local c=$(git rev-parse HEAD); while [ "$(git log -1 --format=%s $c)" = wip ] && git rev-parse -q --verify $c^ >/dev/null && [ -z "$(git branch -r --contains $c)" ]; do c=$(git rev-parse $c^) || return 1; done; git reset --soft $c && gs; }
 # gap: "git pull + add + push": sync, to be used with a notes directory
-function gap() { gs ; git pull --rebase --autostash ; git add -A ; git commit -m wip ; git push ; } ; export -f gap
-# gat: "git at": diff a file with itself at a given ref
-function gat() { vimdiff "$1" <(git show "${2:-HEAD^}":./"$1" ) ; }
+function gap() { gs ; git pull --rebase --autostash ; git add -A ; git commit -m wip ; git push ; }
 # Reset as if freshly checked out, EXCEPT untracked .env* files
 alias gclean="git reset --hard && git clean -f -d -x -e '.env*'"
 # xxd alternative. Interestingly, "hexdump" is more widespread than "od"
 #alias xxh="hexdump -v -e '\"%08.8_ax:\"' -e '16/1 \" %02x\"' -e '\"  \" 16/1 \"%_p\" \"\n\"'"
 
 # Highlight function: each argument is a regex, colored 31, 32, ... in order. Use "." to skip one. Needs GNU sed.
-function hl() { local c=31 a e=(); for a; do [ "$a" = . ] || e+=(-e "s#$a#\x1b[1;${c}m&\x1b[0m#g"); ((c++)); done; sed -E -u "${e[@]}"; } ; export -f hl
+function hl() { local c=31 a e=(); for a; do [ "$a" = . ] || e+=(-e "s#$a#\x1b[1;${c}m&\x1b[0m#g"); ((c++)); done; sed -E -u "${e[@]}"; }
 
 # Recursive git. No args: "git status -sb" for repos with uncommitted changes to tracked files; unchanged repos are listed as a single line (safe to pull). With args: run that git command on ALL repos.
 function G() { local only_dirty=; [ "$#" -lt 1 ] && { only_dirty=1; set -- status -sb; }; find . -name .git -type d | while read -r a; do a="${a%.git}"; tput smso; echo "$a"; tput rmso; if [ -z "$only_dirty" ] || ! command git -C "$a" diff-index --quiet --ignore-submodules HEAD --; then command git -C "$a" "$@"; fi; done ; }
@@ -154,7 +151,7 @@ function s() { tmux attach-session || tmux new-session \; set prefix2 c-a ; }
 function sx() { screen -xRS llm "$@" ; }
 
 # Avoid mandatory reconfiguration of git with user/email for hotfixes. File permission matching git does by itself since 2022 (was here earlier)
-function git() { command git -c user.email="${USER:-$(id -un)}@${HOSTNAME:-$(uname -n)}" -c user.name="${USER:-$(id -un)}" "$@" ; } ; export -f git
+function git() { command git -c user.email="${USER:-$(id -un)}@${HOSTNAME:-$(uname -n)}" -c user.name="${USER:-$(id -un)}" "$@" ; }
 # Anyone else here remember when `mount` and `df` were 2-3 actual disks...?
 function M() { mount "$@" | grep '^\/dev\/' ; }
 function D() { df -h "$@" | grep -v 'snap\|^tmpfs\|^udev\|^none\|^overlay\|^shm\|^efivarfs' ; }
@@ -286,15 +283,18 @@ complete -F _scc "${!_SCA[@]}"
 
 # XXX "-ne" should also be there, but it seems to disable codemode
 # Isolated pi agent (attachments and prompt only). See inject-ai-subagent.md
-function pi0() { command pi -ns -nt -nc -na --no-mcp -t codemode "$@" ; } ; export -f pi0
+function pi0() { command pi -ns -nt -nc -na --no-mcp -t codemode "$@" ; }
 # Read-only pi agent (limited by tools).
-function pir() { command pi -ns --no-mcp -t read,grep,find,ls,codemode "$@" ; } ; export -f pir
+function pir() { command pi -ns --no-mcp -t read,grep,find,ls,codemode "$@" ; }
 # Shortcut to enable codemode and load kkrc extensions
-function pp() { command pi -t +codemode $([ -d ~/.kkrc/pi-ext ] && for ext in ~/.kkrc/pi-ext/*.ts; do printf -- '-e %s ' "$ext"; done) "$@" ; } ; export -f pp
+function pp() { command pi -t +codemode $([ -d ~/.kkrc/pi-ext ] && for ext in ~/.kkrc/pi-ext/*.ts; do printf -- '-e %s ' "$ext"; done) "$@" ; }
 
 # ~/.local/bin is in the XDG Base Directory Specification: https://specifications.freedesktop.org/basedir/latest/
 # Use linuxbrew if installed. Pi installs rg and fd even on older systems, why not use them.
 for p in "$HOME/.local/bin" /home/linuxbrew/.linuxbrew/{bin,sbin} "$HOME/.bun/bin" "$HOME/.pi/agent/bin"; do [[ ":$PATH:" == *":$p:"* ]] || PATH="${PATH+$PATH:}$p"; done
+
+# Export what needs to be passed down to subshells
+export -f ts gl gf gp ga W gap hl git pi0 pir pp
 
 # END of part to be injected
 
