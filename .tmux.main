@@ -549,7 +549,7 @@ bind -T menus "h" display-menu -T " Harnesses... " \
 "Bun install pi ........................" "c-p" setup_pi_bun \
 "Clean up pi ............................." "P" "send-keys ' rm -rf ~/.pi ~/.local/bin/pi ~/.bun' enter" \
 "Mistral EU endpoint for pi..............." "m" "send-keys ' mkdir -p ~/.pi/agent && echo \"{ \\\"providers\\\": { \\\"mistral\\\": { \\\"baseUrl\\\": \\\"https://api.eu.mistral.ai\\\" } } }\" >~/.pi/agent/models.json' enter" \
-"Transfer pi-ext/ ........................" "e" "send-keys ' mkdir -p ~/.pi/agent/extensions && base64 -d | tar zxv -C ~/.pi/agent/extensions/' enter ; pipe-pane -I 'COPYFILE_DISABLE=1 tar cf - --no-xattrs -C ~/.kkrc/pi-ext/ . | gzip -c | base64 | fold -w76; echo; printf \"\\004\"'" \
+"Transfer pi-ext/ ........................" "e" "send-keys ' mkdir -p ~/.pi/agent/extensions && base64 -d | tar zxv -C ~/.pi/agent/extensions/' enter ; pipe-pane -I 'COPYFILE_DISABLE=1 tar cf - --no-xattrs -C ~/.kkrc/pi-ext/ . | gzip -c | base64 -w76; echo; printf \"\\004\"'" \
 "" \
 "Download (o)pencode......................" "o" setup_opencode \
 "bun install opencode .................." "c-o" "send-keys ' bun install -g --minimum-release-age 1 --trust @opencode-ai/cli' enter" \
@@ -614,7 +614,7 @@ bind -T menus "e" display-menu -T " inject from tmux session environment... " \
 # Submenu: sandbox
 # Note: Not adding `--user "$(id -u):$(id -g)"` because no sudo :-/
 bind -T menus "s" display-menu -T " Sandbox... " \
-"Inject sandbox.sh .................." "s" "send-keys ' bash -c \"\$(base64 -d | gunzip)\" sandbox.sh' enter ; pipe-pane -I 'gzip -c ~/.kkrc/other/sandbox.sh | base64 | fold -w76; echo; printf \"\\004\"'" \
+"Inject sandbox.sh .................." "s" "send-keys ' bash -c \"\$(base64 -d | gunzip)\" sandbox.sh' enter ; pipe-pane -I 'gzip -c ~/.kkrc/other/sandbox.sh | base64 -w76; echo; printf \"\\004\"'" \
 "Start bwrap on 26.04 ..............." "6" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-26.txt'" \
 "Start bwrap on 24.04 ..............." "4" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-bwrap-24.txt'" \
 "Start podman ......................." "p" "pipe-pane -I 'cat ~/.kkrc/inject-sandbox-podman.txt'" \
@@ -633,13 +633,16 @@ bind -T menus "v" display-menu -T " vim... " \
 
 # Submenu: zmodem-like (= binary-to-ascii and back)
 bind -T menus "z" display-menu -T " Zmodem... " \
-"tmodem send ......................" "z" "command-prompt -p 'Send path:' -I '/' \"send-keys ' base64 -d | tar zxv' enter ; run-shell '(COPYFILE_DISABLE=1 tar cf - --no-xattrs -C `dirname %1` `basename %1` | gzip -c | base64 | fold -w76; echo) | tmux load-buffer -b sendbuf -' ; paste-buffer -r -d -b sendbuf ; send-keys C-d\"" \
+"tmodem send ......................" "z" "command-prompt -p 'Send path:' -I '/' \"send-keys ' base64 -d | tar zxv' enter ; run-shell '(COPYFILE_DISABLE=1 tar cf - --no-xattrs -C `dirname %1` `basename %1` | gzip -c | base64 -w76; echo) | tmux load-buffer -b sendbuf -' ; paste-buffer -r -d -b sendbuf ; send-keys C-d\"" \
 "" \
-"tar+gzip+base64 ingress .........." "i" "send-keys \" (base64 -di | tar zxv)\" enter" \
-"tar+gzip+base64 egress ..........." "e" "send-keys ' COPYFILE_DISABLE=1 tar cf - --no-xattrs . | gzip -c | base64 -w0'" \
+"gzip+base64 ingress .............." "i" "send-keys ' (base64 -di | gunzip) > '" \
+"gzip+base64 egress ..............." "e" "send-keys ' | gzip -c | base64 -w\${COLUMNS:-76}' Home" \
 "" \
-"Poor man's \"xxd\" with hexdump ...." "h" "send-keys \"hexdump -v -e '\\\"%08.8_ax:\\\"' -e '16/1 \\\" %02x\\\"' -e '\\\"  \\\" 16/1 \\\"%_p\\\" \\\"\\\\n\\\"' " \
-"Poor man's \"xxd\" with od ........." "o" 'send-keys "od -v -A x -t x1z "' \
+"tar+gzip+base64 ingress .........." "I" "send-keys ' (base64 -di | tar zxv)'" \
+"tar+gzip+base64 egress ..........." "E" "send-keys ' COPYFILE_DISABLE=1 tar cf - --no-xattrs . | gzip -c | base64 -w\${COLUMNS:-76}'" \
+"" \
+"Poor man's \"xxd\" with hexdump ...." "h" "send-keys \" | hexdump -v -e '\\\"%08.8_ax:\\\"' -e '16/1 \\\" %02x\\\"' -e '\\\"  \\\" 16/1 \\\"%_p\\\" \\\"\\\\n\\\"' \" Home" \
+"Poor man's \"xxd\" with od ........." "o" 'send-keys " | od -v -A x -t x1z "' \
 "" \
 "Bytestream with hexdump .........." "b" "send-keys \"hexdump -v -e '32/1 \\\" %02x\\\" \\\"\\\\n\\\"' \"" \
 "Bytestream reverse ..............." "r" "send-keys 'while read -r -d \" \" x; do [ -n \"\$x\" ] && printf \"\\x\${x}\"; done'"
