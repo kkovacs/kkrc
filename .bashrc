@@ -121,7 +121,7 @@ function W() { git add -u ; git commit -m wip ; gs ; }
 # unwip: fold the contiguous tip of "wip" commits into the index. Never move a commit any remote branch already contains.
 function unwip() { git diff --quiet HEAD || return 1; local c=$(git rev-parse HEAD); while [ "$(git log -1 --format=%s $c)" = wip ] && git rev-parse -q --verify $c^ >/dev/null && [ -z "$(git branch -r --contains $c)" ]; do c=$(git rev-parse $c^) || return 1; done; git reset --soft $c && gs; }
 # gap: "git pull + add + push": sync, to be used with a notes directory
-function gap() { gs ; git pull --rebase --autostash ; git add -A ; git commit -m wip ; git push ; }
+function gap() { git status -sb ; git pull --rebase --autostash ; git add -A ; git commit -m wip ; git push ; }
 # Reset as if freshly checked out, EXCEPT untracked .env* files
 alias gclean="git reset --hard && git clean -f -d -x -e '.env*'"
 # xxd alternative. Interestingly, "hexdump" is more widespread than "od"
