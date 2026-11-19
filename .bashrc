@@ -115,6 +115,7 @@ function gl(){ git log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Crese
 function gs(){ git status -sb "$@"; }
 function gf(){ git fetch --all -v "$@"; }
 function gp(){ git pull --ff-only -v "$@"; }
+function gpp(){ git pull --rebase --autostash -v "$@"; }
 function ga(){ git commit --amend "$@"; }
 # W: "git add + commit" changed files (not untracked).
 function W() { git add -u ; git commit -m wip ; gs ; }
