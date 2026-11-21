@@ -502,10 +502,12 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "Inject fancy 'set -x' .............." "x" "send-keys \"export PS4=\$'+\\\\t\$(date -Iseconds) L\\\$LINENO:\\\\t '\" enter" \
 "" \
 "Install (o)bscura .................." "o" "send-keys ' mkdir -p ~/.local/bin ; curl -fL https://github.com/h4ckf0r0day/obscura/releases/latest/download/obscura-\$(uname -m)-linux.tar.gz | tar zxv -C ~/.local/bin/' enter" \
-"… (m)cp add obscura ................" "m" "send-keys ' mcp add browser -- obscura mcp --allow-private-network' enter" \
-"… (M)cp add chrome npx ............." "M" "send-keys ' mcp add chrome -- bun x chrome-devtools-mcp@latest --browserUrl=http://127.0.0.1:9222' enter" \
-"Docker run chrome CDP .............." "c" "send-keys 'sudo docker run -u `id -u $USER` -it --rm --add-host host.docker.internal:host-gateway -p 127.0.0.1:9222:9222 chromedp/headless-shell:latest --no-sandbox --disable-web-security --disable-site-isolation-trials --window-size=1280,720' enter" \
-"… params for (c)hrome devtools ....." "D" "send-keys ' --remote-debugging-port=9222 --user-data-dir=/tmp/cdp/ --disable-web-security --disable-site-isolation-trials --no-first-run --no-default-browser-check --disable-signin-promo --disable-sync --disable-infobars https://example.com/ ; rm -rf /tmp/cdp' enter" \
+"… mcp add obscura ................" "c-o" "send-keys ' mcp add obscura -- obscura mcp --allow-private-network' enter" \
+"Install (l)ightpanda ..............." "l" "send-keys ' mkdir -p ~/.local/bin ; curl -fL https://github.com/lightpanda-io/browser/releases/latest/download/lightpanda-\$(uname -m)-linux -o ~/.local/bin/lightpanda && chmod 755 ~/.local/bin/lightpanda' enter" \
+"… mcp add lightpanda ............." "c-l" "send-keys ' mcp add lightpanda -- lightpanda mcp' enter" \
+"Docker-run chrome CDP .............." "c" "send-keys 'sudo docker run -u `id -u $USER` -it --rm --add-host host.docker.internal:host-gateway -p 127.0.0.1:9222:9222 chromedp/headless-shell:latest --no-sandbox --disable-web-security --disable-site-isolation-trials --window-size=1280,720' enter" \
+"… (M)cp add chrome npx ............." "M" "send-keys ' mcp add chromecdp -- bun x chrome-devtools-mcp@latest --browserUrl=http://127.0.0.1:9222' enter" \
+"… params for chrome (D)evtools ....." "D" "send-keys ' --remote-debugging-port=9222 --user-data-dir=/tmp/cdp/ --disable-web-security --disable-site-isolation-trials --no-first-run --no-default-browser-check --disable-signin-promo --disable-sync --disable-infobars https://example.com/ ; rm -rf /tmp/cdp' enter" \
 "" \
 "Install (t)ailcat .................." "t" "send-keys ' mkdir -p ~/.local/bin ; curl -fL https://github.com/tailscale/tailcat/releases/latest/download/tailcat_0.7.0_linux_\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | tar zxv -C ~/.local/bin/ tailcat' enter" \
 "Install (b)rew ....................." "b" setup_brew \
