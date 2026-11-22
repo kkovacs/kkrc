@@ -2,9 +2,8 @@
 /**
  * Opencode Go — Privacy / ZDR Retriever
  *
- * Fetches the public OpenCode Go docs page and parses:
- *   - the "Privacy" table   (ZDR status per model)
- *   - the pricing table     (Usage tier + token prices)
+ * Fetches model metadata (ZDR flag, token prices, monthly usage tier) from
+ * the public models API, and the docs page only for the Privacy footnotes.
  *
  * Prints one concise table per model with ZDR status, tier, token prices,
  * and a STATUS column that is either OK or a compact list of failed filters.
@@ -13,7 +12,8 @@
  *   ./other/opencode-status.ts
  */
 
-const DOCS_URL = "https://opencode.ai/v2/docs/console/go/";
+const DOCS_URL = "https://opencode.ai/docs/console/go/";
+const MODELS_URL = "https://opencode.ai/inference/go/v1/models";
 
 // ─── Terminal colors ───────────────────────────────────────────────────────
 
@@ -64,18 +64,7 @@ function printTable(
   }
 }
 
-interface PrivacyRow {
-  model: string;
-  training: string;
-  retention: string;
-}
-
-// Collapse a model name so dash/space/spacing variants join across tables.
-function normalizeModel(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
-}
-
-// ─── HTML helpers ──────────────────────────────────────────────────────────
+// ─── HTML helpers ────────────────────────────────────────────────────────────
 
 function decodeEntities(s: string): string {
   return s
@@ -107,27 +96,16 @@ async function fetchDocsHtml(): Promise<string> {
   return res.text();
 }
 
-function extractPrivacy(html: string): { rows: PrivacyRow[]; notes: string[] } {
+// Footnotes are the <ul> immediately after the Privacy table.
+function extractPrivacyNotes(html: string): string[] {
   const anchor = html.indexOf('<h2 id="privacy"');
   if (anchor === -1) throw new Error("Could not locate the Privacy section (#privacy)");
 
   const section = html.slice(anchor);
+  const tableEnd = section.indexOf("</table>");
+  if (tableEnd === -1) throw new Error("Could not locate the Privacy table");
 
-  const tableMatch = section.match(/<table>([\s\S]*?)<\/table>/);
-  if (!tableMatch) throw new Error("Could not locate the Privacy table");
-
-  const rows: PrivacyRow[] = [];
-  for (const tr of tableMatch[1].matchAll(/<tr>([\s\S]*?)<\/tr>/g)) {
-    const cells = [...tr[1].matchAll(/<t[dh]>([\s\S]*?)<\/t[dh]>/g)].map((m) =>
-      stripTags(m[1]),
-    );
-    if (cells.length < 3) continue;
-    if (cells[0].toLowerCase() === "model") continue; // header row
-    rows.push({ model: cells[0], training: cells[1], retention: cells[2] });
-  }
-
-  // Footnotes are the <ul> immediately after the table.
-  const afterTable = section.slice((tableMatch.index ?? 0) + tableMatch[0].length);
+  const afterTable = section.slice(tableEnd);
   const ulMatch = afterTable.match(/<ul>([\s\S]*?)<\/ul>/);
   const notes: string[] = [];
   if (ulMatch) {
@@ -136,70 +114,41 @@ function extractPrivacy(html: string): { rows: PrivacyRow[]; notes: string[] } {
       if (text) notes.push(text);
     }
   }
-
-  return { rows, notes };
+  return notes;
 }
 
-// Locate a <table> whose header row contains ALL of `headers`.
-// Each header may be a string or an array of acceptable alternatives.
-function findTableByHeader(html: string, headers: (string | string[])[]): string {
-  for (const table of html.matchAll(/<table>([\s\S]*?)<\/table>/g)) {
-    const body = table[1];
-    const firstRow = body.match(/<tr>([\s\S]*?)<\/tr>/);
-    if (!firstRow) continue;
-    const head = [...firstRow[1].matchAll(/<t[dh]>([\s\S]*?)<\/t[dh]>/g)].map((m) =>
-      stripTags(m[1]).toLowerCase(),
-    );
-    if (headers.every((h) => {
-      const alts = Array.isArray(h) ? h : [h];
-      return head.some((c) => alts.some((a) => c.includes(a)));
-    })) return body;
-  }
-  throw new Error(`Could not locate table with headers: ${headers.join(", ")}`);
+interface ApiCacheWrite {
+  // Either a flat $/M price or time-bucketed e.g. { "30m": 0.25, "12h": 0.5 }.
+  [key: string]: number | undefined;
 }
 
-// "$2.00" -> 2.00, "-" -> null
-function parseMoney(s: string): number | null {
-  const v = parseFloat(s.replace(/[^0-9.]/g, ""));
-  return Number.isNaN(v) ? null : v;
+interface ApiModel {
+  name: string;
+  cost: {
+    text: {
+      input: { price: number; cache?: { read?: number; write?: number | ApiCacheWrite } };
+      output: { price: number };
+    };
+  };
+  go: {
+    monthly_usage: { go?: number | null } | null;
+    training: boolean;
+    zdr: boolean;
+  } | null;
 }
 
-// Strip a trailing variant suffix like " (≤ 272K tokens)".
-function baseName(s: string): string {
-  return s.replace(/\s*\(.*\)\s*$/, "").trim();
+async function fetchModels(): Promise<ApiModel[]> {
+  const res = await fetch(MODELS_URL, { headers: { "Accept": "application/json" } });
+  if (!res.ok) throw new Error(`HTTP ${res.status} from ${MODELS_URL}`);
+  const json = await res.json();
+  return json.data as ApiModel[];
 }
 
-interface PricingRow {
-  usage: number | null;
-  input: number | null;
-  output: number | null;
-  cachedRead: number | null;
-  cachedWrite: number | null;
-  name: string; // cleaned model name
-}
-
-// Parse the pricing table: normalized model name -> full pricing.
-function extractPricing(html: string): Map<string, PricingRow> {
-  const body = findTableByHeader(html, ["cached read", ["usage", "monthly limit"]]);
-  const out = new Map<string, PricingRow>();
-  for (const tr of body.matchAll(/<tr>([\s\S]*?)<\/tr>/g)) {
-    const cells = [...tr[1].matchAll(/<t[dh]>([\s\S]*?)<\/t[dh]>/g)].map((m) =>
-      stripTags(m[1]),
-    );
-    if (cells.length < 6) continue;
-    if (cells[0].toLowerCase() === "model") continue; // header row
-    const key = normalizeModel(baseName(cells[0]));
-    if (out.has(key)) continue; // keep first variant row
-    out.set(key, {
-      usage: parseMoney(cells[5]),
-      input: parseMoney(cells[1]),
-      output: parseMoney(cells[2]),
-      cachedRead: parseMoney(cells[3]),
-      cachedWrite: parseMoney(cells[4]),
-      name: baseName(cells[0]),
-    });
-  }
-  return out;
+// Collapse time-bucketed cache-write prices to the long-lived ("12h") one.
+function cacheWritePrice(cw: number | ApiCacheWrite | undefined): number | null {
+  if (cw == null) return null;
+  if (typeof cw === "number") return cw;
+  return cw["12h"] ?? Object.values(cw).find((v) => v != null) ?? null;
 }
 
 // The pricing table is followed by DeepSeek peak/off-peak + vision notes
@@ -214,9 +163,9 @@ function extractUsageNotes(html: string): string[] {
   return out;
 }
 
-function isZDR(retention: string): boolean {
-  const r = retention.replace(/\*/g, "").trim().toLowerCase();
-  return r === "0 days" || r === "0";
+function isZDR(m: ApiModel): boolean {
+  // ZDR = provider's zero-retention flag AND no training on your data.
+  return !!m.go && m.go.zdr && !m.go.training;
 }
 
 function priceColor(n: number): string {
@@ -246,11 +195,13 @@ function formatStatus(r: ModelRec, filters: Filter[]): string {
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 interface ModelRec {
-  display: string; // model name, with footnote `*` if present
-  base: string; // model name without the footnote marker
+  display: string;
   zdr: boolean;
-  usage: number | null; // monthly Usage tier ($) from pricing table
-  prices: PricingRow | undefined;
+  usage: number | null; // monthly usage tier ($) for the base Go plan
+  cachedRead: number | null;
+  cachedWrite: number | null;
+  input: number | null;
+  output: number | null;
 }
 
 interface Filter {
@@ -260,25 +211,22 @@ interface Filter {
 }
 
 async function main() {
-  const html = await fetchDocsHtml();
-  const { rows, notes } = extractPrivacy(html);
+  const [models, html] = await Promise.all([fetchModels(), fetchDocsHtml()]);
+  const notes = extractPrivacyNotes(html);
 
-  if (rows.length === 0) {
-    throw new Error("Parsed zero rows from the Privacy table");
+  if (models.length === 0) {
+    throw new Error("Models API returned zero models");
   }
 
-  // Master list = privacy table; join pricing via normalized name.
-  const pricing = extractPricing(html);
-  const recs: ModelRec[] = rows.map((row) => {
-    const display = row.retention.includes("*") ? `${row.model}*` : row.model;
-    return {
-      display,
-      base: row.model,
-      zdr: isZDR(row.retention) && row.training.trim().toLowerCase() === "not used",
-      usage: pricing.get(normalizeModel(row.model))?.usage ?? null,
-      prices: pricing.get(normalizeModel(row.model)),
-    };
-  });
+  const recs: ModelRec[] = models.map((m) => ({
+    display: m.name,
+    zdr: isZDR(m),
+    usage: m.go?.monthly_usage?.go ?? null,
+    cachedRead: m.cost.text.input.cache?.read ?? null,
+    cachedWrite: cacheWritePrice(m.cost.text.input.cache?.write),
+    input: m.cost.text.input.price ?? null,
+    output: m.cost.text.output.price ?? null,
+  }));
 
   // Add filters here as new dimensions arrive.
   const filters: Filter[] = [
@@ -288,8 +236,7 @@ async function main() {
 
   // Sort by output_price + 10*cache_read descending.
   function score(r: ModelRec): number {
-    const p = r.prices;
-    return (p?.output ?? 0) + 10 * (p?.cachedRead ?? 0);
+    return (r.output ?? 0) + 10 * (r.cachedRead ?? 0);
   }
   recs.sort((a, b) => score(b) - score(a));
 
@@ -297,13 +244,12 @@ async function main() {
   const aligns: ("left" | "right")[] = ["left", "right", "right", "right", "right", "left", "right", "left"];
 
   const tableRows = recs.map((r) => {
-    const p = r.prices;
     return [
       r.display,
-      formatPrice(p?.cachedRead),
-      formatPrice(p?.cachedWrite),
-      formatPrice(p?.input),
-      formatPrice(p?.output),
+      formatPrice(r.cachedRead),
+      formatPrice(r.cachedWrite),
+      formatPrice(r.input),
+      formatPrice(r.output),
       paint(r.zdr ? C.green : C.red, r.zdr ? "yes" : "no"),
       r.usage !== null ? paint(tierColor(r.usage), `$${r.usage}`) : "-",
       formatStatus(r, filters),
