@@ -509,7 +509,7 @@ bind -T menus "t" display-menu -T " Tools / platforms... " \
 "… mcp add chrome npx ............." "c-c" "send-keys ' mcp add chromecdp -- bun x chrome-devtools-mcp@latest --browserUrl=http://127.0.0.1:9222' enter" \
 "… params for chrome (D)evtools ....." "D" "send-keys ' --remote-debugging-port=9222 --user-data-dir=/tmp/cdp/ --disable-web-security --disable-site-isolation-trials --no-first-run --no-default-browser-check --disable-signin-promo --disable-sync --disable-infobars https://example.com/ ; rm -rf /tmp/cdp' enter" \
 "" \
-"Install (t)ailcat .................." "t" "send-keys ' mkdir -p ~/.local/bin ; curl -fL https://github.com/tailscale/tailcat/releases/latest/download/tailcat_0.7.0_linux_\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | tar zxv -C ~/.local/bin/ tailcat' enter" \
+"Install (t)ailcat .................." "t" "send-keys ' mkdir -p ~/.local/bin ; v=\$(curl -sfLo /dev/null -w \"%{url_effective}\" https://github.com/tailscale/tailcat/releases/latest | sed \"s|.*/tag/||\") && curl -fL https://github.com/tailscale/tailcat/releases/download/\$v/tailcat_\${v#v}_linux_\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | tar zxv -C ~/.local/bin/ tailcat' enter" \
 "Install (b)rew ....................." "b" setup_brew \
 "Install (a)ge ......................" "a" "send-keys ' mkdir -p ~/.local/bin ; v=\$(curl -sfLo /dev/null -w \"%{url_effective}\" https://github.com/FiloSottile/age/releases/latest | sed \"s|.*/tag/||\") && curl -fL https://github.com/FiloSottile/age/releases/download/\$v/age-\$v-linux-\$(uname -m | sed \"s/x86_64/amd64/; s/aarch64/arm64/\").tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1 --wildcards \"age/age*\"' enter" \
 "Install (d)ocker ..................." "d" setup_docker \
