@@ -465,7 +465,6 @@ bind -T menus "g" display-menu -T " GO... " \
 
 # Submenu: PHP
 bind -T menus "p" display-menu -T " PHP... " \
-"Download p(u)n toolchain ..........." "u" "send-keys ' mkdir -p ~/.local/bin ; curl -fL https://github.com/shipfastlabs/pun/releases/latest/download/punphp-\$(uname -m)-unknown-linux-musl.tar.gz | tar zxv -C ~/.local/bin/ --strip-components=1 --wildcards \"*/pun\" && ln -sf ~/.local/bin/pun ~/.local/bin/punx' enter" \
 "Download static-php-cli ............" "p" setup_static_php_cli \
 "Download frankenphp ................" "f" setup_frankenphp \
 "Download php composer .............." "c" setup_composer \
